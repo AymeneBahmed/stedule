@@ -33,15 +33,16 @@ export default function ScheduleTable() {
         {hours.map((hour) => (
           <TableRow
             key={hour}
-            className="h-[5rem] border-black dark:border-white"
+            className="h-[5rem] border-black hover:bg-transparent dark:border-white"
           >
             <TableCell className="bg-secondary text-center font-bold">
               {hour}:00 {hour < 12 ? "AM" : "PM"}
             </TableCell>
+
             {[...Array(7)].map((_, i) => (
               <TableCell
                 key={i}
-                className="border-l border-black dark:border-white"
+                className="cursor-pointer border-l border-black hover:bg-muted/70 active:bg-muted/90 dark:border-white"
               />
             ))}
           </TableRow>
