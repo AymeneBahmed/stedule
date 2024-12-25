@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { Fragment } from "react";
 
 export default function ScheduleTable() {
   const hours = Array.from({ length: 9 }, (_, i) => i + 8);
@@ -30,22 +31,35 @@ export default function ScheduleTable() {
       </TableHeader>
 
       <TableBody>
-        {hours.map((hour) => (
-          <TableRow
-            key={hour}
-            className="h-[5rem] border-black hover:bg-transparent dark:border-white"
-          >
-            <TableCell className="bg-secondary text-center font-bold">
-              {hour}:00 {hour < 12 ? "AM" : "PM"}
-            </TableCell>
+        {hours.map((hour, i) => (
+          <Fragment key={hour}>
+            {/* A seperator row between the hours <= 12 and > 12 */}
+            {hour >= 13 && hours[i - 1] < 13 && (
+              <TableRow className="h-[1rem] border-black dark:border-white">
+                <TableCell className="bg-secondary text-center font-bold"></TableCell>
 
-            {[...Array(7)].map((_, i) => (
-              <TableCell
-                key={i}
-                className="cursor-pointer border-l border-black hover:bg-muted/70 active:bg-muted/90 dark:border-white"
-              />
-            ))}
-          </TableRow>
+                {[...Array(7)].map((_, i) => (
+                  <TableCell
+                    key={i}
+                    className="border-l border-black bg-secondary dark:border-white"
+                  />
+                ))}
+              </TableRow>
+            )}
+
+            <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
+              <TableCell className="bg-secondary text-center font-bold">
+                {hour}:00 {hour < 12 ? "AM" : "PM"}
+              </TableCell>
+
+              {[...Array(7)].map((_, i) => (
+                <TableCell
+                  key={i}
+                  className="cursor-pointer border-l border-black hover:bg-muted/70 active:bg-muted/90 dark:border-white"
+                />
+              ))}
+            </TableRow>
+          </Fragment>
         ))}
       </TableBody>
     </Table>
