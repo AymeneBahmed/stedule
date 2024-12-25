@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import ThemeTogglerButton from "@/components/ThemeTogglerButton";
 
 const inter = Inter({
   display: "swap",
@@ -27,6 +28,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <ThemeTogglerButton className="absolute right-10 top-10" />
           {children}
         </ThemeProvider>
       </body>
