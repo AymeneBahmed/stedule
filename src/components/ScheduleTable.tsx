@@ -8,6 +8,15 @@ import {
   TableRow,
 } from "./ui/table";
 import { Fragment } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import NewTaskForm from "./NewTaskForm";
 
 export default function ScheduleTable() {
   const hours = Array.from({ length: 9 }, (_, i) => i + 8);
@@ -53,10 +62,20 @@ export default function ScheduleTable() {
               </TableCell>
 
               {[...Array(7)].map((_, i) => (
-                <TableCell
-                  key={i}
-                  className="cursor-pointer border-l border-black hover:bg-muted/70 active:bg-muted/90 dark:border-white"
-                />
+                <Dialog key={i}>
+                  <DialogTrigger asChild>
+                    <TableCell className="cursor-pointer border-l border-black hover:bg-muted/70 active:bg-muted/90 dark:border-white" />
+                  </DialogTrigger>
+
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>What do you want to do?</DialogTitle>
+                      <DialogDescription className="sr-only">Create a task and add an optional description such as notes.</DialogDescription>
+                    </DialogHeader>
+
+                    <NewTaskForm />
+                  </DialogContent>
+                </Dialog>
               ))}
             </TableRow>
           </Fragment>
