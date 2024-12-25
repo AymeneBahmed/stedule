@@ -16,12 +16,12 @@ export default function ScheduleTable() {
       <TableHeader>
         <TableRow className="border-black dark:border-white">
           {/* Additional empty cell */}
-          <TableHead></TableHead>
+          <TableHead className="bg-secondary"></TableHead>
 
           {days.map((day) => (
             <TableHead
               key={day}
-              className="border-l border-black text-center text-black dark:border-white dark:text-white"
+              className="border-l border-black bg-secondary text-center text-black dark:border-white dark:text-white"
             >
               {day.toUpperCase()}
             </TableHead>
@@ -35,7 +35,7 @@ export default function ScheduleTable() {
             key={hour}
             className="h-[5rem] border-black dark:border-white"
           >
-            <TableCell className="text-center font-bold">
+            <TableCell className="bg-secondary text-center font-bold">
               {hour}:00 {hour < 12 ? "AM" : "PM"}
             </TableCell>
             {[...Array(7)].map((_, i) => (
