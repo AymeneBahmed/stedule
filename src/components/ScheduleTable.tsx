@@ -10,7 +10,7 @@ export default function ScheduleTable() {
           <TableHead></TableHead>
 
           {days.map((day) => (
-            <TableHead key={day} className="text-black">
+            <TableHead key={day} className="text-center text-black">
               {day.toUpperCase()}
             </TableHead>
           ))}
