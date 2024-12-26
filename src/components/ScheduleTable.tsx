@@ -17,9 +17,22 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import NewTaskForm from "./NewTaskForm";
+import { Time } from "@/lib/classes/Time";
+import { Task } from "@/lib/classes/Task";
 
 export default function ScheduleTable() {
   const hours = Array.from({ length: 9 }, (_, i) => i + 8);
+  // prettier-ignore
+  const tasks: Task[] = [
+    new Task("Read a book", "sunday", new Time(3, 10), "low", "Study as hard as you can"),
+    new Task("Read a book", "sunday", new Time(12, 40), "low", "Study as hard as you can"),
+    new Task("Read a book", "sunday", new Time(16, 45), "medium", "Study as hard as you can"),
+    new Task("Read a book", "sunday", new Time(3, 8), "high", "Study as hard as you can"),
+    new Task("Read a book", "sunday", new Time(7, 20), "low", "Study as hard as you can"),
+    new Task("Read a book", "sunday", new Time(11, 30), "medium", "Study as hard as you can"),
+    new Task("Read a book", "sunday", new Time(15, 40), "low", "Study as hard as you can"),
+    new Task("Read a book", "sunday", new Time(9, 45), "low", "Study as hard as you can"),
+  ];
 
   return (
     <Table className="border border-black dark:border-white">
@@ -70,7 +83,10 @@ export default function ScheduleTable() {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>What do you want to do?</DialogTitle>
-                      <DialogDescription className="sr-only">Create a task and add an optional description such as notes.</DialogDescription>
+                      <DialogDescription className="sr-only">
+                        Create a task and add an optional description such as
+                        notes.
+                      </DialogDescription>
                     </DialogHeader>
 
                     <NewTaskForm />
