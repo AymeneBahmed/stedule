@@ -20,6 +20,7 @@ export default function NewTaskForm() {
     resolver: zodResolver(newTaskSchema),
     defaultValues: {
       task: "",
+      priority: "unspecified",
       description: "",
     },
   });
@@ -41,6 +42,36 @@ export default function NewTaskForm() {
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="priority"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Priority <em className="text-muted-foreground">(Optional)</em>
+                </FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="border-gray-400 bg-secondary">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+
+                  <SelectContent>
+                    {["unspecified", "low", "medium", "high"].map((pri) => (
+                      <SelectItem key={pri} value={pri}>
+                        {pri}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
