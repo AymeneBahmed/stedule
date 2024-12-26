@@ -14,6 +14,16 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { startTransition, useActionState } from "react";
+import { addNewTask } from "@/actions/new-task-form";
+import FormError from "./FormError";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 export default function NewTaskForm() {
   const form = useForm<z.infer<typeof newTaskSchema>>({
@@ -24,10 +34,17 @@ export default function NewTaskForm() {
       description: "",
     },
   });
+  const [state, addNewTaskAction, isPending] = useActionState(addNewTask, null);
+
+  function onSubmit(values: z.infer<typeof newTaskSchema>) {
+    startTransition(() => {
+      addNewTaskAction(values);
+    });
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(() => {})} className="mt-5">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5">
         <div className="space-y-4">
           <FormField
             control={form.control}
@@ -98,7 +115,13 @@ export default function NewTaskForm() {
           />
         </div>
 
-        <Button className="mt-10 w-full">Submit</Button>
+        {typeof state?.error === "string" && (
+          <FormError message={state.error} />
+        )}
+
+        <Button disabled={isPending} className="mt-10 w-full">
+          Submit
+        </Button>
       </form>
     </Form>
   );
