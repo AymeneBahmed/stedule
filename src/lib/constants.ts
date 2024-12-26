@@ -7,3 +7,5 @@ export const days = [
   "friday",
   "saturday",
 ] as const;
+
+export const priorities = ["unspecified", "low", "medium", "high"] as const;

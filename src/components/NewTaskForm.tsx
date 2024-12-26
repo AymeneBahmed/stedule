@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { priorities } from "@/lib/constants";
 
 export default function NewTaskForm() {
   const form = useForm<z.infer<typeof newTaskSchema>>({
@@ -82,7 +83,7 @@ export default function NewTaskForm() {
                   </FormControl>
 
                   <SelectContent>
-                    {["unspecified", "low", "medium", "high"].map((pri) => (
+                    {priorities.map((pri) => (
                       <SelectItem key={pri} value={pri}>
                         {pri}
                       </SelectItem>
