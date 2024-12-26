@@ -33,6 +33,11 @@ export default function ScheduleTable() {
     new Task("Read a book", "sunday", new Time(15, 40), "low", "Study as hard as you can"),
     new Task("Read a book", "sunday", new Time(9, 45), "low", "Study as hard as you can"),
   ];
+  const times: Time[] = tasks
+    .map((task) => task.time)
+    .toSorted((a, b) =>
+      a.hour === b.hour ? a.minute - b.minute : a.hour - b.hour,
+    );
 
   return (
     <Table className="border border-black dark:border-white">
