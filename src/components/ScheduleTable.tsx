@@ -31,6 +31,8 @@ export default function ScheduleTable() {
     new Task("Read a book", "sunday", new Time(11, 30), "medium", "Study as hard as you can"),
     new Task("Read a book", "sunday", new Time(15, 40), "low", "Study as hard as you can"),
     new Task("Read a book", "sunday", new Time(9, 45), "low", "Study as hard as you can"),
+    new Task("Read a book", "monday", new Time(12, 40), "low", "Study as hard as you can"),
+    new Task("Read a book", "thursday", new Time(12, 40), "low", "Study as hard as you can"),
   ];
   const times: Time[] = tasks
     .map((task) => task.time)
