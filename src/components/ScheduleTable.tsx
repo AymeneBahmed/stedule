@@ -19,6 +19,7 @@ import {
 import NewTaskForm from "./NewTaskForm";
 import { Time } from "@/lib/classes/Time";
 import { Task } from "@/lib/classes/Task";
+import { Hour, Minute } from "@/lib/ts/types";
 
 export default function ScheduleTable() {
   // prettier-ignore
@@ -39,6 +40,11 @@ export default function ScheduleTable() {
     .toSorted((a, b) =>
       a.hour === b.hour ? a.minute - b.minute : a.hour - b.hour,
     );
+  const timesWithoutDuplicates = Array.from(
+    new Set(times.map((time) => JSON.stringify(time))),
+  )
+    .map<{ hour: Hour; minute: Minute }>((val) => JSON.parse(val))
+    .map((val) => new Time(val.hour, val.minute));
 
   return (
     <Table className="border border-black dark:border-white">
@@ -59,10 +65,10 @@ export default function ScheduleTable() {
       </TableHeader>
 
       <TableBody>
-        {times.map((time, i) => (
+        {timesWithoutDuplicates.map((time, i) => (
           <Fragment key={time.hour + time.minute + tasks[i].day + i}>
             {/* A seperator row between the hours <= 12 and > 12 */}
-            {time.hour >= 13 && times[i - 1].hour < 13 && (
+            {time.hour >= 13 && timesWithoutDuplicates[i - 1].hour < 13 && (
               <TableRow className="h-[1rem] border-black dark:border-white">
                 <TableCell className="bg-secondary text-center font-bold"></TableCell>
 
