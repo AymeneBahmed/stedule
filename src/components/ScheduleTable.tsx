@@ -20,25 +20,12 @@ import {
 } from "./ui/dialog";
 import NewTaskForm from "./NewTaskForm";
 import { Time } from "@/lib/classes/Time";
-import { Task } from "@/lib/classes/Task";
 import { Hour, Minute } from "@/lib/ts/types";
-import { Day } from "@/lib/ts/enums";
 import { useDayAndTimeStore } from "@/lib/stores/dayAndTimeStore";
+import { useTasksStore } from "@/lib/stores/tasks";
 
 export default function ScheduleTable() {
-  // prettier-ignore
-  const tasks: Task[] = [
-    new Task("Read a book", Day.Sunday, new Time(3, 10), "low", "Study as hard as you can"),
-    new Task("Read a book", Day.Tuesday, new Time(12, 40), "low", "Study as hard as you can"),
-    new Task("Read a book", Day.Saturday, new Time(16, 45), "medium", "Study as hard as you can"),
-    new Task("Read a book", Day.Monday, new Time(3, 8), "high", "Study as hard as you can"),
-    new Task("Read a book", Day.Friday, new Time(7, 20), "low", "Study as hard as you can"),
-    new Task("Read a book", Day.Wednesday, new Time(11, 30), "medium", "Study as hard as you can"),
-    new Task("Read a book", Day.Sunday, new Time(15, 40), "low", "Study as hard as you can"),
-    new Task("Read a book", Day.Wednesday, new Time(9, 45), "low", "Study as hard as you can"),
-    new Task("Read a book", Day.Thursday, new Time(12, 40), "low", "Study as hard as you can"),
-    new Task("Read a book", Day.Monday, new Time(12, 40), "low", "Study as hard as you can"),
-  ];
+  const { tasks } = useTasksStore();
   const times: Time[] = tasks
     .map((task) => task.time)
     .toSorted((a, b) =>
