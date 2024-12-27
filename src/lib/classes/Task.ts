@@ -1,9 +1,10 @@
-import { days, priorities } from "@/lib/constants";
+import { priorities } from "@/lib/constants";
 import { Time } from "./Time";
+import { Day } from "../ts/enums";
 
 export class Task {
   name: string;
-  day: (typeof days)[number];
+  day: Day;
   time: Time;
   priority: (typeof priorities)[number];
   description?: string;
