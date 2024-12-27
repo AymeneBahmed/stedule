@@ -20,5 +20,5 @@ export const newTaskSchema = z.object({
     { message: "Invalid time!" },
   ),
   priority: z.enum(priorities, { message: "Invalid priority!" }),
-  description: z.string(),
+  description: z.string().optional(),
 });
