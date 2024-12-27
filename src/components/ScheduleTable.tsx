@@ -1,3 +1,5 @@
+"use client";
+
 import { days } from "@/lib/constants";
 import {
   Table,
@@ -91,7 +93,16 @@ export default function ScheduleTable() {
               </TableCell>
 
               {[...Array(7)].map((_, j) => (
-                <Dialog key={j}>
+                <Dialog
+                  key={j}
+                  onOpenChange={() => {
+                    history.pushState(
+                      null,
+                      "",
+                      `?day=${days[j]}&time=${time.hour.toString().padStart(2, "0")}:${time.minute.toString().padStart(2, "0")}`,
+                    );
+                  }}
+                >
                   <DialogTrigger asChild>
                     <TableCell className="cursor-pointer border-l border-black text-center hover:bg-muted/70 active:bg-muted/90 dark:border-white">
                       {
