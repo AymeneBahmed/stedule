@@ -28,12 +28,16 @@ import { days, priorities } from "@/lib/constants";
 import { useDayAndTimeStore } from "@/lib/stores";
 
 export default function NewTaskForm() {
-  const { day } = useDayAndTimeStore();
+  const { day, time } = useDayAndTimeStore();
   const form = useForm<z.infer<typeof newTaskSchema>>({
     resolver: zodResolver(newTaskSchema),
     defaultValues: {
       task: "",
       day: day ?? undefined,
+      time:
+        time == null
+          ? undefined
+          : `${time?.hour.toString().padStart(2, "0")}:${time?.minute.toString().padStart(2, "0")}`,
       priority: "unspecified",
       description: "",
     },
@@ -91,6 +95,23 @@ export default function NewTaskForm() {
                     ))}
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Time</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="hh:mm"
+                    className="border-gray-400 bg-secondary"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
