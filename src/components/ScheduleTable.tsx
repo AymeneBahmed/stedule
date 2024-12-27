@@ -46,6 +46,7 @@ export default function ScheduleTable() {
   )
     .map<{ hour: Hour; minute: Minute }>((val) => JSON.parse(val))
     .map((val) => new Time(val.hour, val.minute));
+  const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
 
   return (
     <Table className="border border-black dark:border-white">
@@ -89,10 +90,18 @@ export default function ScheduleTable() {
                 {time.minute}
               </TableCell>
 
-              {[...Array(7)].map((_, i) => (
-                <Dialog key={i}>
+              {[...Array(7)].map((_, j) => (
+                <Dialog key={j}>
                   <DialogTrigger asChild>
-                    <TableCell className="cursor-pointer border-l border-black hover:bg-muted/70 active:bg-muted/90 dark:border-white" />
+                    <TableCell className="cursor-pointer border-l border-black text-center hover:bg-muted/70 active:bg-muted/90 dark:border-white">
+                      {
+                        tasksGroupedByDay[days[j]]?.find(
+                          (task) =>
+                            task.time.hour === time.hour &&
+                            task.time.minute === time.minute,
+                        )?.name
+                      }
+                    </TableCell>
                   </DialogTrigger>
 
                   <DialogContent>
