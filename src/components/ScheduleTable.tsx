@@ -23,6 +23,7 @@ import { Time } from "@/lib/classes/Time";
 import { Task } from "@/lib/classes/Task";
 import { Hour, Minute } from "@/lib/ts/types";
 import { Day } from "@/lib/ts/enums";
+import { useDayAndTimeStore } from "@/lib/stores";
 
 export default function ScheduleTable() {
   // prettier-ignore
@@ -49,6 +50,7 @@ export default function ScheduleTable() {
     .map<{ hour: Hour; minute: Minute }>((val) => JSON.parse(val))
     .map((val) => new Time(val.hour, val.minute));
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
+  const { setDay, setTime } = useDayAndTimeStore();
 
   return (
     <Table className="border border-black dark:border-white">
@@ -96,11 +98,8 @@ export default function ScheduleTable() {
                 <Dialog
                   key={j}
                   onOpenChange={() => {
-                    history.pushState(
-                      null,
-                      "",
-                      `?day=${days[j]}&time=${time.hour.toString().padStart(2, "0")}:${time.minute.toString().padStart(2, "0")}`,
-                    );
+                    setDay(days[j]);
+                    setTime(time);
                   }}
                 >
                   <DialogTrigger asChild>
