@@ -26,7 +26,7 @@ export default function ScheduleTable() {
   // prettier-ignore
   const tasks: Task[] = [
     new Task("Read a book", Day.Sunday, new Time(3, 10), "low", "Study as hard as you can"),
-    new Task("Read a book", Day.Thursday, new Time(12, 40), "low", "Study as hard as you can"),
+    new Task("Read a book", Day.Tuesday, new Time(12, 40), "low", "Study as hard as you can"),
     new Task("Read a book", Day.Saturday, new Time(16, 45), "medium", "Study as hard as you can"),
     new Task("Read a book", Day.Monday, new Time(3, 8), "high", "Study as hard as you can"),
     new Task("Read a book", Day.Friday, new Time(7, 20), "low", "Study as hard as you can"),
