@@ -3,7 +3,7 @@ import { days, priorities } from "./constants";
 
 export const newTaskSchema = z.object({
   task: z.string().min(1, { message: "This field is required!" }),
-  day: z.enum(days),
+  day: z.enum(days, { message: "Invalid day!" }),
   time: z.string().refine(
     (time) => {
       const [hour, min] = time.split(":").map(Number);
@@ -19,6 +19,6 @@ export const newTaskSchema = z.object({
     },
     { message: "Invalid time!" },
   ),
-  priority: z.enum(priorities),
+  priority: z.enum(priorities, { message: "Invalid priority!" }),
   description: z.string(),
 });
