@@ -21,7 +21,6 @@ import { Time } from "@/lib/classes/Time";
 import { Task } from "@/lib/classes/Task";
 
 export default function ScheduleTable() {
-  const hours = Array.from({ length: 9 }, (_, i) => i + 8);
   // prettier-ignore
   const tasks: Task[] = [
     new Task("Read a book", "sunday", new Time(3, 10), "low", "Study as hard as you can"),
