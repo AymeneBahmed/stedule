@@ -59,10 +59,10 @@ export default function ScheduleTable() {
       </TableHeader>
 
       <TableBody>
-        {hours.map((hour, i) => (
-          <Fragment key={hour}>
+        {times.map((time, i) => (
+          <Fragment key={time.hour + time.minute + tasks[i].day + i}>
             {/* A seperator row between the hours <= 12 and > 12 */}
-            {hour >= 13 && hours[i - 1] < 13 && (
+            {time.hour >= 13 && times[i - 1].hour < 13 && (
               <TableRow className="h-[1rem] border-black dark:border-white">
                 <TableCell className="bg-secondary text-center font-bold"></TableCell>
 
@@ -77,7 +77,9 @@ export default function ScheduleTable() {
 
             <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
               <TableCell className="bg-secondary text-center font-bold">
-                {hour}:00 {hour < 12 ? "AM" : "PM"}
+                {time.hour < 10 && "0"}
+                {time.hour}:{time.minute < 10 && "0"}
+                {time.minute}
               </TableCell>
 
               {[...Array(7)].map((_, i) => (
