@@ -25,14 +25,15 @@ import {
   SelectValue,
 } from "./ui/select";
 import { days, priorities } from "@/lib/constants";
+import { useDayAndTimeStore } from "@/lib/stores";
 
 export default function NewTaskForm() {
+  const { day } = useDayAndTimeStore();
   const form = useForm<z.infer<typeof newTaskSchema>>({
     resolver: zodResolver(newTaskSchema),
     defaultValues: {
       task: "",
-      // TODO: Change default value later
-      day: "friday",
+      day: day ?? undefined,
       priority: "unspecified",
       description: "",
     },
@@ -78,7 +79,7 @@ export default function NewTaskForm() {
                 >
                   <FormControl>
                     <SelectTrigger className="border-gray-400 bg-secondary">
-                      <SelectValue />
+                      <SelectValue placeholder="Select a day" />
                     </SelectTrigger>
                   </FormControl>
 
