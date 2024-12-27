@@ -23,7 +23,7 @@ import { Time } from "@/lib/classes/Time";
 import { Task } from "@/lib/classes/Task";
 import { Hour, Minute } from "@/lib/ts/types";
 import { Day } from "@/lib/ts/enums";
-import { useDayAndTimeStore } from "@/lib/stores";
+import { useDayAndTimeStore } from "@/lib/stores/dayAndTimeStore";
 
 export default function ScheduleTable() {
   // prettier-ignore

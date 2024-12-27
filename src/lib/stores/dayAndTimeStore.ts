@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { days } from "./constants";
-import { Time } from "./classes/Time";
+import { days } from "../constants";
+import { Time } from "../classes/Time";
 
 interface DayAndTimeStore {
   day: (typeof days)[number] | null;
