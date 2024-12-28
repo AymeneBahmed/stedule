@@ -29,11 +29,14 @@ interface ScheduleTableProps {
 }
 
 export default function ScheduleTable({ tasks }: ScheduleTableProps) {
-  const times: Time[] = tasks
-    .map((task) => task.time)
-    .toSorted((a, b) =>
-      a.hour === b.hour ? a.minute - b.minute : a.hour - b.hour,
-    );
+  const times: Time[] =
+    tasks.length !== 0
+      ? tasks
+          .map((task) => task.time)
+          .toSorted((a, b) =>
+            a.hour === b.hour ? a.minute - b.minute : a.hour - b.hour,
+          )
+      : Array.from({ length: 8 }, (_, i) => new Time((i + 8) as Hour, 0));
   const timesWithoutDuplicates = Array.from(
     new Set(times.map((time) => JSON.stringify(time))),
   )
@@ -62,9 +65,9 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
 
       <TableBody>
         {timesWithoutDuplicates.map((time, i) => (
-          <Fragment key={time.hour + time.minute + tasks[i].day + i}>
+          <Fragment key={time.hour + time.minute + i}>
             {/* A seperator row between the hours <= 12 and > 12 */}
-            {time.hour >= 13 && timesWithoutDuplicates[i - 1].hour < 13 && (
+            {time.hour >= 13 && timesWithoutDuplicates[i - 1]!.hour < 13 && (
               <TableRow className="h-[1rem] border-black dark:border-white">
                 <TableCell className="bg-secondary text-center font-bold"></TableCell>
 
@@ -88,14 +91,14 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
                 <Dialog
                   key={j}
                   onOpenChange={() => {
-                    setDay(days[j]);
+                    setDay(days[j]!);
                     setTime(time);
                   }}
                 >
                   <DialogTrigger asChild>
                     <TableCell className="cursor-pointer border-l border-black text-center hover:bg-muted/70 active:bg-muted/90 dark:border-white">
                       {
-                        tasksGroupedByDay[days[j]]?.find(
+                        tasksGroupedByDay[days[j]!]?.find(
                           (task) =>
                             task.time.hour === time.hour &&
                             task.time.minute === time.minute,
