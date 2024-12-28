@@ -8,10 +8,17 @@ datasource db {
 }
 
 model Task {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   day         String
   time        String
-  priority    String?
+  priority    Priority
   description String?
+}
+
+enum Priority {
+  Unspecified
+  Low
+  Medium
+  High
 }
