@@ -9,16 +9,18 @@ export const newTaskSchema = z.object({
       const [hour, min] = time.split(":").map(Number);
 
       return (
-        !isNaN(hour) &&
-        !isNaN(min) &&
-        hour >= 0 &&
-        hour <= 23 &&
-        min >= 0 &&
-        min <= 59
+        !isNaN(hour!) &&
+        !isNaN(min!) &&
+        hour! >= 0 &&
+        hour! <= 23 &&
+        min! >= 0 &&
+        min! <= 59
       );
     },
     { message: "Invalid time!" },
   ),
-  priority: z.enum(priorities, { message: "Invalid priority!" }),
+  priority: z.enum(priorities as unknown as [(typeof priorities)[number]], {
+    message: "Invalid priority!",
+  }),
   description: z.string().optional(),
 });
