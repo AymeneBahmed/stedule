@@ -1,12 +1,12 @@
-import { priorities } from "@/lib/constants";
 import { Time } from "./Time";
 import { Day } from "../ts/enums";
+import { Priority } from "@prisma/client";
 
 export class Task {
   name: string;
   day: Day;
   time: Time;
-  priority: (typeof priorities)[number];
+  priority: Priority;
   description?: string;
 
   constructor(
