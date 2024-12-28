@@ -22,10 +22,13 @@ import NewTaskForm from "./NewTaskForm";
 import { Time } from "@/lib/classes/Time";
 import { Hour, Minute } from "@/lib/ts/types";
 import { useDayAndTimeStore } from "@/lib/stores/dayAndTimeStore";
-import { useTasksStore } from "@/lib/stores/tasks";
+import { Task } from "@/lib/classes/Task";
 
-export default function ScheduleTable() {
-  const { tasks } = useTasksStore();
+interface ScheduleTableProps {
+  tasks: Task[];
+}
+
+export default function ScheduleTable({ tasks }: ScheduleTableProps) {
   const times: Time[] = tasks
     .map((task) => task.time)
     .toSorted((a, b) =>
