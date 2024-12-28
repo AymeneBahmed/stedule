@@ -8,6 +8,7 @@ export default async function Home() {
   const tasks = ((await getTasks()) ?? []).map(
     (task) =>
       new Task(
+        task.id,
         task.name,
         task.date.getDay(),
         new Time(

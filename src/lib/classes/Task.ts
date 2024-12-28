@@ -3,6 +3,7 @@ import { Day } from "../ts/enums";
 import { Priority } from "@prisma/client";
 
 export class Task {
+  id: number;
   name: string;
   day: Day;
   time: Time;
@@ -10,12 +11,14 @@ export class Task {
   description?: string;
 
   constructor(
+    id: number,
     name: string,
     day: Day,
     time: Time,
     priority: Priority,
     description?: string,
   ) {
+    this.id = id;
     this.name = name;
     this.day = day;
     this.time = time;
