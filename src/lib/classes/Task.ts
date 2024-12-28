@@ -11,9 +11,9 @@ export class Task {
 
   constructor(
     name: string,
-    day: typeof this.day,
+    day: Day,
     time: Time,
-    priority: typeof this.priority,
+    priority: Priority,
     description?: string,
   ) {
     this.name = name;
