@@ -1,3 +1,5 @@
+import { Priority } from "@prisma/client";
+
 export const days = [
   "sunday",
   "monday",
@@ -8,4 +10,4 @@ export const days = [
   "saturday",
 ] as const;
 
-export const priorities = ["unspecified", "low", "medium", "high"] as const;
+export const priorities: Priority[] = ["Unspecified", "Low", "Medium", "High"];
