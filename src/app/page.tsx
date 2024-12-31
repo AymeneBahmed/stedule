@@ -1,22 +1,21 @@
 import ScheduleTable from "@/components/ScheduleTable";
 import { Task } from "@/lib/classes/Task";
-import { Time } from "@/lib/classes/Time";
 import { getTasks } from "@/lib/db/task";
 import { Hour, Minute } from "@/lib/ts/types";
 
 export default async function Home() {
-  const tasks = ((await getTasks()) ?? []).map(
-    (task) =>
-      new Task(
-        task.id,
-        task.name,
-        task.date.getDay(),
-        new Time(
-          task.date.getHours() as Hour,
-          task.date.getMinutes() as Minute,
-        ),
-        task.priority,
-      ),
+  const tasks = ((await getTasks()) ?? []).map<Task>(
+    ({ id, name, date, priority, description }) => ({
+      id,
+      name,
+      priority,
+      day: date.getDay(),
+      time: {
+        hour: date.getHours() as Hour,
+        minute: date.getMinutes() as Minute,
+      },
+      description: description ?? undefined,
+    }),
   );
 
   return (
