@@ -4,7 +4,7 @@ import { Hour } from "../ts/types";
 
 interface ScheduleTimesStore {
   times: Time[];
-  addTime: (newTime: Time) => void;
+  addTimes: (...newTimes: Time[]) => void;
   removeTime: (time: Time) => void;
   initializeWithDefaultTimes: () => void;
 }
@@ -21,13 +21,21 @@ export const useScheduleTimesStore = create<ScheduleTimesStore>((set, get) => {
 
   return {
     times: [],
-    addTime(newTime) {
-      const timeExists = get().times.find((time) => Time.equals(time, newTime));
+    addTimes(...newTimes) {
+      const timesToAdd: Time[] = [];
 
-      if (timeExists == null) {
-        set({ times: get().times.concat(newTime) });
-        sortTimes();
+      for (const newTime of newTimes) {
+        const timeExists = get().times.find((time) =>
+          Time.equals(time, newTime),
+        );
+
+        if (timeExists) {
+          timesToAdd.push(timeExists);
+        }
       }
+
+      set({ times: get().times.concat(timesToAdd) });
+      sortTimes();
     },
     removeTime(time) {
       set({ times: get().times.filter((t) => !Time.equals(t, time)) });
