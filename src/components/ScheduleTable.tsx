@@ -21,7 +21,7 @@ import {
 import NewTaskForm from "./NewTaskForm";
 import { Time } from "@/lib/classes/Time";
 import { Hour, Minute } from "@/lib/ts/types";
-import { useDayAndTimeStore } from "@/lib/stores/dayAndTimeStore";
+import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTimeStore";
 import { Task } from "@/lib/classes/Task";
 
 interface ScheduleTableProps {
@@ -43,7 +43,7 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
     .map<{ hour: Hour; minute: Minute }>((val) => JSON.parse(val))
     .map((val) => new Time(val.hour, val.minute));
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
-  const { setDay, setTime } = useDayAndTimeStore();
+  const { setDay, setTime } = useDefaultDayAndTimeStore();
 
   return (
     <Table className="border border-black dark:border-white">
