@@ -9,6 +9,10 @@ export class Time {
     this.minute = minute;
   }
 
+  static equals(a: Time, b: Time): boolean {
+    return a.hour === b.hour && a.minute === b.minute;
+  }
+
   static fromString(time: string): Time | null {
     const [hour, min] = time.split(":").map(Number);
 
