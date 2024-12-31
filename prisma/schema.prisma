@@ -11,6 +11,7 @@ model Task {
   id          Int      @id @default(autoincrement())
   name        String
   day         Int
+  time        Json
   priority    Priority
   description String?
 }
