@@ -10,7 +10,7 @@ datasource db {
 model Task {
   id          Int      @id @default(autoincrement())
   name        String
-  date        DateTime
+  day         Int
   priority    Priority
   description String?
 }
