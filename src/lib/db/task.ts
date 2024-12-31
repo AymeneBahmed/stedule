@@ -4,7 +4,7 @@ import { PrismaTaskModified } from "../ts/interfaces";
 
 export async function getTasks() {
   try {
-    return await prisma.task.findMany();
+    return (await prisma.task.findMany()) as PrismaTaskModified[];
   } catch {
     return null;
   }
