@@ -16,7 +16,7 @@ export async function createTask(task: Omit<Task, "id">) {
       data: {
         name: task.name,
         day: task.day,
-        time: task.time,
+        time: Object(task.time),
         priority: task.priority,
       },
     })) as PrismaTaskModified;
