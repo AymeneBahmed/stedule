@@ -25,4 +25,11 @@ export class Time {
 
     return null;
   }
+
+  toJSON(): { hour: Hour; minute: Minute } {
+    return {
+      hour: this.hour,
+      minute: this.minute,
+    };
+  }
 }
