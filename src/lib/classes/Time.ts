@@ -10,15 +10,15 @@ export class Time {
   }
 
   static fromString(time: string): Time | null {
-    const [hour, min] = time.split("").map(Number);
+    const [hour, min] = time.split(":").map(Number);
 
     if (
-      !isNaN(hour) &&
-      !isNaN(min) &&
-      hour >= 0 &&
-      hour <= 23 &&
-      min >= 0 &&
-      min <= 59
+      !isNaN(hour!) &&
+      !isNaN(min!) &&
+      hour! >= 0 &&
+      hour! <= 23 &&
+      min! >= 0 &&
+      min! <= 59
     ) {
       return new Time(hour as Hour, min as Minute);
     }
