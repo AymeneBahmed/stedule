@@ -21,7 +21,7 @@ import {
 import NewTaskForm from "./NewTaskForm";
 import { Time } from "@/lib/classes/Time";
 import { Hour, Minute } from "@/lib/ts/types";
-import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTimeStore";
+import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTime";
 import { Task } from "@/lib/classes/Task";
 
 interface ScheduleTableProps {

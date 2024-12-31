@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { days, priorities } from "@/lib/constants";
-import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTimeStore";
+import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTime";
 
 export default function NewTaskForm() {
   const { day, time } = useDefaultDayAndTimeStore();
