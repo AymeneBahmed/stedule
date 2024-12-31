@@ -26,6 +26,7 @@ export const useScheduleTimesStore = create<ScheduleTimesStore>((set, get) => {
 
       if (timeExists == null) {
         set({ times: get().times.concat(newTime) });
+        sortTimes();
       }
     },
     removeTime(time) {
