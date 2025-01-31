@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,31 +19,27 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import NewTaskForm from "./NewTaskForm";
-import { Time } from "@/lib/classes/Time";
-import { Hour, Minute } from "@/lib/ts/types";
 import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTime";
 import { Task } from "@/lib/classes/Task";
+import { useScheduleTimesStore } from "@/lib/stores/scheduleTimes";
 
 interface ScheduleTableProps {
   tasks: Task[];
 }
 
 export default function ScheduleTable({ tasks }: ScheduleTableProps) {
-  const times: Time[] =
-    tasks.length !== 0
-      ? tasks
-          .map((task) => task.time)
-          .toSorted((a, b) =>
-            a.hour === b.hour ? a.minute - b.minute : a.hour - b.hour,
-          )
-      : Array.from({ length: 8 }, (_, i) => new Time((i + 8) as Hour, 0));
-  const timesWithoutDuplicates = Array.from(
-    new Set(times.map((time) => JSON.stringify(time))),
-  )
-    .map<{ hour: Hour; minute: Minute }>((val) => JSON.parse(val))
-    .map((val) => new Time(val.hour, val.minute));
+  const { times, initializeWithDefaultTimes, addTimes } =
+    useScheduleTimesStore();
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
   const { setDay, setTime } = useDefaultDayAndTimeStore();
+
+  useEffect(() => {
+    if (tasks.length === 0) {
+      initializeWithDefaultTimes();
+    } else {
+      addTimes(tasks.map((task) => task.time));
+    }
+  }, [addTimes, initializeWithDefaultTimes, tasks]);
 
   return (
     <Table className="border border-black dark:border-white">
@@ -64,10 +60,10 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
       </TableHeader>
 
       <TableBody>
-        {timesWithoutDuplicates.map((time, i) => (
+        {times.map((time, i) => (
           <Fragment key={time.hour + time.minute + i}>
             {/* A seperator row between the hours <= 12 and > 12 */}
-            {time.hour >= 13 && timesWithoutDuplicates[i - 1]!.hour < 13 && (
+            {time.hour >= 13 && times[i - 1]!.hour < 13 && (
               <TableRow className="h-[1rem] border-black dark:border-white">
                 <TableCell className="bg-secondary text-center font-bold"></TableCell>
 
