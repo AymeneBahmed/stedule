@@ -22,19 +22,17 @@ export const useScheduleTimesStore = create<ScheduleTimesStore>((set, get) => {
   return {
     times: [],
     addTimes(newTimes) {
-      const timesToAdd: Time[] = [];
+      const times = get().times;
 
       for (const newTime of newTimes) {
-        const timeExists = get().times.find((time) =>
-          Time.equals(time, newTime),
-        );
+        const timeExists = times.find((time) => Time.equals(time, newTime));
 
-        if (timeExists) {
-          timesToAdd.push(timeExists);
+        if (!timeExists) {
+          times.push(newTime);
         }
       }
 
-      set({ times: get().times.concat(timesToAdd) });
+      set({ times });
       sortTimes();
     },
     removeTime(time) {
