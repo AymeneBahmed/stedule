@@ -3,21 +3,21 @@ import { days } from "../constants";
 import { Time } from "../classes/Time";
 
 interface DefaultDayAndTimeStore {
-  day: (typeof days)[number] | null;
-  time: Time | null;
-  setDay: (day: (typeof days)[number]) => void;
-  setTime: (time: Time) => void;
+  defaultDay: (typeof days)[number] | null;
+  defaultTime: Time | null;
+  setDefaultDay: (day: (typeof days)[number] | null) => void;
+  setDefaultTime: (time: Time | null) => void;
 }
 
 export const useDefaultDayAndTimeStore = create<DefaultDayAndTimeStore>(
   (set) => ({
-    day: null,
-    time: null,
-    setDay(day) {
-      set({ day });
+    defaultDay: null,
+    defaultTime: null,
+    setDefaultDay(day) {
+      set({ defaultDay: day });
     },
-    setTime(time) {
-      set({ time });
+    setDefaultTime(time) {
+      set({ defaultTime: time });
     },
   }),
 );
