@@ -22,6 +22,8 @@ import NewTaskForm from "./NewTaskForm";
 import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTime";
 import { Task } from "@/lib/classes/Task";
 import { useScheduleTimesStore } from "@/lib/stores/scheduleTimes";
+import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
+import { Time } from "@/lib/classes/Time";
 
 interface ScheduleTableProps {
   tasks: Task[];
@@ -31,7 +33,10 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
   const { times, initializeWithDefaultTimes, addTimes } =
     useScheduleTimesStore();
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
-  const { setDay, setTime } = useDefaultDayAndTimeStore();
+  const { defaultDay, defaultTime, setDefaultDay, setDefaultTime } =
+    useDefaultDayAndTimeStore();
+  const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
+    useShouldOpenNewTaskFormStore();
 
   useEffect(() => {
     if (tasks.length === 0) {
@@ -77,6 +82,7 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
             )}
 
             <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
+              {/* Time cell (the first cell of each row) */}
               <TableCell className="bg-secondary text-center font-bold">
                 {time.hour < 10 && "0"}
                 {time.hour}:{time.minute < 10 && "0"}
@@ -86,9 +92,23 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
               {[...Array(7)].map((_, j) => (
                 <Dialog
                   key={j}
-                  onOpenChange={() => {
-                    setDay(days[j]!);
-                    setTime(time);
+                  open={
+                    // These checks were added to prevent the slow opening of the dialog
+                    defaultDay === days[j] &&
+                    defaultTime != null &&
+                    Time.equals(defaultTime, time) &&
+                    shouldOpenNewTaskForm
+                  }
+                  onOpenChange={(val) => {
+                    if (!val) {
+                      setDefaultDay(null);
+                      setDefaultTime(null);
+                      closeNewTaskForm();
+                    } else {
+                      setDefaultDay(days[j]!);
+                      setDefaultTime(time);
+                      openNewTaskForm();
+                    }
                   }}
                 >
                   <DialogTrigger asChild>

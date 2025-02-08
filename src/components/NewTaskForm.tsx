@@ -26,9 +26,10 @@ import {
 } from "./ui/select";
 import { days, priorities } from "@/lib/constants";
 import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTime";
+import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
 
 export default function NewTaskForm() {
-  const { day, time } = useDefaultDayAndTimeStore();
+  const { defaultDay: day, defaultTime: time } = useDefaultDayAndTimeStore();
   const form = useForm<z.infer<typeof newTaskSchema>>({
     resolver: zodResolver(newTaskSchema),
     defaultValues: {
@@ -43,10 +44,12 @@ export default function NewTaskForm() {
     },
   });
   const [state, addNewTaskAction, isPending] = useActionState(addNewTask, null);
+  const { closeNewTaskForm } = useShouldOpenNewTaskFormStore();
 
   function onSubmit(values: z.infer<typeof newTaskSchema>) {
     startTransition(() => {
       addNewTaskAction(values);
+      closeNewTaskForm();
     });
   }
 
