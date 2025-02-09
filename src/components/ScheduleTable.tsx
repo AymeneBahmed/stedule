@@ -68,18 +68,20 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
         {times.map((time, i) => (
           <Fragment key={time.hour + time.minute + i}>
             {/* A seperator row between the hours <= 12 and > 12 */}
-            {time.hour >= 13 && times[i - 1]!.hour < 13 && (
-              <TableRow className="h-[1rem] border-black dark:border-white">
-                <TableCell className="bg-secondary text-center font-bold"></TableCell>
+            {time.hour >= 13 &&
+              times[i - 1] != null &&
+              times[i - 1]!.hour < 13 && (
+                <TableRow className="h-[1rem] border-black dark:border-white">
+                  <TableCell className="bg-secondary text-center font-bold"></TableCell>
 
-                {[...Array(7)].map((_, i) => (
-                  <TableCell
-                    key={i}
-                    className="border-l border-black bg-secondary dark:border-white"
-                  />
-                ))}
-              </TableRow>
-            )}
+                  {[...Array(7)].map((_, i) => (
+                    <TableCell
+                      key={i}
+                      className="border-l border-black bg-secondary dark:border-white"
+                    />
+                  ))}
+                </TableRow>
+              )}
 
             <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
               {/* Time cell (the first cell of each row) */}
