@@ -33,8 +33,13 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
   const { times, initializeWithDefaultTimes, addTimes } =
     useScheduleTimesStore();
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
-  const { defaultDay, defaultTime, setDefaultDay, setDefaultTime } =
-    useNewTaskFormDefaultValuesStore();
+  const {
+    defaultDay,
+    defaultTime,
+    setDefaultDay,
+    setDefaultTime,
+    setDefaultTask,
+  } = useNewTaskFormDefaultValuesStore();
   const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
     useShouldOpenNewTaskFormStore();
 
@@ -102,13 +107,24 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
                     shouldOpenNewTaskForm
                   }
                   onOpenChange={(val) => {
+                    // on closing the dialog
                     if (!val) {
                       setDefaultDay(null);
                       setDefaultTime(null);
+                      setDefaultTask(null);
                       closeNewTaskForm();
-                    } else {
+                    }
+                    // On opening the dialog
+                    else {
                       setDefaultDay(days[j]!);
                       setDefaultTime(time);
+                      setDefaultTask(
+                        tasks.find(
+                          (task) =>
+                            days[task.day] === days[j] &&
+                            Time.equals(task.time, time),
+                        ) ?? null,
+                      );
                       openNewTaskForm();
                     }
                   }}
