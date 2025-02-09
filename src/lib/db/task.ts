@@ -18,6 +18,7 @@ export async function createTask(task: Omit<Task, "id">) {
         day: task.day,
         time: Object(task.time),
         priority: task.priority,
+        description: task.description,
       },
     })) as PrismaTaskModified;
   } catch {
