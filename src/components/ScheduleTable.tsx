@@ -19,7 +19,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import NewTaskForm from "./NewTaskForm";
-import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTime";
+import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValues";
 import { Task } from "@/lib/classes/Task";
 import { useScheduleTimesStore } from "@/lib/stores/scheduleTimes";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
@@ -34,7 +34,7 @@ export default function ScheduleTable({ tasks }: ScheduleTableProps) {
     useScheduleTimesStore();
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
   const { defaultDay, defaultTime, setDefaultDay, setDefaultTime } =
-    useDefaultDayAndTimeStore();
+    useNewTaskFormDefaultValuesStore();
   const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
     useShouldOpenNewTaskFormStore();
 

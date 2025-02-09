@@ -25,11 +25,12 @@ import {
   SelectValue,
 } from "./ui/select";
 import { days, priorities } from "@/lib/constants";
-import { useDefaultDayAndTimeStore } from "@/lib/stores/defaultDayAndTime";
+import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValues";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
 
 export default function NewTaskForm() {
-  const { defaultDay: day, defaultTime: time } = useDefaultDayAndTimeStore();
+  const { defaultDay: day, defaultTime: time } =
+    useNewTaskFormDefaultValuesStore();
   const form = useForm<z.infer<typeof newTaskSchema>>({
     resolver: zodResolver(newTaskSchema),
     defaultValues: {
