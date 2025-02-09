@@ -29,18 +29,19 @@ import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaul
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
 
 export default function NewTaskForm() {
-  const { defaultDay, defaultTime } = useNewTaskFormDefaultValuesStore();
+  const { defaultDay, defaultTime, defaultTask } =
+    useNewTaskFormDefaultValuesStore();
   const form = useForm<z.infer<typeof newTaskSchema>>({
     resolver: zodResolver(newTaskSchema),
     defaultValues: {
-      task: "",
+      task: defaultTask?.name ?? "",
       day: defaultDay ?? undefined,
       time:
         defaultTime == null
           ? undefined
           : `${defaultTime.hour.toString().padStart(2, "0")}:${defaultTime.minute.toString().padStart(2, "0")}`,
-      priority: "Unspecified",
-      description: "",
+      priority: defaultTask?.priority ?? "Unspecified",
+      description: defaultTask?.description ?? "",
     },
   });
   const [state, addNewTaskAction, isPending] = useActionState(addNewTask, null);
