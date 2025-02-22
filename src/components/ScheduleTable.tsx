@@ -24,16 +24,16 @@ import { Task } from "@/lib/classes/Task";
 import { useScheduleTimesStore } from "@/lib/stores/scheduleTimes";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
 import { Time } from "@/lib/classes/Time";
+import { useTasksStore } from "@/lib/stores/tasks";
 
 interface ScheduleTableProps {
   initialTasks: Task[];
 }
 
-export default function ScheduleTable({
-  initialTasks: tasks,
-}: ScheduleTableProps) {
+export default function ScheduleTable({ initialTasks }: ScheduleTableProps) {
   const { times, initializeWithDefaultTimes, addTimes } =
     useScheduleTimesStore();
+  const { tasks } = useTasksStore();
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
   const {
     defaultDay,
@@ -46,12 +46,13 @@ export default function ScheduleTable({
     useShouldOpenNewTaskFormStore();
 
   useEffect(() => {
-    if (tasks.length === 0) {
+    if (initialTasks.length === 0) {
       initializeWithDefaultTimes();
     } else {
-      addTimes(tasks.map((task) => task.time));
+      addTimes(initialTasks.map((task) => task.time));
+      useTasksStore.setState({ tasks: initialTasks });
     }
-  }, [addTimes, initializeWithDefaultTimes, tasks]);
+  }, [addTimes, initialTasks, initializeWithDefaultTimes]);
 
   return (
     <Table className="border border-black dark:border-white">
