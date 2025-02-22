@@ -26,10 +26,12 @@ import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFor
 import { Time } from "@/lib/classes/Time";
 
 interface ScheduleTableProps {
-  tasks: Task[];
+  initialTasks: Task[];
 }
 
-export default function ScheduleTable({ tasks }: ScheduleTableProps) {
+export default function ScheduleTable({
+  initialTasks: tasks,
+}: ScheduleTableProps) {
   const { times, initializeWithDefaultTimes, addTimes } =
     useScheduleTimesStore();
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
