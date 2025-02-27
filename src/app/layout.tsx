@@ -28,7 +28,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ThemeTogglerButton className="absolute right-10 top-10" />
+          <ThemeTogglerButton className="absolute top-10 right-10 cursor-pointer" />
           {children}
         </ThemeProvider>
       </body>
