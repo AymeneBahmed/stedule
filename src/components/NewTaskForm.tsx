@@ -27,6 +27,8 @@ import {
 import { days, priorities } from "@/lib/constants";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValues";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
+import { useTasksStore } from "@/lib/stores/tasks";
+import { Time } from "@/lib/classes/Time";
 
 export default function NewTaskForm() {
   const { defaultDay, defaultTime, defaultTask } =
@@ -46,12 +48,36 @@ export default function NewTaskForm() {
   });
   const [state, addNewTaskAction, isPending] = useActionState(addNewTask, null);
   const { closeNewTaskForm } = useShouldOpenNewTaskFormStore();
+  const { tasks } = useTasksStore();
 
   function onSubmit(values: z.infer<typeof newTaskSchema>) {
     startTransition(() => {
       addNewTaskAction(values);
       closeNewTaskForm();
     });
+  }
+
+  function getExistingTask() {
+    const formValues = form.getValues();
+    const existingTask = tasks.find(
+      (task) =>
+        days[task.day] === formValues.day &&
+        Time.equals(task.time, Time.fromString(formValues.time)!),
+    );
+
+    if (existingTask) {
+      form.setValue("task", existingTask.name);
+      form.setValue("day", days[existingTask.day]);
+      form.setValue(
+        "time",
+        `${existingTask.time.hour < 10 ? "0" : ""}${existingTask.time.hour}:${existingTask.time.minute < 10 ? "0" : ""}${existingTask.time.minute}`,
+      );
+      form.setValue("priority", existingTask.priority);
+      form.setValue("description", existingTask.description);
+    } else {
+      form.setValue("task", "");
+      form.setValue("description", "");
+    }
   }
 
   return (
@@ -82,7 +108,11 @@ export default function NewTaskForm() {
               <FormItem>
                 <FormLabel>Day</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+
+                    getExistingTask();
+                  }}
                   defaultValue={field.value}
                 >
                   <FormControl>
@@ -114,6 +144,11 @@ export default function NewTaskForm() {
                     placeholder="hh:mm"
                     className="border-gray-400 bg-secondary"
                     {...field}
+                    onBlur={() => {
+                      field.onBlur();
+
+                      getExistingTask();
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -128,10 +163,7 @@ export default function NewTaskForm() {
                 <FormLabel>
                   Priority <em className="text-muted-foreground">(Optional)</em>
                 </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="border-gray-400 bg-secondary">
                       <SelectValue />
