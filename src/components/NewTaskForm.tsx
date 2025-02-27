@@ -90,7 +90,7 @@ export default function NewTaskForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Task</FormLabel>
-                <FormControl className="!mt-1">
+                <FormControl className="mt-1!">
                   <Input
                     placeholder="e.g algorithms and data structures..."
                     className="border-gray-400 bg-secondary"
@@ -191,7 +191,7 @@ export default function NewTaskForm() {
                   Description{" "}
                   <em className="text-muted-foreground">(Optional)</em>
                 </FormLabel>
-                <FormControl className="!mt-1">
+                <FormControl className="mt-1!">
                   <Input
                     placeholder="Solve an exercise and write some code..."
                     className="border-gray-400 bg-secondary"
