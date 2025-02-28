@@ -50,7 +50,8 @@ export default function NewTaskForm() {
   const [state, addNewTaskAction, isPending] = useActionState(addNewTask, null);
   const { closeNewTaskForm } = useShouldOpenNewTaskFormStore();
   const { tasks } = useTasksStore();
-  const { enableEditTaskMode, disableEditTaskMode } = useEditTaskModeStore();
+  const { editTaskModeEnabled, enableEditTaskMode, disableEditTaskMode } =
+    useEditTaskModeStore();
 
   function onSubmit(values: z.infer<typeof newTaskSchema>) {
     startTransition(() => {
@@ -221,7 +222,7 @@ export default function NewTaskForm() {
         )}
 
         <Button disabled={isPending} className="mt-10 w-full">
-          Submit
+          {editTaskModeEnabled ? "Edit" : "Submit"}
         </Button>
       </form>
     </Form>
