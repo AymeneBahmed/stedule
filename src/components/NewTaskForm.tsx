@@ -157,10 +157,13 @@ export default function NewTaskForm() {
                     placeholder="hh:mm"
                     className="bg-secondary border-gray-400"
                     {...field}
-                    onBlur={() => {
-                      field.onBlur();
-
-                      getExistingTask();
+                    onInput={(e) => {
+                      if (
+                        e.currentTarget.value.length === 5 &&
+                        Time.fromString(e.currentTarget.value) != null
+                      ) {
+                        getExistingTask();
+                      }
                     }}
                   />
                 </FormControl>
