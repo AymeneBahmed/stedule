@@ -25,6 +25,8 @@ import { useScheduleTimesStore } from "@/lib/stores/scheduleTimes";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
 import { Time } from "@/lib/classes/Time";
 import { useTasksStore } from "@/lib/stores/tasks";
+import { useEditTaskModeStore } from "@/lib/stores/editTaskMode";
+import { cn } from "@/lib/utils";
 
 interface ScheduleTableProps {
   initialTasks: Task[];
@@ -44,6 +46,7 @@ export default function ScheduleTable({ initialTasks }: ScheduleTableProps) {
   } = useNewTaskFormDefaultValuesStore();
   const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
     useShouldOpenNewTaskFormStore();
+  const { editTaskModeEnabled } = useEditTaskModeStore();
 
   useEffect(() => {
     if (initialTasks.length === 0) {
@@ -144,9 +147,19 @@ export default function ScheduleTable({ initialTasks }: ScheduleTableProps) {
                     </TableCell>
                   </DialogTrigger>
 
-                  <DialogContent>
+                  <DialogContent className="gap-0">
                     <DialogHeader>
-                      <DialogTitle>What do you want to do?</DialogTitle>
+                      <DialogTitle>
+                        What do you want to do?{" "}
+                        <span
+                          className={cn(
+                            "rounded bg-blue-700 px-2 py-0.5 text-sm text-white",
+                            !editTaskModeEnabled && "invisible",
+                          )}
+                        >
+                          Edit
+                        </span>
+                      </DialogTitle>
                       <DialogDescription className="sr-only">
                         Create a task and add an optional description such as
                         notes.

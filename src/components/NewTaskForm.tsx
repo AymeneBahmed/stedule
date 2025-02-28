@@ -14,7 +14,7 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { startTransition, useActionState } from "react";
+import { startTransition, useActionState, useEffect } from "react";
 import { addNewTask } from "@/actions/new-task-form";
 import FormError from "./FormError";
 import {
@@ -29,6 +29,7 @@ import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaul
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
 import { useTasksStore } from "@/lib/stores/tasks";
 import { Time } from "@/lib/classes/Time";
+import { useEditTaskModeStore } from "@/lib/stores/editTaskMode";
 
 export default function NewTaskForm() {
   const { defaultDay, defaultTime, defaultTask } =
@@ -49,6 +50,7 @@ export default function NewTaskForm() {
   const [state, addNewTaskAction, isPending] = useActionState(addNewTask, null);
   const { closeNewTaskForm } = useShouldOpenNewTaskFormStore();
   const { tasks } = useTasksStore();
+  const { enableEditTaskMode, disableEditTaskMode } = useEditTaskModeStore();
 
   function onSubmit(values: z.infer<typeof newTaskSchema>) {
     startTransition(() => {
@@ -66,6 +68,7 @@ export default function NewTaskForm() {
     );
 
     if (existingTask) {
+      enableEditTaskMode();
       form.setValue("task", existingTask.name);
       form.setValue("day", days[existingTask.day]);
       form.setValue(
@@ -75,10 +78,19 @@ export default function NewTaskForm() {
       form.setValue("priority", existingTask.priority);
       form.setValue("description", existingTask.description);
     } else {
+      disableEditTaskMode();
       form.setValue("task", "");
       form.setValue("description", "");
     }
   }
+
+  useEffect(() => {
+    if (defaultTask != null) {
+      enableEditTaskMode();
+    } else {
+      disableEditTaskMode();
+    }
+  }, [defaultTask, disableEditTaskMode, enableEditTaskMode]);
 
   return (
     <Form {...form}>
