@@ -93,7 +93,7 @@ export default function NewTaskForm() {
                 <FormControl className="mt-1!">
                   <Input
                     placeholder="e.g algorithms and data structures..."
-                    className="border-gray-400 bg-secondary"
+                    className="bg-secondary border-gray-400"
                     {...field}
                   />
                 </FormControl>
@@ -116,7 +116,7 @@ export default function NewTaskForm() {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger className="border-gray-400 bg-secondary">
+                    <SelectTrigger className="bg-secondary border-gray-400">
                       <SelectValue placeholder="Select a day" />
                     </SelectTrigger>
                   </FormControl>
@@ -142,7 +142,7 @@ export default function NewTaskForm() {
                 <FormControl>
                   <Input
                     placeholder="hh:mm"
-                    className="border-gray-400 bg-secondary"
+                    className="bg-secondary border-gray-400"
                     {...field}
                     onBlur={() => {
                       field.onBlur();
@@ -165,7 +165,7 @@ export default function NewTaskForm() {
                 </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className="border-gray-400 bg-secondary">
+                    <SelectTrigger className="bg-secondary border-gray-400">
                       <SelectValue />
                     </SelectTrigger>
                   </FormControl>
@@ -194,7 +194,7 @@ export default function NewTaskForm() {
                 <FormControl className="mt-1!">
                   <Input
                     placeholder="Solve an exercise and write some code..."
-                    className="border-gray-400 bg-secondary"
+                    className="bg-secondary border-gray-400"
                     {...field}
                   />
                 </FormControl>

@@ -64,7 +64,7 @@ export default function ScheduleTable({ initialTasks }: ScheduleTableProps) {
           {days.map((day) => (
             <TableHead
               key={day}
-              className="border-l border-black bg-secondary text-center text-black dark:border-white dark:text-white"
+              className="bg-secondary border-l border-black text-center text-black dark:border-white dark:text-white"
             >
               {day.toUpperCase()}
             </TableHead>
@@ -85,7 +85,7 @@ export default function ScheduleTable({ initialTasks }: ScheduleTableProps) {
                   {[...Array(7)].map((_, i) => (
                     <TableCell
                       key={i}
-                      className="border-l border-black bg-secondary dark:border-white"
+                      className="bg-secondary border-l border-black dark:border-white"
                     />
                   ))}
                 </TableRow>
@@ -133,7 +133,7 @@ export default function ScheduleTable({ initialTasks }: ScheduleTableProps) {
                   }}
                 >
                   <DialogTrigger asChild>
-                    <TableCell className="cursor-pointer border-l border-black text-center hover:bg-muted/70 active:bg-muted/90 dark:border-white">
+                    <TableCell className="hover:bg-muted/70 active:bg-muted/90 cursor-pointer border-l border-black text-center dark:border-white">
                       {
                         tasksGroupedByDay[days[j]!]?.find(
                           (task) =>
