@@ -16,7 +16,7 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { startTransition, useActionState, useEffect } from "react";
-import { addNewTask } from "@/actions/new-task-form";
+import { addNewTask } from "@/actions/new-task-form-actions";
 import FormError from "./FormError";
 import {
   Select,
