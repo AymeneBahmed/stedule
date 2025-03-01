@@ -26,11 +26,11 @@ import {
   SelectValue,
 } from "./ui/select";
 import { days, priorities } from "@/lib/constants";
-import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValues";
-import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
-import { useTasksStore } from "@/lib/stores/tasks";
+import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
+import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
+import { useTasksStore } from "@/lib/stores/tasksStore";
 import { Time } from "@/lib/classes/Time";
-import { useEditTaskModeStore } from "@/lib/stores/editTaskMode";
+import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
 
 export default function NewTaskForm() {
   const { defaultDay, defaultTime, defaultTask } =

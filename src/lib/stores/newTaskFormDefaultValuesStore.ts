@@ -3,7 +3,7 @@ import { days } from "../constants";
 import { Time } from "../classes/Time";
 import { Task } from "../classes/Task";
 
-interface NewTaskFormDefaultValues {
+interface NewTaskFormDefaultValuesStore {
   defaultDay: (typeof days)[number] | null;
   defaultTime: Time | null;
   // Used if clicked on an occupied cell in the schedule table
@@ -14,7 +14,7 @@ interface NewTaskFormDefaultValues {
 }
 
 export const useNewTaskFormDefaultValuesStore =
-  create<NewTaskFormDefaultValues>((set) => ({
+  create<NewTaskFormDefaultValuesStore>((set) => ({
     defaultDay: null,
     defaultTime: null,
     defaultTask: null,

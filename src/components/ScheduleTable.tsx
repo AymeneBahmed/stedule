@@ -19,13 +19,13 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import NewTaskForm from "./NewTaskForm";
-import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValues";
+import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Task } from "@/lib/classes/Task";
-import { useScheduleTimesStore } from "@/lib/stores/scheduleTimes";
-import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskForm";
+import { useScheduleTimesStore } from "@/lib/stores/scheduleTimesStore";
+import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Time } from "@/lib/classes/Time";
-import { useTasksStore } from "@/lib/stores/tasks";
-import { useEditTaskModeStore } from "@/lib/stores/editTaskMode";
+import { useTasksStore } from "@/lib/stores/tasksStore";
+import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
 import { cn } from "@/lib/utils";
 
 interface ScheduleTableProps {
