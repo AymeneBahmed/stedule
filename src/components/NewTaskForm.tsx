@@ -7,6 +7,7 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -158,6 +159,37 @@ export default function NewTaskForm() {
                     className="bg-secondary border-gray-400"
                     {...field}
                     onInput={(e) => {
+                      const value = e.currentTarget.value.replace(
+                        /[^0-9]/g,
+                        "",
+                      );
+                      let newValue = "";
+
+                      // Automatically insert colon after 2 digits
+                      if (value.length > 2) {
+                        newValue =
+                          value.substring(0, 2) + ":" + value.substring(2, 4);
+                      } else {
+                        newValue = value;
+                      }
+
+                      // Move cursor to correct position
+                      e.currentTarget.value = newValue;
+                      if (newValue.length === 2 && value.length > 2) {
+                        e.currentTarget.setSelectionRange(3, 3);
+                      } else if (newValue.length === 2) {
+                        e.currentTarget.setSelectionRange(2, 2);
+                      } else if (
+                        newValue.length === 3 &&
+                        !newValue.includes(":")
+                      ) {
+                        e.currentTarget.value =
+                          newValue.substring(0, 2) +
+                          ":" +
+                          newValue.substring(2);
+                        e.currentTarget.setSelectionRange(3, 3);
+                      }
+
                       if (
                         e.currentTarget.value.length === 5 &&
                         Time.fromString(e.currentTarget.value) != null
@@ -167,6 +199,9 @@ export default function NewTaskForm() {
                     }}
                   />
                 </FormControl>
+                <FormDescription>
+                  The colon (:) is automatically inserted.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
