@@ -11,9 +11,18 @@ model Task {
   id          Int      @id @default(autoincrement())
   name        String
   day         Int
-  time        Json
+  time        Time     @relation(fields: [timeId], references: [id])
   priority    Priority
   description String?
+  timeId      Int
+}
+
+model Time {
+  id     Int @id @default(autoincrement())
+  hour   Int
+  minute Int
+
+  Task Task[]
 }
 
 enum Priority {
