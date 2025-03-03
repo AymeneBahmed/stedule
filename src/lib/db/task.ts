@@ -18,7 +18,7 @@ export async function createTask(task: Omit<Task, "id">) {
       data: {
         name: task.name,
         day: task.day,
-        time: Object(task.time),
+        time: { create: task.time },
         priority: task.priority,
         description: task.description,
       },
