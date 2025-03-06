@@ -23,6 +23,8 @@ model Time {
   minute Int
 
   Task Task[]
+
+  @@unique([hour, minute])
 }
 
 enum Priority {
