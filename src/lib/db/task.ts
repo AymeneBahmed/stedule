@@ -18,7 +18,20 @@ export async function createTask(task: Omit<Task, "id">) {
       data: {
         name: task.name,
         day: task.day,
-        time: { create: task.time },
+        time: {
+          connectOrCreate: {
+            where: {
+              hour_minute: {
+                hour: task.time.hour,
+                minute: task.time.minute,
+              },
+            },
+            create: {
+              hour: task.time.hour,
+              minute: task.time.minute,
+            },
+          },
+        },
         priority: task.priority,
         description: task.description,
       },
