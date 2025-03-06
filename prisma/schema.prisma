@@ -11,7 +11,7 @@ model Task {
   id          Int      @id @default(autoincrement())
   name        String
   day         Int
-  time        Time     @relation(fields: [timeId], references: [id])
+  time        Time     @relation(fields: [timeId], references: [id], onDelete: Cascade)
   priority    Priority
   description String?
   timeId      Int
