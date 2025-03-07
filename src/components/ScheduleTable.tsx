@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,21 +21,17 @@ import {
 import NewTaskForm from "./NewTaskForm";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Task } from "@/lib/classes/Task";
-import { useScheduleTimesStore } from "@/lib/stores/scheduleTimesStore";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Time } from "@/lib/classes/Time";
-import { useTasksStore } from "@/lib/stores/tasksStore";
 import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
 import { cn } from "@/lib/utils";
 
 interface ScheduleTableProps {
-  initialTasks: Task[];
+  times: Time[];
+  tasks: Task[];
 }
 
-export default function ScheduleTable({ initialTasks }: ScheduleTableProps) {
-  const { times, initializeWithDefaultTimes, addTimes } =
-    useScheduleTimesStore();
-  const { tasks } = useTasksStore();
+export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
   const {
     defaultDay,
@@ -47,15 +43,6 @@ export default function ScheduleTable({ initialTasks }: ScheduleTableProps) {
   const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
     useShouldOpenNewTaskFormStore();
   const { editTaskModeEnabled } = useEditTaskModeStore();
-
-  useEffect(() => {
-    if (initialTasks.length === 0) {
-      initializeWithDefaultTimes();
-    } else {
-      addTimes(initialTasks.map((task) => task.time));
-      useTasksStore.setState({ tasks: initialTasks });
-    }
-  }, [addTimes, initialTasks, initializeWithDefaultTimes]);
 
   return (
     <Table className="border border-black dark:border-white">
