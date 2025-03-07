@@ -24,3 +24,7 @@ export const newTaskSchema = z.object({
   }),
   description: z.string().optional(),
 });
+
+export const newTimeSchema = z.object({
+  time: newTaskSchema.shape.time,
+});
