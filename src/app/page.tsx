@@ -1,6 +1,6 @@
 import ScheduleTable from "@/components/ScheduleTable";
 import { Task } from "@/lib/classes/Task";
-import { Time } from "@/lib/classes/Time";
+import { Time as TimeClass } from "@/lib/classes/Time";
 import { getTasks } from "@/lib/db/task";
 import { prisma } from "@/lib/prisma";
 
@@ -9,7 +9,7 @@ export default async function Home() {
     ...task,
     description: task.description ?? undefined,
   }));
-  const times = (await prisma.time.findMany()) as Time[];
+  const times = (await prisma.time.findMany()) as TimeClass[];
 
   // The second condition make sure to not insert multiple default times if they already exist.
   if (initialTasks.length === 0 && times.length === 0) {
