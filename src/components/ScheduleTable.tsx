@@ -10,22 +10,13 @@ import {
   TableRow,
 } from "./ui/table";
 import { Fragment } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import NewTaskForm from "./NewTaskForm";
+import { Dialog, DialogTrigger } from "./ui/dialog";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Task } from "@/lib/classes/Task";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
-import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
-import { cn } from "@/lib/utils";
 import { Time } from "@prisma/client";
+import NewTaskFormDialogContent from "./NewTaskFormDialogContent";
 
 interface ScheduleTableProps {
   times: (TimeClass & Time)[];
@@ -43,7 +34,6 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
   } = useNewTaskFormDefaultValuesStore();
   const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
     useShouldOpenNewTaskFormStore();
-  const { editTaskModeEnabled } = useEditTaskModeStore();
 
   return (
     <Table className="border border-black dark:border-white">
@@ -135,27 +125,7 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
                     </TableCell>
                   </DialogTrigger>
 
-                  <DialogContent className="gap-0">
-                    <DialogHeader>
-                      <DialogTitle>
-                        What do you want to do?{" "}
-                        <span
-                          className={cn(
-                            "rounded bg-blue-700 px-2 py-0.5 text-sm text-white",
-                            !editTaskModeEnabled && "invisible",
-                          )}
-                        >
-                          Edit
-                        </span>
-                      </DialogTitle>
-                      <DialogDescription className="sr-only">
-                        Create a task and add an optional description such as
-                        notes.
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <NewTaskForm />
-                  </DialogContent>
+                  <NewTaskFormDialogContent />
                 </Dialog>
               ))}
             </TableRow>
