@@ -22,7 +22,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex min-h-full items-center justify-center [&>div]:w-[80%]">
+    <div className="flex min-h-full items-center justify-center py-10 [&>div]:w-[80%]">
       <ScheduleTable tasks={initialTasks} times={times} />
     </div>
   );
