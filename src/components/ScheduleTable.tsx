@@ -25,9 +25,10 @@ import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFor
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
 import { cn } from "@/lib/utils";
+import { Time } from "@prisma/client";
 
 interface ScheduleTableProps {
-  times: TimeClass[];
+  times: (TimeClass & Time)[];
   tasks: Task[];
 }
 
