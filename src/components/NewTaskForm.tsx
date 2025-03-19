@@ -129,7 +129,7 @@ export default function NewTaskForm() {
                   }}
                   defaultValue={field.value}
                 >
-                  <FormControl>
+                  <FormControl className="w-full">
                     <SelectTrigger className="bg-secondary border-gray-400">
                       <SelectValue placeholder="Select a day" />
                     </SelectTrigger>
@@ -215,7 +215,7 @@ export default function NewTaskForm() {
                   Priority <em className="text-muted-foreground">(Optional)</em>
                 </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
+                  <FormControl className="w-full">
                     <SelectTrigger className="bg-secondary border-gray-400">
                       <SelectValue />
                     </SelectTrigger>
