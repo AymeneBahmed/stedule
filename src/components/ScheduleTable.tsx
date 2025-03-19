@@ -22,12 +22,12 @@ import NewTaskForm from "./NewTaskForm";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Task } from "@/lib/classes/Task";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
-import { Time } from "@/lib/classes/Time";
+import { Time as TimeClass } from "@/lib/classes/Time";
 import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
 import { cn } from "@/lib/utils";
 
 interface ScheduleTableProps {
-  times: Time[];
+  times: TimeClass[];
   tasks: Task[];
 }
 
@@ -96,7 +96,7 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
                     // These checks were added to prevent the slow opening of the dialog
                     defaultDay === days[j] &&
                     defaultTime != null &&
-                    Time.equals(defaultTime, time) &&
+                    TimeClass.equals(defaultTime, time) &&
                     shouldOpenNewTaskForm
                   }
                   onOpenChange={(val) => {
@@ -115,7 +115,7 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
                         tasks.find(
                           (task) =>
                             days[task.day] === days[j] &&
-                            Time.equals(task.time, time),
+                            TimeClass.equals(task.time, time),
                         ) ?? null,
                       );
                       openNewTaskForm();
