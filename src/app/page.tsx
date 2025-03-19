@@ -10,7 +10,9 @@ export default async function Home() {
     ...task,
     description: task.description ?? undefined,
   }));
-  const times = (await prisma.time.findMany()) as (TimeClass & Time)[];
+  const times = (await prisma.time.findMany()).toSorted((a, b) =>
+    a.hour === b.hour ? a.minute - b.minute : a.hour - b.hour,
+  ) as (TimeClass & Time)[];
 
   // The second condition make sure to not insert multiple default times if they already exist.
   if (initialTasks.length === 0 && times.length === 0) {
