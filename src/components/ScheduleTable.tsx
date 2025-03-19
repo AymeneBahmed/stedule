@@ -65,7 +65,7 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
 
       <TableBody>
         {times.map((time, i) => (
-          <Fragment key={time.hour + time.minute + i}>
+          <Fragment key={time.id}>
             {/* A seperator row between the hours <= 12 and > 12 */}
             {time.hour >= 13 &&
               times[i - 1] != null &&
