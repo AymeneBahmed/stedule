@@ -1,4 +1,5 @@
 import ScheduleTable from "@/components/ScheduleTable";
+import Toolbar from "@/components/Toolbar";
 import { Task } from "@/lib/classes/Task";
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { getTasks } from "@/lib/db/task";
@@ -22,7 +23,8 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex min-h-full items-center justify-center py-10 [&>div]:w-[80%]">
+    <div className="flex min-h-full flex-col items-center justify-center gap-6 py-10 [&>div]:w-[80%]">
+      <Toolbar />
       <ScheduleTable tasks={initialTasks} times={times} />
     </div>
   );
