@@ -32,6 +32,7 @@ export default function NewTimeForm() {
 
   function onSubmit(values: z.infer<typeof newTimeSchema>) {
     startTransition(() => {
+      setSubmitted(true);
       addNewTimeAction(values);
     });
   }
@@ -92,15 +93,7 @@ export default function NewTimeForm() {
 
         {state?.error && <FormError message={state.error} />}
 
-        <Button
-          className="mt-10 w-full"
-          disabled={isPending}
-          onClick={() => {
-            if (form.formState.isValid) {
-              setSubmitted(true);
-            }
-          }}
-        >
+        <Button className="mt-10 w-full" disabled={isPending}>
           Submit
         </Button>
       </form>
