@@ -3,12 +3,20 @@ import { Task } from "../classes/Task";
 
 interface TasksStore {
   tasks: Task[];
-  addTask: (task: Task) => void;
+  addTasks: (newTasks: Task[]) => void;
 }
 
-export const useTasksStore = create<TasksStore>((set) => ({
+export const useTasksStore = create<TasksStore>((set, get) => ({
   tasks: [],
-  addTask(task) {
-    set((state) => ({ tasks: [...state.tasks, task] }));
+  addTasks(newTasks) {
+    const tasksToAdd: Task[] = [];
+
+    for (const task of newTasks) {
+      if (!get().tasks.includes(task)) {
+        tasksToAdd.push(task);
+      }
+    }
+
+    set((state) => ({ tasks: [...state.tasks, ...tasksToAdd] }));
   },
 }));
