@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Task } from "@/lib/classes/Task";
@@ -17,6 +17,7 @@ import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFor
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { Time } from "@prisma/client";
 import NewTaskFormDialogContent from "./NewTaskFormDialogContent";
+import { useTasksStore } from "@/lib/stores/tasksStore";
 
 interface ScheduleTableProps {
   times: (TimeClass & Time)[];
@@ -34,6 +35,11 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
   } = useNewTaskFormDefaultValuesStore();
   const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
     useShouldOpenNewTaskFormStore();
+  const { addTasks } = useTasksStore();
+
+  useEffect(() => {
+    addTasks(tasks);
+  }, [addTasks, tasks]);
 
   return (
     <Table className="border border-black dark:border-white">
