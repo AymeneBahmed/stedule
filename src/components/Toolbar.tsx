@@ -4,7 +4,7 @@ import ThemeTogglerButton from "./ThemeTogglerButton";
 
 export default function Toolbar() {
   return (
-    <span className="bg-primary/50 space-x-1 rounded-full">
+    <span className="bg-primary/50 flex space-x-1 rounded-full">
       <AddNewTimeButton />
       <AddNewTaskButton />
       <ThemeTogglerButton className="rounded-full" />
