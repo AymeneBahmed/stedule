@@ -44,7 +44,7 @@ export default function NewTimeForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5">
         <FormField
           control={form.control}
           name="time"
