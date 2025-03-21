@@ -14,10 +14,10 @@ import { newTimeSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { startTransition, useActionState, useEffect, useState } from "react";
+import { startTransition, useActionState } from "react";
 import { addNewTime } from "@/actions/new-time-form-actions";
 import FormError from "./FormError";
-import { useShouldOpenNewTimeFormStore } from "@/lib/stores/shouldOpenNewTimeFormStore";
+import FormSuccess from "./FormSuccess";
 
 export default function NewTimeForm() {
   const form = useForm<z.infer<typeof newTimeSchema>>({
@@ -27,21 +27,12 @@ export default function NewTimeForm() {
     },
   });
   const [state, addNewTimeAction, isPending] = useActionState(addNewTime, null);
-  const [submitted, setSubmitted] = useState(false);
-  const { closeNewTimeForm } = useShouldOpenNewTimeFormStore();
 
   function onSubmit(values: z.infer<typeof newTimeSchema>) {
     startTransition(() => {
-      setSubmitted(true);
       addNewTimeAction(values);
     });
   }
-
-  useEffect(() => {
-    if (submitted && state?.error == null) {
-      closeNewTimeForm();
-    }
-  }, [closeNewTimeForm, state?.error, submitted]);
 
   return (
     <Form {...form}>
@@ -92,6 +83,7 @@ export default function NewTimeForm() {
         />
 
         {state?.error && <FormError message={state.error} />}
+        {state?.success && <FormSuccess message={state.success} />}
 
         <Button className="mt-10 w-full" disabled={isPending}>
           Submit
