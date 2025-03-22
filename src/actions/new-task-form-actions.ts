@@ -5,6 +5,7 @@ import { days } from "@/lib/constants";
 import { createTask } from "@/lib/db/task";
 import { prisma } from "@/lib/prisma";
 import { newTaskSchema } from "@/lib/schemas";
+import { PrismaTaskModified } from "@/lib/ts/interfaces";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -20,7 +21,8 @@ export async function addNewTask(
     };
   }
 
-  const { task, day, time, priority, description } = validated.data;
+  const { task: taskName, day, time, priority, description } = validated.data;
+  let task: PrismaTaskModified | null = null;
 
   try {
     const existingTask = await prisma.task.findFirst({
@@ -31,17 +33,20 @@ export async function addNewTask(
     });
 
     if (existingTask != null) {
-      await prisma.task.update({
+      task = (await prisma.task.update({
         where: { id: existingTask.id },
         data: {
-          name: task,
+          name: taskName,
           priority,
           description,
         },
-      });
+        include: {
+          time: true,
+        },
+      })) as PrismaTaskModified;
     } else {
-      await createTask({
-        name: task,
+      task = await createTask({
+        name: taskName,
         day: days.indexOf(day),
         time: Time.fromString(time)!,
         priority,
@@ -58,5 +63,6 @@ export async function addNewTask(
 
   return {
     success: "Added a task successfully!",
+    task: task as PrismaTaskModified,
   };
 }
