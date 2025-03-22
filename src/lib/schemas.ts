@@ -9,6 +9,7 @@ export const newTaskSchema = z.object({
       const [hour, min] = time.split(":").map(Number);
 
       return (
+        time.length === 5 &&
         !isNaN(hour!) &&
         !isNaN(min!) &&
         hour! >= 0 &&
