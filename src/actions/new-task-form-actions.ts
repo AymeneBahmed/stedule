@@ -45,7 +45,7 @@ export async function addNewTask(
         day: days.indexOf(day),
         time: Time.fromString(time)!,
         priority,
-        description,
+        description: description ?? null,
       });
     }
   } catch {

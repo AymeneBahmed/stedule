@@ -12,16 +12,16 @@ import {
 import { Fragment, useEffect } from "react";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
-import { Task } from "@/lib/classes/Task";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { Time } from "@prisma/client";
 import NewTaskFormDialogContent from "./NewTaskFormDialogContent";
 import { useTasksStore } from "@/lib/stores/tasksStore";
+import { PrismaTaskModified } from "@/lib/ts/interfaces";
 
 interface ScheduleTableProps {
   times: (TimeClass & Time)[];
-  tasks: Task[];
+  tasks: PrismaTaskModified[];
 }
 
 export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {

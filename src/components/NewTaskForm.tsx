@@ -78,7 +78,7 @@ export default function NewTaskForm() {
         `${existingTask.time.hour < 10 ? "0" : ""}${existingTask.time.hour}:${existingTask.time.minute < 10 ? "0" : ""}${existingTask.time.minute}`,
       );
       form.setValue("priority", existingTask.priority);
-      form.setValue("description", existingTask.description);
+      form.setValue("description", existingTask.description ?? undefined);
     } else {
       disableEditTaskMode();
       form.setValue("task", "");

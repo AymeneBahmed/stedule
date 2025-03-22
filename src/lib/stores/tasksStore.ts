@@ -1,22 +1,22 @@
 import { create } from "zustand";
-import { Task } from "../classes/Task";
 import { Time } from "../classes/Time";
 import { Day } from "../ts/enums";
 import { days } from "../constants";
+import { PrismaTaskModified } from "../ts/interfaces";
 
 interface TasksStore {
-  tasks: Task[];
-  addTasks: (newTasks: Task[]) => void;
+  tasks: PrismaTaskModified[];
+  addTasks: (newTasks: PrismaTaskModified[]) => void;
   findTaskByDayAndTime: (
     day: Day | (typeof days)[number],
     time: Time,
-  ) => Task | null;
+  ) => PrismaTaskModified | null;
 }
 
 export const useTasksStore = create<TasksStore>((set, get) => ({
   tasks: [],
   addTasks(newTasks) {
-    const tasksToAdd: Task[] = [];
+    const tasksToAdd: PrismaTaskModified[] = [];
 
     for (const task of newTasks) {
       if (!get().tasks.includes(task)) {

@@ -1,4 +1,3 @@
-import { Task } from "../classes/Task";
 import { prisma } from "../prisma";
 import { PrismaTaskModified } from "../ts/interfaces";
 
@@ -12,9 +11,11 @@ export async function getTasks() {
   }
 }
 
-export async function createTask(task: Omit<Task, "id">) {
+export async function createTask(
+  task: Omit<PrismaTaskModified, "id" | "timeId">,
+) {
   try {
-    return (await prisma.task.create({
+    return await prisma.task.create({
       data: {
         name: task.name,
         day: task.day,
@@ -35,7 +36,7 @@ export async function createTask(task: Omit<Task, "id">) {
         priority: task.priority,
         description: task.description,
       },
-    })) as PrismaTaskModified;
+    });
   } catch {
     return null;
   }
