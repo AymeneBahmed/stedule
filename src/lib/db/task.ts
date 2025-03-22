@@ -36,6 +36,9 @@ export async function createTask(
         priority: task.priority,
         description: task.description,
       },
+      include: {
+        time: true,
+      },
     });
   } catch {
     return null;
