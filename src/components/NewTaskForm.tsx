@@ -15,7 +15,7 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { startTransition, useActionState, useEffect } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { addNewTask } from "@/actions/new-task-form-actions";
 import FormError from "./FormError";
 import {
@@ -50,14 +50,26 @@ export default function NewTaskForm() {
   });
   const [state, addNewTaskAction, isPending] = useActionState(addNewTask, null);
   const { closeNewTaskForm } = useShouldOpenNewTaskFormStore();
-  const { tasks } = useTasksStore();
+  const {
+    tasks,
+    findTaskByDayAndTime,
+    updateExistingTask: updateExistingTaskInStore,
+    addTasks: addTasksToStore,
+  } = useTasksStore();
   const { editTaskModeEnabled, enableEditTaskMode, disableEditTaskMode } =
     useEditTaskModeStore();
+  const [oldTask, setOldTask] = useState(
+    findTaskByDayAndTime(
+      form.getValues("day"),
+      Time.fromString(form.getValues("time"))!,
+    ),
+  );
+  const [submitted, setSubmitted] = useState(false);
 
   function onSubmit(values: z.infer<typeof newTaskSchema>) {
     startTransition(() => {
       addNewTaskAction(values);
-      closeNewTaskForm();
+      setSubmitted(true);
     });
   }
 
@@ -70,21 +82,34 @@ export default function NewTaskForm() {
     );
 
     if (existingTask) {
+      setOldTask(existingTask);
       enableEditTaskMode();
-      form.setValue("task", existingTask.name);
-      form.setValue("day", days[existingTask.day]);
-      form.setValue(
-        "time",
-        `${existingTask.time.hour < 10 ? "0" : ""}${existingTask.time.hour}:${existingTask.time.minute < 10 ? "0" : ""}${existingTask.time.minute}`,
-      );
-      form.setValue("priority", existingTask.priority);
-      form.setValue("description", existingTask.description ?? undefined);
     } else {
       disableEditTaskMode();
-      form.setValue("task", "");
-      form.setValue("description", "");
     }
   }
+
+  useEffect(() => {
+    if (submitted && state?.success) {
+      if (editTaskModeEnabled) {
+        console.log(state.task);
+
+        updateExistingTaskInStore(state.task.day, state.task.time, state.task);
+      } else {
+        addTasksToStore([state.task]);
+      }
+
+      closeNewTaskForm();
+    }
+  }, [
+    addTasksToStore,
+    closeNewTaskForm,
+    editTaskModeEnabled,
+    state?.success,
+    state?.task,
+    submitted,
+    updateExistingTaskInStore,
+  ]);
 
   useEffect(() => {
     if (defaultTask != null) {
@@ -96,6 +121,24 @@ export default function NewTaskForm() {
 
   return (
     <Form {...form}>
+      {editTaskModeEnabled && oldTask && (
+        <div className="text-muted-foreground mt-7 mb-3">
+          <div>Old task&apos;s details:</div>
+          <ol className="list-disc *:ml-7" role="list">
+            <li>
+              name: <strong>{oldTask!.name}</strong>
+            </li>
+            <li>
+              priority: <strong>{oldTask!.priority}</strong>
+            </li>
+            {oldTask?.description && (
+              <li>
+                description: <strong>{oldTask.description}</strong>
+              </li>
+            )}
+          </ol>
+        </div>
+      )}
       <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5">
         <div className="space-y-4">
           <FormField
