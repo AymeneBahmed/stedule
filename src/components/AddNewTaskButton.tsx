@@ -38,7 +38,7 @@ export default function AddNewTaskButton(
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add time</DialogTitle>
+          <DialogTitle>What do you want to do?</DialogTitle>
           <DialogDescription className="sr-only">
             Add new time
           </DialogDescription>
