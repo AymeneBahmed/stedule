@@ -1,3 +1,7 @@
+import { Task, Time } from "@prisma/client";
+import { createTask } from "../db/task";
+import { PrismaTaskModified } from "./interfaces";
+
 // 0 -> Sunday
 export type weekdayIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type Hour =
@@ -86,3 +90,4 @@ export type Minute =
   | 57
   | 58
   | 59;
+export type TaskWithTime = Task & { time: Time };
