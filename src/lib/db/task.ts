@@ -13,9 +13,9 @@ export async function getTasks() {
 
 export async function createTask(
   task: Omit<PrismaTaskModified, "id" | "timeId">,
-) {
+): Promise<PrismaTaskModified | null> {
   try {
-    return await prisma.task.create({
+    return (await prisma.task.create({
       data: {
         name: task.name,
         day: task.day,
@@ -39,7 +39,7 @@ export async function createTask(
       include: {
         time: true,
       },
-    });
+    })) as PrismaTaskModified;
   } catch {
     return null;
   }
