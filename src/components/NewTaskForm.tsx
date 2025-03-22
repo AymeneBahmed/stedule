@@ -125,7 +125,12 @@ export default function NewTaskForm() {
                   onValueChange={(value) => {
                     field.onChange(value);
 
-                    getExistingTask();
+                    if (
+                      form.getValues("time").length === 5 &&
+                      !form.getFieldState("time").invalid
+                    ) {
+                      getExistingTask();
+                    }
                   }}
                   defaultValue={field.value}
                 >
