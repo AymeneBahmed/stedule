@@ -11,6 +11,11 @@ interface TasksStore {
     day: Day | (typeof days)[number],
     time: Time,
   ) => PrismaTaskModified | null;
+  updateExistingTask: (
+    day: Day | (typeof days)[number],
+    time: Time,
+    newDetails: Partial<PrismaTaskModified>,
+  ) => void;
 }
 
 export const useTasksStore = create<TasksStore>((set, get) => ({
@@ -35,5 +40,21 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
             : task.day === day) && Time.equals(task.time, time),
       ) ?? null
     );
+  },
+  updateExistingTask(day, time, newDetails) {
+    const existingTasks = get().tasks;
+
+    for (let i = 0; i < get().tasks.length; i++) {
+      const task = existingTasks[i]!;
+
+      if (
+        (typeof day === "string" ? days[task.day] === day : task.day === day) &&
+        Time.equals(task.time, time)
+      ) {
+        existingTasks[i] = { ...task, ...newDetails };
+      }
+    }
+
+    set((state) => ({ tasks: state.tasks }));
   },
 }));
