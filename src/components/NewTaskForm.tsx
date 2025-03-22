@@ -42,7 +42,7 @@ export default function NewTaskForm() {
       day: defaultDay ?? undefined,
       time:
         defaultTime == null
-          ? undefined
+          ? ""
           : `${defaultTime.hour.toString().padStart(2, "0")}:${defaultTime.minute.toString().padStart(2, "0")}`,
       priority: defaultTask?.priority ?? "Unspecified",
       description: defaultTask?.description ?? "",
