@@ -31,6 +31,8 @@ import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFor
 import { useTasksStore } from "@/lib/stores/tasksStore";
 import { Time } from "@/lib/classes/Time";
 import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
+import { toast } from "sonner";
+import { Check } from "lucide-react";
 
 export default function NewTaskForm() {
   const { defaultDay, defaultTime, defaultTask } =
@@ -98,6 +100,7 @@ export default function NewTaskForm() {
       }
 
       closeNewTaskForm();
+      toast(state.success, { icon: <Check /> });
     }
   }, [
     addTasksToStore,
