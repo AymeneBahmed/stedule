@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "./ui/button";
 import { ClipboardList } from "lucide-react";
 import {
@@ -8,14 +10,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import NewTaskForm from "./NewTaskForm";
 
 export default function AddNewTaskButton(
   props: React.ComponentProps<typeof Button>,
 ) {
+  const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
+    useShouldOpenNewTaskFormStore();
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <Dialog
+      open={shouldOpenNewTaskForm}
+      onOpenChange={(open) => {
+        if (open) {
+          openNewTaskForm();
+        } else {
+          closeNewTaskForm();
+        }
+      }}
+    >
+      <DialogTrigger asChild onClick={openNewTaskForm}>
         <Button size="icon" className="rounded-full" {...props}>
           <ClipboardList className="scale-125" />
         </Button>
