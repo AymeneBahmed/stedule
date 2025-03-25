@@ -23,6 +23,7 @@ export async function addNewTask(
 
   const { task: taskName, day, time, priority, description } = validated.data;
   let task: PrismaTaskModified | null = null;
+  let isNewTask = false;
 
   try {
     const existingTask = await prisma.task.findFirst({
@@ -45,6 +46,7 @@ export async function addNewTask(
         },
       })) as PrismaTaskModified;
     } else {
+      isNewTask = true;
       task = await createTask({
         name: taskName,
         day: days.indexOf(day),
@@ -62,7 +64,9 @@ export async function addNewTask(
   revalidatePath("/");
 
   return {
-    success: "Added a task successfully!",
+    success: isNewTask
+      ? "Added a task successfully!"
+      : "Updated task successfully!",
     task: task as PrismaTaskModified,
   };
 }
