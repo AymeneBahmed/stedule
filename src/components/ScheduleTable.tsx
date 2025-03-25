@@ -17,6 +17,7 @@ import { Time } from "@prisma/client";
 import NewTaskFormDialogContent from "./NewTaskFormDialogContent";
 import { useTasksStore } from "@/lib/stores/tasksStore";
 import { PrismaTaskModified } from "@/lib/ts/interfaces";
+import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 
 interface ScheduleTableProps {
   times: (TimeClass & Time)[];
@@ -29,6 +30,8 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
     useNewTaskFormDefaultValuesStore();
   const { addTasks } = useTasksStore();
   const dialogTriggerRef = useRef<HTMLButtonElement>(null);
+  const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
+    useShouldOpenNewTaskFormStore();
 
   useEffect(() => {
     addTasks(tasks);
@@ -94,7 +97,7 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
                             TimeClass.equals(task.time, time),
                         ) ?? null,
                       );
-                      dialogTriggerRef.current?.click();
+                      openNewTaskForm();
                     }}
                   >
                     {
@@ -113,8 +116,10 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
       </Table>
 
       <Dialog
+        open={shouldOpenNewTaskForm}
         onOpenChange={(open) => {
           if (!open) {
+            closeNewTaskForm();
             // use setTimeout to prevent the from from disabling edit mode which hides old task's details just before closing improving UX
             setTimeout(() => {
               setDefaultDay(null);
