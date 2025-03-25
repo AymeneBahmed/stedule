@@ -9,10 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
-import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { Time } from "@prisma/client";
 import NewTaskFormDialogContent from "./NewTaskFormDialogContent";
@@ -26,86 +25,66 @@ interface ScheduleTableProps {
 
 export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
   const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
-  const {
-    defaultDay,
-    defaultTime,
-    setDefaultDay,
-    setDefaultTime,
-    setDefaultTask,
-  } = useNewTaskFormDefaultValuesStore();
-  const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
-    useShouldOpenNewTaskFormStore();
+  const { setDefaultDay, setDefaultTime, setDefaultTask } =
+    useNewTaskFormDefaultValuesStore();
   const { addTasks } = useTasksStore();
+  const dialogTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     addTasks(tasks);
   }, [addTasks, tasks]);
 
   return (
-    <Table className="border border-black dark:border-white">
-      <TableHeader>
-        <TableRow className="border-black dark:border-white">
-          {/* Additional empty cell */}
-          <TableHead className="bg-secondary"></TableHead>
+    <>
+      <Table className="border border-black dark:border-white">
+        <TableHeader>
+          <TableRow className="border-black dark:border-white">
+            {/* Additional empty cell */}
+            <TableHead className="bg-secondary"></TableHead>
 
-          {days.map((day) => (
-            <TableHead
-              key={day}
-              className="bg-secondary border-l border-black text-center text-black dark:border-white dark:text-white"
-            >
-              {day.toUpperCase()}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
+            {days.map((day) => (
+              <TableHead
+                key={day}
+                className="bg-secondary border-l border-black text-center text-black dark:border-white dark:text-white"
+              >
+                {day.toUpperCase()}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
 
-      <TableBody>
-        {times.map((time, i) => (
-          <Fragment key={time.id}>
-            {/* A seperator row between the hours <= 12 and > 12 */}
-            {time.hour >= 13 &&
-              times[i - 1] != null &&
-              times[i - 1]!.hour < 13 && (
-                <TableRow className="h-[1rem] border-black dark:border-white">
-                  <TableCell className="bg-secondary text-center font-bold"></TableCell>
+        <TableBody>
+          {times.map((time, i) => (
+            <Fragment key={time.id}>
+              {/* A seperator row between the hours <= 12 and > 12 */}
+              {time.hour >= 13 &&
+                times[i - 1] != null &&
+                times[i - 1]!.hour < 13 && (
+                  <TableRow className="h-[1rem] border-black dark:border-white">
+                    <TableCell className="bg-secondary text-center font-bold"></TableCell>
 
-                  {[...Array(7)].map((_, i) => (
-                    <TableCell
-                      key={i}
-                      className="bg-secondary border-l border-black dark:border-white"
-                    />
-                  ))}
-                </TableRow>
-              )}
+                    {[...Array(7)].map((_, i) => (
+                      <TableCell
+                        key={i}
+                        className="bg-secondary border-l border-black dark:border-white"
+                      />
+                    ))}
+                  </TableRow>
+                )}
 
-            <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
-              {/* Time cell (the first cell of each row) */}
-              <TableCell className="bg-secondary text-center font-bold">
-                {time.hour < 10 && "0"}
-                {time.hour}:{time.minute < 10 && "0"}
-                {time.minute}
-              </TableCell>
+              <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
+                {/* Time cell (the first cell of each row) */}
+                <TableCell className="bg-secondary text-center font-bold">
+                  {time.hour < 10 && "0"}
+                  {time.hour}:{time.minute < 10 && "0"}
+                  {time.minute}
+                </TableCell>
 
-              {[...Array(7)].map((_, j) => (
-                <Dialog
-                  key={j}
-                  open={
-                    // These checks were added to prevent the slow opening of the dialog
-                    defaultDay === days[j] &&
-                    defaultTime != null &&
-                    TimeClass.equals(defaultTime, time) &&
-                    shouldOpenNewTaskForm
-                  }
-                  onOpenChange={(val) => {
-                    // on closing the dialog
-                    if (!val) {
-                      setDefaultDay(null);
-                      setDefaultTime(null);
-                      setDefaultTask(null);
-                      closeNewTaskForm();
-                    }
-                    // On opening the dialog
-                    else {
+                {[...Array(7)].map((_, j) => (
+                  <TableCell
+                    key={j}
+                    className="hover:bg-muted/70 active:bg-muted/90 cell cursor-pointer border-l border-black text-center dark:border-white"
+                    onClick={() => {
                       setDefaultDay(days[j]!);
                       setDefaultTime(time);
                       setDefaultTask(
@@ -115,29 +94,42 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
                             TimeClass.equals(task.time, time),
                         ) ?? null,
                       );
-                      openNewTaskForm();
+                      dialogTriggerRef.current?.click();
+                    }}
+                  >
+                    {
+                      tasksGroupedByDay[days[j]!]?.find(
+                        (task) =>
+                          task.time.hour === time.hour &&
+                          task.time.minute === time.minute,
+                      )?.name
                     }
-                  }}
-                >
-                  <DialogTrigger asChild>
-                    <TableCell className="hover:bg-muted/70 active:bg-muted/90 cursor-pointer border-l border-black text-center dark:border-white">
-                      {
-                        tasksGroupedByDay[days[j]!]?.find(
-                          (task) =>
-                            task.time.hour === time.hour &&
-                            task.time.minute === time.minute,
-                        )?.name
-                      }
-                    </TableCell>
-                  </DialogTrigger>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </Fragment>
+          ))}
+        </TableBody>
+      </Table>
 
-                  <NewTaskFormDialogContent />
-                </Dialog>
-              ))}
-            </TableRow>
-          </Fragment>
-        ))}
-      </TableBody>
-    </Table>
+      <Dialog
+        onOpenChange={(open) => {
+          if (!open) {
+            // use setTimeout to prevent the from from disabling edit mode which hides old task's details just before closing improving UX
+            setTimeout(() => {
+              setDefaultDay(null);
+              setDefaultTime(null);
+              setDefaultTask(null);
+            }, 100);
+          }
+        }}
+      >
+        <DialogTrigger
+          className="sr-only"
+          ref={dialogTriggerRef}
+        ></DialogTrigger>
+        <NewTaskFormDialogContent />
+      </Dialog>
+    </>
   );
 }
