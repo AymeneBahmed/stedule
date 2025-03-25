@@ -92,8 +92,6 @@ export default function NewTaskForm() {
   useEffect(() => {
     if (submitted && state?.success) {
       if (editTaskModeEnabled) {
-        console.log(state.task);
-
         updateExistingTaskInStore(state.task.day, state.task.time, state.task);
       } else {
         addTasksToStore([state.task]);
