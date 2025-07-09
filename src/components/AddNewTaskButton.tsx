@@ -12,21 +12,34 @@ import {
 } from "./ui/dialog";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import NewTaskForm from "./NewTaskForm";
+import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 
 export default function AddNewTaskButton(
   props: React.ComponentProps<typeof Button>,
 ) {
   const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
     useShouldOpenNewTaskFormStore();
+  const { setDefaultDay, setDefaultTime, setDefaultTask } =
+    useNewTaskFormDefaultValuesStore();
 
   return (
     <Dialog
       open={shouldOpenNewTaskForm}
       onOpenChange={(open) => {
         if (open) {
+          setDefaultDay(null);
+          setDefaultTime(null);
+          setDefaultTask(null);
+
           openNewTaskForm();
         } else {
           closeNewTaskForm();
+
+          setTimeout(() => {
+            setDefaultDay(null);
+            setDefaultTime(null);
+            setDefaultTask(null);
+          }, 100);
         }
       }}
     >
