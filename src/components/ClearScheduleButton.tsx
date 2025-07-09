@@ -48,7 +48,11 @@ function ClearScheduleButton({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <form action={clearScheduleAction}>
-            <AlertDialogAction type="submit">Clear</AlertDialogAction>
+            <AlertDialogAction type="submit" asChild>
+              <Button variant="destructive" className="text-white">
+                Clear
+              </Button>
+            </AlertDialogAction>
           </form>
         </AlertDialogFooter>
       </AlertDialogContent>
