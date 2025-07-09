@@ -1,6 +1,7 @@
 import AddNewTaskButton from "./AddNewTaskButton";
 import AddNewTimeButton from "./AddNewTimeButton";
 import ClearScheduleButton from "./ClearScheduleButton";
+import PrintScheduleButton from "./PrintScheduleButton";
 import ThemeTogglerButton from "./ThemeTogglerButton";
 
 export default function Toolbar() {
@@ -9,6 +10,7 @@ export default function Toolbar() {
       <AddNewTimeButton />
       <AddNewTaskButton />
       <ThemeTogglerButton className="rounded-full" />
+      <PrintScheduleButton className="rounded-full" />
       <ClearScheduleButton
         variant="destructive"
         className="!bg-destructive rounded-full"

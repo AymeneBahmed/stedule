@@ -35,7 +35,10 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
 
   return (
     <>
-      <Table className="table-fixed border border-black dark:border-white">
+      <Table
+        id="schedule-table"
+        className="table-fixed border border-black dark:border-white print:absolute print:top-9 print:left-1/2 print:w-[80%] print:-translate-x-1/2"
+      >
         <TableHeader>
           <TableRow className="border-black dark:border-white">
             {/* Additional empty cell */}

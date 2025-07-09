@@ -19,8 +19,10 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex min-h-full flex-col items-center justify-center gap-6 py-10 [&>div]:w-[80%]">
-      <Toolbar />
+    <div className="flex min-h-full flex-col items-center justify-center gap-6 py-10 [&>div]:w-[80%] print:[&>div]:w-full">
+      <div className="contents print:hidden">
+        <Toolbar />
+      </div>
       <ScheduleTable tasks={initialTasks} times={times} />
     </div>
   );
