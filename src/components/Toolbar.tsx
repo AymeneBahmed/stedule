@@ -9,7 +9,10 @@ export default function Toolbar() {
       <AddNewTimeButton />
       <AddNewTaskButton />
       <ThemeTogglerButton className="rounded-full" />
-      <ClearScheduleButton className="rounded-full" variant="destructive" />
+      <ClearScheduleButton
+        variant="destructive"
+        className="!bg-destructive rounded-full"
+      />
     </span>
   );
 }
