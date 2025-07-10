@@ -14,7 +14,7 @@ export default function Toolbar() {
   return (
     <span
       className={cn(
-        "bg-primary/15 sticky top-10 flex space-x-2 rounded-full px-1.5 py-1",
+        "bg-primary/15 sticky top-10 flex space-x-2 rounded-full px-1.5 py-1 backdrop-blur-xl",
         !shouldOpenNewTaskForm && "z-[9999999]",
       )}
     >
