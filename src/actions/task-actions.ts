@@ -70,3 +70,21 @@ export async function addNewTask(
     task: task as PrismaTaskModified,
   };
 }
+
+export async function removeTask(_prevState: unknown, id: number) {
+  try {
+    await prisma.task.delete({
+      where: { id },
+    });
+  } catch {
+    return {
+      error: "Something went wrong! Please try again.",
+    };
+  }
+
+  revalidatePath("/");
+
+  return {
+    success: "Removed task successfully!",
+  };
+}

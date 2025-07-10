@@ -20,6 +20,8 @@ import { Button } from "./ui/button";
 import { CheckIcon, Trash2Icon, TriangleAlert } from "lucide-react";
 import { removeTime } from "@/actions/time-actions";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { removeTask } from "@/actions/task-actions";
 
 interface ScheduleTableProps {
   times: (TimeClass & Time)[];
@@ -32,21 +34,34 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
     useNewTaskFormDefaultValuesStore();
   const { addTasks } = useTasksStore();
   const { openNewTaskForm } = useShouldOpenNewTaskFormStore();
-  const [state, removeTimeAction, pending] = useActionState(removeTime, null);
+  const [removeTimeActionState, removeTimeAction, removeTimeActionPending] =
+    useActionState(removeTime, null);
+  const [removeTaskActionState, removeTaskAction, removeTaskActionPending] =
+    useActionState(removeTask, null);
 
   useEffect(() => {
     addTasks(tasks);
   }, [addTasks, tasks]);
 
   useEffect(() => {
-    if (state?.error) {
-      toast(state.error, { icon: <TriangleAlert /> });
+    if (removeTimeActionState?.error) {
+      toast(removeTimeActionState.error, { icon: <TriangleAlert /> });
     }
 
-    if (state?.success) {
-      toast(state.success, { icon: <CheckIcon /> });
+    if (removeTimeActionState?.success) {
+      toast(removeTimeActionState.success, { icon: <CheckIcon /> });
     }
-  }, [state]);
+  }, [removeTimeActionState]);
+
+  useEffect(() => {
+    if (removeTaskActionState?.error) {
+      toast(removeTaskActionState.error, { icon: <TriangleAlert /> });
+    }
+
+    if (removeTaskActionState?.success) {
+      toast(removeTaskActionState.success, { icon: <CheckIcon /> });
+    }
+  }, [removeTaskActionState]);
 
   return (
     <>
@@ -101,7 +116,7 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
                         removeTimeAction(time.id);
                       });
                     }}
-                    disabled={pending}
+                    disabled={removeTimeActionPending}
                   >
                     <Trash2Icon />
                   </Button>
@@ -111,32 +126,55 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
                   </div>
                 </TableCell>
 
-                {[...Array(7)].map((_, j) => (
-                  <TableCell
-                    key={j}
-                    className="hover:bg-muted/70 active:bg-muted/90 cell cursor-pointer border-l border-black py-4 text-center break-words hyphens-auto whitespace-break-spaces dark:border-white"
-                    onClick={() => {
-                      setDefaultDay(days[j]!);
-                      setDefaultTime(time);
-                      setDefaultTask(
-                        tasks.find(
-                          (task) =>
-                            days[task.day] === days[j] &&
-                            TimeClass.equals(task.time, time),
-                        ) ?? null,
-                      );
-                      openNewTaskForm();
-                    }}
-                  >
-                    {
-                      tasksGroupedByDay[days[j]!]?.find(
-                        (task) =>
-                          task.time.hour === time.hour &&
-                          task.time.minute === time.minute,
-                      )?.name
-                    }
-                  </TableCell>
-                ))}
+                {[...Array(7)].map((_, j) => {
+                  const task = tasksGroupedByDay[days[j]!]?.find(
+                    (task) =>
+                      task.time.hour === time.hour &&
+                      task.time.minute === time.minute,
+                  );
+
+                  return (
+                    <TableCell
+                      key={j}
+                      className="hover:bg-muted/70 active:bg-muted/90 cell group relative cursor-pointer border-l border-black py-6 text-center break-words hyphens-auto whitespace-break-spaces dark:border-white"
+                      onClick={() => {
+                        setDefaultDay(days[j]!);
+                        setDefaultTime(time);
+                        setDefaultTask(
+                          tasks.find(
+                            (task) =>
+                              days[task.day] === days[j] &&
+                              TimeClass.equals(task.time, time),
+                          ) ?? null,
+                        );
+                        openNewTaskForm();
+                      }}
+                    >
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        className={cn(
+                          "!bg-destructive absolute top-2 right-2 hidden size-8",
+                          task != null && "group-hover:flex",
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+
+                          startTransition(() => {
+                            removeTaskAction(task!.id);
+                          });
+                        }}
+                        disabled={removeTaskActionPending}
+                      >
+                        <Trash2Icon />
+                      </Button>
+
+                      <div className="line-clamp-3 flex min-h-8 items-center justify-center text-ellipsis">
+                        {task?.name}
+                      </div>
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             </Fragment>
           ))}
