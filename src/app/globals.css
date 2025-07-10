@@ -164,4 +164,7 @@
   body[data-scroll-locked] {
     margin-right: 0 !important;
   }
+  html:has([data-state="open"]) #toolbar {
+    z-index: auto !important;
+  }
 }
