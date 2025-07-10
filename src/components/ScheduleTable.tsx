@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { Fragment, useEffect } from "react";
+import { Fragment, startTransition, useActionState, useEffect } from "react";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { Time } from "@prisma/client";
@@ -17,7 +17,9 @@ import { useTasksStore } from "@/lib/stores/tasksStore";
 import { PrismaTaskModified } from "@/lib/ts/interfaces";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Button } from "./ui/button";
-import { Trash2Icon } from "lucide-react";
+import { CheckIcon, Trash2Icon, TriangleAlert } from "lucide-react";
+import { removeTime } from "@/actions/time-actions";
+import { toast } from "sonner";
 
 interface ScheduleTableProps {
   times: (TimeClass & Time)[];
@@ -30,10 +32,21 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
     useNewTaskFormDefaultValuesStore();
   const { addTasks } = useTasksStore();
   const { openNewTaskForm } = useShouldOpenNewTaskFormStore();
+  const [state, removeTimeAction, pending] = useActionState(removeTime, null);
 
   useEffect(() => {
     addTasks(tasks);
   }, [addTasks, tasks]);
+
+  useEffect(() => {
+    if (state?.error) {
+      toast(state.error, { icon: <TriangleAlert /> });
+    }
+
+    if (state?.success) {
+      toast(state.success, { icon: <CheckIcon /> });
+    }
+  }, [state]);
 
   return (
     <>
@@ -83,9 +96,16 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
                     size="icon"
                     variant="destructive"
                     className="absolute top-2 right-2 hidden size-8 group-hover:flex"
+                    onClick={() => {
+                      startTransition(() => {
+                        removeTimeAction(time.id);
+                      });
+                    }}
+                    disabled={pending}
                   >
                     <Trash2Icon />
                   </Button>
+
                   <div className="contents">
                     {TimeClass.toString(time.hour, time.minute)}
                   </div>

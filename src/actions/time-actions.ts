@@ -46,3 +46,23 @@ export async function addNewTime(
     success: "Added a time successfully!",
   };
 }
+
+export async function removeTime(_prevState: unknown, id: number) {
+  let time: Time;
+
+  try {
+    time = (await prisma.time.delete({
+      where: { id },
+    })) as Time;
+  } catch {
+    return {
+      error: "Something went wrong! Please try again.",
+    };
+  }
+
+  revalidatePath("/");
+
+  return {
+    success: `Removed time ${Time.toString(time.hour, time.minute)} successfully!`,
+  };
+}
