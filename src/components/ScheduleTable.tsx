@@ -16,6 +16,8 @@ import { Time } from "@prisma/client";
 import { useTasksStore } from "@/lib/stores/tasksStore";
 import { PrismaTaskModified } from "@/lib/ts/interfaces";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
+import { Button } from "./ui/button";
+import { Trash2Icon } from "lucide-react";
 
 interface ScheduleTableProps {
   times: (TimeClass & Time)[];
@@ -76,10 +78,17 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
 
               <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
                 {/* Time cell (the first cell of each row) */}
-                <TableCell className="bg-secondary text-center font-bold">
-                  {time.hour < 10 && "0"}
-                  {time.hour}:{time.minute < 10 && "0"}
-                  {time.minute}
+                <TableCell className="bg-secondary group relative text-center font-bold">
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    className="absolute top-2 right-2 hidden size-8 group-hover:flex"
+                  >
+                    <Trash2Icon />
+                  </Button>
+                  <div className="contents">
+                    {TimeClass.toString(time.hour, time.minute)}
+                  </div>
                 </TableCell>
 
                 {[...Array(7)].map((_, j) => (
