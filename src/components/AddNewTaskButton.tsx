@@ -49,7 +49,7 @@ export default function AddNewTaskButton(
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="z-[9999999]">
         <DialogHeader>
           <DialogTitle>What do you want to do?</DialogTitle>
           <DialogDescription className="sr-only">
