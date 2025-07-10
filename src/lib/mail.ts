@@ -9,3 +9,12 @@ const transporter = nodemailer.createTransport({
     pass: "sxzlplhhsqfpgmpi",
   },
 });
+
+export async function sendEmailVerificationMail(email: string, otp: string) {
+  await transporter.sendMail({
+    from: "Study Schedule <aymendd3131@gmail.com>",
+    to: email,
+    subject: "Verify your account",
+    html: `Here is your verification code: <strong>${otp}</strong>`,
+  });
+}
