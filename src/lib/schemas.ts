@@ -48,3 +48,7 @@ export const LoginSchema = z.object({
   }),
   password: z.string().min(1),
 });
+
+export const VerifyEmailSchema = z.object({
+  code: z.string().min(6, { message: "The code must contain 6 digits." }),
+});
