@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { startTransition, useActionState } from "react";
-import { addNewTime } from "@/actions/new-time-form-actions";
+import { addNewTime } from "@/actions/time-actions";
 import FormError from "./FormError";
 import FormSuccess from "./FormSuccess";
 
