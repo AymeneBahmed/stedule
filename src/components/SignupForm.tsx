@@ -22,6 +22,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SignupSchema } from "@/lib/schemas";
+import { authClient } from "@/lib/auth/auth-client";
+import { useState } from "react";
+import FormSuccess from "./FormSuccess";
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof SignupSchema>>({
@@ -32,14 +35,26 @@ export default function SignupForm() {
       password: "",
     },
   });
+  const [success, setSuccess] = useState(false);
 
-  function onSubmit(data: z.infer<typeof SignupSchema>) {
-    toast.success("Account created successfully!", {
-      description: `Welcome, ${data.fullName}! Your account has been created.`,
-    });
+  async function onSubmit(values: z.infer<typeof SignupSchema>) {
+    await authClient.signUp.email(
+      {
+        name: values.fullName,
+        email: values.email,
+        password: values.password,
+      },
+      {
+        onSuccess() {
+          setSuccess(true);
+        },
+        onError() {
+          toast.error("Couldn't create account! Please try again.");
 
-    // Here you would typically send the data to your backend
-    console.log("Form submitted:", data);
+          setSuccess(false);
+        },
+      },
+    );
   }
 
   return (
@@ -106,7 +121,15 @@ export default function SignupForm() {
                 />
               </div>
 
-              <Button type="submit" className="mt-10 w-full">
+              {success && (
+                <FormSuccess message="Check your inbox for verification." />
+              )}
+
+              <Button
+                type="submit"
+                className="mt-10 w-full"
+                disabled={form.formState.isSubmitting}
+              >
                 Create Account
               </Button>
             </form>
