@@ -23,8 +23,7 @@ import {
 } from "@/components/ui/card";
 import { SignupSchema } from "@/lib/schemas";
 import { authClient } from "@/lib/auth/auth-client";
-import { useState } from "react";
-import FormSuccess from "./FormSuccess";
+import { useRouter } from "next/navigation";
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof SignupSchema>>({
@@ -35,7 +34,7 @@ export default function SignupForm() {
       password: "",
     },
   });
-  const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof SignupSchema>) {
     await authClient.signUp.email(
@@ -45,13 +44,13 @@ export default function SignupForm() {
         password: values.password,
       },
       {
-        onSuccess() {
-          setSuccess(true);
+        async onSuccess() {
+          toast.success("Check your inbox for verification.");
+
+          router.push("/verify-email");
         },
         onError() {
           toast.error("Couldn't create account! Please try again.");
-
-          setSuccess(false);
         },
       },
     );
@@ -120,10 +119,6 @@ export default function SignupForm() {
                   )}
                 />
               </div>
-
-              {success && (
-                <FormSuccess message="Check your inbox for verification." />
-              )}
 
               <Button
                 type="submit"
