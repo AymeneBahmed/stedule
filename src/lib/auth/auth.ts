@@ -1,9 +1,10 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, Session, User } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { emailOTP } from "better-auth/plugins";
 import { prisma } from "../prisma";
 import { sendEmailVerificationMail } from "../mail";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -37,3 +38,32 @@ export const auth = betterAuth({
     autoSignIn: false,
   },
 });
+
+// 1. Define function overloads
+export async function getSession(options?: {
+  redirectOnNull?: false;
+}): Promise<{ session: Session; user: User } | null>;
+export async function getSession(options: {
+  redirectOnNull: true;
+}): Promise<{ session: Session; user: User }>;
+export async function getSession({
+  redirectOnNull = false,
+}: { redirectOnNull?: boolean } = {}): Promise<{
+  session: Session;
+  user: User;
+} | null> {
+  // 2. Original implementation
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (session == null) {
+    if (redirectOnNull) {
+      redirect("/login"); // Never returns when redirecting
+    } else {
+      return null;
+    }
+  }
+
+  return session;
+}
