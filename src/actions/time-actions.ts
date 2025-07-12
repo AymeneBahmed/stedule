@@ -48,7 +48,7 @@ export async function addNewTime(
   revalidatePath("/");
 
   return {
-    success: "Added a time successfully!",
+    success: "Added time successfully!",
   };
 }
 

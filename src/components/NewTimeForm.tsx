@@ -14,10 +14,13 @@ import { newTimeSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { startTransition, useActionState } from "react";
+import { useActionState, useState, useTransition } from "react";
 import { addNewTime } from "@/actions/time-actions";
 import FormError from "./FormError";
 import FormSuccess from "./FormSuccess";
+import { useIsGuestMode } from "@/hooks/use-is-guest-mode";
+import { dexieDB } from "@/lib/db/dexieDB";
+import { Time } from "@/lib/classes/Time";
 
 export default function NewTimeForm() {
   const form = useForm<z.infer<typeof newTimeSchema>>({
@@ -26,11 +29,29 @@ export default function NewTimeForm() {
       time: "",
     },
   });
-  const [state, addNewTimeAction, isPending] = useActionState(addNewTime, null);
+  const [actionState, addNewTimeAction, isActionPending] = useActionState(
+    addNewTime,
+    null,
+  );
+  const [isTransitionPending, startTransition] = useTransition();
+  const isGuestMode = useIsGuestMode();
+  const [guestModeSuccess, setGuestModeSucces] = useState<string>();
+  const [guestModeError, setGuestModeError] = useState<string>();
 
   function onSubmit(values: z.infer<typeof newTimeSchema>) {
-    startTransition(() => {
-      addNewTimeAction(values);
+    startTransition(async () => {
+      if (isGuestMode) {
+        try {
+          await dexieDB.times.add({ ...Time.fromString(values.time)! });
+
+          setGuestModeSucces("Added time successfully");
+        } catch {
+          // TODO: handle all possible errors later
+          setGuestModeError("Something went wrong! Please try again.");
+        }
+      } else {
+        addNewTimeAction(values);
+      }
     });
   }
 
@@ -82,10 +103,19 @@ export default function NewTimeForm() {
           )}
         />
 
-        {state?.error && <FormError message={state.error} />}
-        {state?.success && <FormSuccess message={state.success} />}
+        {(actionState?.error || guestModeError) && (
+          <FormError message={actionState?.error || guestModeError || ""} />
+        )}
+        {(actionState?.success || guestModeSuccess) && (
+          <FormSuccess
+            message={actionState?.success || guestModeSuccess || ""}
+          />
+        )}
 
-        <Button className="mt-10 w-full" disabled={isPending}>
+        <Button
+          className="mt-10 w-full"
+          disabled={isActionPending || isTransitionPending}
+        >
           Submit
         </Button>
       </form>
