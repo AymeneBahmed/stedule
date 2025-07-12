@@ -17,7 +17,7 @@ import { useTasksStore } from "@/lib/stores/tasksStore";
 import { PrismaTaskModified } from "@/lib/ts/interfaces";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Button } from "./ui/button";
-import { CheckIcon, Trash2Icon, TriangleAlert } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { removeTime } from "@/actions/time-actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -87,21 +87,21 @@ export default function ScheduleTable({
 
   useEffect(() => {
     if (removeTimeActionState?.error) {
-      toast(removeTimeActionState.error, { icon: <TriangleAlert /> });
+      toast.error(removeTimeActionState.error);
     }
 
     if (removeTimeActionState?.success) {
-      toast(removeTimeActionState.success, { icon: <CheckIcon /> });
+      toast.success(removeTimeActionState.success);
     }
   }, [removeTimeActionState]);
 
   useEffect(() => {
     if (removeTaskActionState?.error) {
-      toast(removeTaskActionState.error, { icon: <TriangleAlert /> });
+      toast.error(removeTaskActionState.error);
     }
 
     if (removeTaskActionState?.success) {
-      toast(removeTaskActionState.success, { icon: <CheckIcon /> });
+      toast.success(removeTaskActionState.success);
     }
   }, [removeTaskActionState]);
 
@@ -155,8 +155,23 @@ export default function ScheduleTable({
                       variant="destructive"
                       className="absolute top-2 right-2 hidden size-8 group-hover:flex"
                       onClick={() => {
-                        startTransition(() => {
-                          removeTimeAction(time.id);
+                        startTransition(async () => {
+                          if (isGuestMode) {
+                            try {
+                              await dexieDB.times.delete(time.id);
+
+                              toast.success(
+                                `Removed time ${TimeClass.toString(time.hour, time.minute)} successfully!`,
+                              );
+                            } catch {
+                              // TODO: handle all possible errors
+                              toast.error(
+                                `Something went wrong! Please try again.`,
+                              );
+                            }
+                          } else {
+                            removeTimeAction(time.id);
+                          }
                         });
                       }}
                       disabled={removeTimeActionPending}
