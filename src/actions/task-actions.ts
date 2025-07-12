@@ -75,6 +75,8 @@ export async function addNewTask(
 }
 
 export async function removeTask(_prevState: unknown, id: number) {
+  await getSession({ redirectOnNull: true });
+
   try {
     await prisma.task.delete({
       where: { id },

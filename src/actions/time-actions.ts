@@ -1,5 +1,6 @@
 "use server";
 
+import { getSession } from "@/lib/auth/auth";
 import { Time } from "@/lib/classes/Time";
 import { prisma } from "@/lib/prisma";
 import { newTimeSchema } from "@/lib/schemas";
@@ -10,6 +11,7 @@ export async function addNewTime(
   _prevState: unknown,
   values: z.infer<typeof newTimeSchema>,
 ) {
+  const session = await getSession({ redirectOnNull: true });
   const validated = newTimeSchema.safeParse(values);
 
   if (!validated.success) {
@@ -32,7 +34,10 @@ export async function addNewTime(
     }
 
     await prisma.time.create({
-      data: Time.fromString(time)!,
+      data: {
+        userId: session.user.id,
+        ...Time.fromString(time)!,
+      },
     });
   } catch {
     return {
@@ -48,6 +53,8 @@ export async function addNewTime(
 }
 
 export async function removeTime(_prevState: unknown, id: number) {
+  await getSession({ redirectOnNull: true });
+
   let time: Time;
 
   try {
