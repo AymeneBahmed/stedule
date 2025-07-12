@@ -19,17 +19,24 @@ export async function createTask(
       data: {
         name: task.name,
         day: task.day,
+        user: {
+          connect: {
+            id: task.userId,
+          },
+        },
         time: {
           connectOrCreate: {
             where: {
-              hour_minute: {
+              hour_minute_userId: {
                 hour: task.time.hour,
                 minute: task.time.minute,
+                userId: task.userId,
               },
             },
             create: {
               hour: task.time.hour,
               minute: task.time.minute,
+              userId: task.userId,
             },
           },
         },
