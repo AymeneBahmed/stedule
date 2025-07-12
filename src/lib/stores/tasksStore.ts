@@ -4,24 +4,28 @@ import { Day } from "../ts/enums";
 import { days } from "../constants";
 import { PrismaTaskModified } from "../ts/interfaces";
 
+export type TaskFromStore =
+  | PrismaTaskModified
+  | Omit<PrismaTaskModified, "userId">;
+
 interface TasksStore {
-  tasks: PrismaTaskModified[];
-  addTasks: (newTasks: PrismaTaskModified[]) => void;
+  tasks: TaskFromStore[];
+  addTasks: (newTasks: TaskFromStore[]) => void;
   findTaskByDayAndTime: (
     day: Day | (typeof days)[number],
     time: Time,
-  ) => PrismaTaskModified | null;
+  ) => TaskFromStore | null;
   updateExistingTask: (
     day: Day | (typeof days)[number],
     time: Time,
-    newDetails: Partial<PrismaTaskModified>,
+    newDetails: Partial<TaskFromStore>,
   ) => void;
 }
 
 export const useTasksStore = create<TasksStore>((set, get) => ({
   tasks: [],
   addTasks(newTasks) {
-    const tasksToAdd: PrismaTaskModified[] = [];
+    const tasksToAdd: TaskFromStore[] = [];
 
     for (const task of newTasks) {
       if (!get().tasks.includes(task)) {
