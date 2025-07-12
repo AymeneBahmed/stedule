@@ -1,4 +1,4 @@
-import { Task } from "@prisma/client";
+import { Task, Time } from "@prisma/client";
 import { Hour, Minute } from "./types";
 import { Day } from "./enums";
 
@@ -8,4 +8,9 @@ export interface PrismaTaskModified extends Task {
     hour: Hour;
     minute: Minute;
   };
+}
+
+export interface PrismaTimeModified extends Time {
+  hour: Hour;
+  minute: Minute;
 }
