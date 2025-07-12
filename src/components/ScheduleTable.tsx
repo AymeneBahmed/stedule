@@ -22,17 +22,42 @@ import { removeTime } from "@/actions/time-actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { removeTask } from "@/actions/task-actions";
+import { useLiveQuery } from "dexie-react-hooks";
+import { dexieDB } from "@/lib/db/dexieDB";
+import { Hour } from "@/lib/ts/types";
 
-interface ScheduleTableProps {
+interface BaseScheduleTableProps {
+  isGuestMode?: boolean;
+}
+
+interface GuestModeProps extends BaseScheduleTableProps {
+  isGuestMode: true;
+  times?: never;
+  tasks?: never;
+}
+
+interface RegularModeProps extends BaseScheduleTableProps {
+  isGuestMode?: false;
   times: (TimeClass & Time)[];
   tasks: PrismaTaskModified[];
 }
 
-export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
-  const tasksGroupedByDay = Object.groupBy(tasks, ({ day }) => days[day]);
+type ScheduleTableProps = GuestModeProps | RegularModeProps;
+
+export default function ScheduleTable({
+  times,
+  tasks,
+  isGuestMode,
+}: ScheduleTableProps) {
+  const dexieTimes = useLiveQuery(() => dexieDB.times.toArray());
+  const dexieTasks = useLiveQuery(() => dexieDB.tasks.toArray());
+  const { tasks: tasksFromStore, addTasks } = useTasksStore();
+  const tasksGroupedByDay = Object.groupBy(
+    isGuestMode ? tasksFromStore : tasks,
+    ({ day }) => days[day],
+  );
   const { setDefaultDay, setDefaultTime, setDefaultTask } =
     useNewTaskFormDefaultValuesStore();
-  const { addTasks } = useTasksStore();
   const { openNewTaskForm } = useShouldOpenNewTaskFormStore();
   const [removeTimeActionState, removeTimeAction, removeTimeActionPending] =
     useActionState(removeTime, null);
@@ -40,8 +65,25 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
     useActionState(removeTask, null);
 
   useEffect(() => {
-    addTasks(tasks);
-  }, [addTasks, tasks]);
+    if (!isGuestMode) {
+      addTasks(tasks);
+    }
+
+    if (isGuestMode) {
+      if (dexieTasks != null) {
+        addTasks(dexieTasks);
+      }
+
+      if (dexieTimes?.length === 0) {
+        dexieDB.times.bulkAdd(
+          Array.from({ length: 8 }, (_, i) => ({
+            hour: (i + 8) as Hour,
+            minute: 0,
+          })),
+        );
+      }
+    }
+  }, [addTasks, dexieTasks, dexieTimes?.length, isGuestMode, tasks]);
 
   useEffect(() => {
     if (removeTimeActionState?.error) {
@@ -86,98 +128,100 @@ export default function ScheduleTable({ times, tasks }: ScheduleTableProps) {
         </TableHeader>
 
         <TableBody>
-          {times.map((time, i) => (
-            <Fragment key={time.id}>
-              {/* A seperator row between the hours <= 12 and > 12 */}
-              {time.hour >= 13 &&
-                times[i - 1] != null &&
-                times[i - 1]!.hour < 13 && (
-                  <TableRow className="h-[1rem] border-black dark:border-white">
-                    <TableCell className="bg-secondary text-center font-bold"></TableCell>
+          {(isGuestMode ? dexieTimes : times)?.map(
+            (time, i, currentTimesArray) => (
+              <Fragment key={time.id}>
+                {/* A seperator row between the hours <= 12 and > 12 */}
+                {time.hour >= 13 &&
+                  currentTimesArray[i - 1] != null &&
+                  currentTimesArray[i - 1]!.hour < 13 && (
+                    <TableRow className="h-[1rem] border-black dark:border-white">
+                      <TableCell className="bg-secondary text-center font-bold"></TableCell>
 
-                    {[...Array(7)].map((_, i) => (
-                      <TableCell
-                        key={i}
-                        className="bg-secondary border-l border-black dark:border-white"
-                      />
-                    ))}
-                  </TableRow>
-                )}
+                      {[...Array(7)].map((_, i) => (
+                        <TableCell
+                          key={i}
+                          className="bg-secondary border-l border-black dark:border-white"
+                        />
+                      ))}
+                    </TableRow>
+                  )}
 
-              <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
-                {/* Time cell (the first cell of each row) */}
-                <TableCell className="bg-secondary group relative text-center font-bold">
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="absolute top-2 right-2 hidden size-8 group-hover:flex"
-                    onClick={() => {
-                      startTransition(() => {
-                        removeTimeAction(time.id);
-                      });
-                    }}
-                    disabled={removeTimeActionPending}
-                  >
-                    <Trash2Icon />
-                  </Button>
-
-                  <div className="contents">
-                    {TimeClass.toString(time.hour, time.minute)}
-                  </div>
-                </TableCell>
-
-                {[...Array(7)].map((_, j) => {
-                  const task = tasksGroupedByDay[days[j]!]?.find(
-                    (task) =>
-                      task.time.hour === time.hour &&
-                      task.time.minute === time.minute,
-                  );
-
-                  return (
-                    <TableCell
-                      key={j}
-                      className="hover:bg-muted/70 active:bg-muted/90 cell group relative cursor-pointer border-l border-black py-6 text-center break-words hyphens-auto whitespace-break-spaces dark:border-white"
+                <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
+                  {/* Time cell (the first cell of each row) */}
+                  <TableCell className="bg-secondary group relative text-center font-bold">
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="absolute top-2 right-2 hidden size-8 group-hover:flex"
                       onClick={() => {
-                        setDefaultDay(days[j]!);
-                        setDefaultTime(time);
-                        setDefaultTask(
-                          tasks.find(
-                            (task) =>
-                              days[task.day] === days[j] &&
-                              TimeClass.equals(task.time, time),
-                          ) ?? null,
-                        );
-                        openNewTaskForm();
+                        startTransition(() => {
+                          removeTimeAction(time.id);
+                        });
                       }}
+                      disabled={removeTimeActionPending}
                     >
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        className={cn(
-                          "!bg-destructive absolute top-2 right-2 hidden size-8",
-                          task != null && "group-hover:flex",
-                        )}
-                        onClick={(e) => {
-                          e.stopPropagation();
+                      <Trash2Icon />
+                    </Button>
 
-                          startTransition(() => {
-                            removeTaskAction(task!.id);
-                          });
+                    <div className="contents">
+                      {TimeClass.toString(time.hour, time.minute)}
+                    </div>
+                  </TableCell>
+
+                  {[...Array(7)].map((_, j) => {
+                    const task = tasksGroupedByDay[days[j]!]?.find(
+                      (task) =>
+                        task.time.hour === time.hour &&
+                        task.time.minute === time.minute,
+                    );
+
+                    return (
+                      <TableCell
+                        key={j}
+                        className="hover:bg-muted/70 active:bg-muted/90 cell group relative cursor-pointer border-l border-black py-6 text-center break-words hyphens-auto whitespace-break-spaces dark:border-white"
+                        onClick={() => {
+                          setDefaultDay(days[j]!);
+                          setDefaultTime(time);
+                          setDefaultTask(
+                            (isGuestMode ? tasksFromStore : tasks).find(
+                              (task) =>
+                                days[task.day] === days[j] &&
+                                TimeClass.equals(task.time, time),
+                            ) ?? null,
+                          );
+                          openNewTaskForm();
                         }}
-                        disabled={removeTaskActionPending}
                       >
-                        <Trash2Icon />
-                      </Button>
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          className={cn(
+                            "!bg-destructive absolute top-2 right-2 hidden size-8",
+                            task != null && "group-hover:flex",
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
 
-                      <div className="line-clamp-3 flex min-h-8 items-center justify-center text-ellipsis">
-                        {task?.name}
-                      </div>
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            </Fragment>
-          ))}
+                            startTransition(() => {
+                              removeTaskAction(task!.id);
+                            });
+                          }}
+                          disabled={removeTaskActionPending}
+                        >
+                          <Trash2Icon />
+                        </Button>
+
+                        <div className="line-clamp-3 flex min-h-8 items-center justify-center text-ellipsis">
+                          {task?.name}
+                        </div>
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              </Fragment>
+            ),
+          )}
         </TableBody>
       </Table>
     </>
