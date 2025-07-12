@@ -1,9 +1,9 @@
-import { Task, Time } from "@prisma/client";
 import Dexie, { EntityTable } from "dexie";
+import { PrismaTaskModified, PrismaTimeModified } from "../ts/interfaces";
 
 export const dexieDB = new Dexie("study-schedule") as Dexie & {
-  tasks: EntityTable<Omit<Task, "userId">, "id">;
-  times: EntityTable<Omit<Time, "userId">, "id">;
+  tasks: EntityTable<Omit<PrismaTaskModified, "userId">, "id">;
+  times: EntityTable<Omit<PrismaTimeModified, "userId">, "id">;
 };
 
 dexieDB.version(1).stores({
