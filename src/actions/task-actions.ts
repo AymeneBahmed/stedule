@@ -1,5 +1,6 @@
 "use server";
 
+import { getSession } from "@/lib/auth/auth";
 import { Time } from "@/lib/classes/Time";
 import { days } from "@/lib/constants";
 import { createTask } from "@/lib/db/task";
@@ -13,6 +14,7 @@ export async function addNewTask(
   _prevState: unknown,
   values: z.infer<typeof newTaskSchema>,
 ) {
+  const session = await getSession({ redirectOnNull: true });
   const validated = newTaskSchema.safeParse(values);
 
   if (!validated.success) {
@@ -53,6 +55,7 @@ export async function addNewTask(
         time: Time.fromString(time)!,
         priority,
         description: description ?? null,
+        userId: session.user.id,
       });
     }
   } catch {
