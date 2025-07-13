@@ -21,10 +21,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoginSchema } from "@/lib/schemas";
-import { useState } from "react";
-import FormSuccess from "./FormSuccess";
 import Link from "next/link";
 import { Checkbox } from "./ui/checkbox";
+import { authClient } from "@/lib/auth/auth-client";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -35,9 +35,22 @@ export default function LoginForm() {
       remember: false,
     },
   });
-  const [success, setSuccess] = useState(false);
 
-  async function onSubmit(values: z.infer<typeof LoginSchema>) {}
+  async function onSubmit(values: z.infer<typeof LoginSchema>) {
+    await authClient.signIn.email(
+      {
+        email: values.email,
+        password: values.password,
+        rememberMe: values.remember,
+        callbackURL: "/",
+      },
+      {
+        onError(context) {
+          toast.error(context.error.message, { position: "top-center" });
+        },
+      },
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
@@ -104,10 +117,6 @@ export default function LoginForm() {
                   )}
                 />
               </div>
-
-              {success && (
-                <FormSuccess message="Check your inbox for verification." />
-              )}
 
               <Button
                 type="submit"
