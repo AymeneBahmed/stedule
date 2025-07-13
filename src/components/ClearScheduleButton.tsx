@@ -18,11 +18,13 @@ import { startTransition, useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import { useIsGuestMode } from "@/hooks/use-is-guest-mode";
 import { dexieDB } from "@/lib/db/dexieDB";
+import { useTasksStore } from "@/lib/stores/tasksStore";
 
 function ClearScheduleButton({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const [state, clearScheduleAction] = useActionState(clearSchedule, null);
+  const { deleteTasks } = useTasksStore();
   const isGuestMode = useIsGuestMode();
 
   function handleSubmit(e: React.MouseEvent<HTMLFormElement>) {
@@ -31,7 +33,11 @@ function ClearScheduleButton({
     startTransition(async () => {
       if (isGuestMode) {
         try {
+          const tasks = await dexieDB.tasks.toArray();
+
           await Promise.all([dexieDB.tasks.clear(), dexieDB.times.clear()]);
+
+          deleteTasks(tasks.map(({ id }) => id));
         } catch {
           toast.error("Couldn't clear the schedule! Please try again.");
         }
