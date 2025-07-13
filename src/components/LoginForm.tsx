@@ -24,6 +24,7 @@ import { LoginSchema } from "@/lib/schemas";
 import { useState } from "react";
 import FormSuccess from "./FormSuccess";
 import Link from "next/link";
+import { Checkbox } from "./ui/checkbox";
 
 export default function LoginForm() {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -31,6 +32,7 @@ export default function LoginForm() {
     defaultValues: {
       email: "",
       password: "",
+      remember: false,
     },
   });
   const [success, setSuccess] = useState(false);
@@ -82,6 +84,21 @@ export default function LoginForm() {
                           {...field}
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="remember"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center">
+                      <FormControl>
+                        <Checkbox onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <FormLabel className="text-[0.8rem]">
+                        Keep me logged in
+                      </FormLabel>
                       <FormMessage />
                     </FormItem>
                   )}

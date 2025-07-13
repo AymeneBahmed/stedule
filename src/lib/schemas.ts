@@ -47,6 +47,7 @@ export const LoginSchema = z.object({
     message: "Please enter a valid email address.",
   }),
   password: z.string().min(1),
+  remember: z.boolean().default(false),
 });
 
 export const VerifyEmailSchema = z.object({
