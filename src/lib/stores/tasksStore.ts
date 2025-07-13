@@ -21,6 +21,7 @@ interface TasksStore {
     time: Time,
     newDetails: Partial<TaskFromStore>,
   ) => void;
+  deleteTasks: (taskIDs: number[]) => void;
 }
 
 export function isPrismaTask(task: TaskFromStore): task is PrismaTaskModified {
@@ -100,5 +101,17 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
     }
 
     set(() => ({ tasks: existingTasks }));
+  },
+  deleteTasks(taskIDs) {
+    const existingTasks = get().tasks;
+    const newTasksArray = [];
+
+    for (const task of existingTasks) {
+      if (!taskIDs.includes(task.id)) {
+        newTasksArray.push(task);
+      }
+    }
+
+    set({ tasks: newTasksArray });
   },
 }));

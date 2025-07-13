@@ -51,7 +51,7 @@ export default function ScheduleTable({
 }: ScheduleTableProps) {
   const dexieTimes = useLiveQuery(() => dexieDB.times.toArray());
   const dexieTasks = useLiveQuery(() => dexieDB.tasks.toArray());
-  const { tasks: tasksFromStore, addTasks } = useTasksStore();
+  const { tasks: tasksFromStore, addTasks, deleteTasks } = useTasksStore();
   const tasksGroupedByDay = Object.groupBy(
     isGuestMode ? tasksFromStore : tasks,
     ({ day }) => days[day],
@@ -154,11 +154,24 @@ export default function ScheduleTable({
                       size="icon"
                       variant="destructive"
                       className="absolute top-2 right-2 hidden size-8 group-hover:flex"
-                      onClick={() => {
+                      onClick={async () => {
                         startTransition(async () => {
                           if (isGuestMode) {
                             try {
-                              await dexieDB.times.delete(time.id);
+                              // TODO: remove tasks as well from tasks store
+                              const tasksCollection = dexieDB.tasks.where({
+                                timeId: time.id,
+                              });
+                              const tasksIDs = (
+                                await tasksCollection.toArray()
+                              ).map(({ id }) => id);
+
+                              await Promise.all([
+                                dexieDB.times.delete(time.id),
+                                tasksCollection.delete(),
+                              ]);
+
+                              deleteTasks(tasksIDs);
 
                               toast.success(
                                 `Removed time ${TimeClass.toString(time.hour, time.minute)} successfully!`,
@@ -195,9 +208,7 @@ export default function ScheduleTable({
                       );
 
                       if (existingTime == null) {
-                        throw new Error(
-                          `Time ID ${task.timeId} does not exist in times table`,
-                        );
+                        return;
                       }
 
                       return TimeClass.equals(existingTime, time);
@@ -224,8 +235,21 @@ export default function ScheduleTable({
                           onClick={(e) => {
                             e.stopPropagation();
 
-                            startTransition(() => {
-                              removeTaskAction(task!.id);
+                            startTransition(async () => {
+                              if (isGuestMode) {
+                                try {
+                                  await dexieDB.tasks.delete(task!.id);
+
+                                  toast.success("Removed task successfully!");
+                                } catch {
+                                  // TODO: handle all possible errors
+                                  toast.error(
+                                    "Something went wrong! Please try again.",
+                                  );
+                                }
+                              } else {
+                                removeTaskAction(task!.id);
+                              }
                             });
                           }}
                           disabled={removeTaskActionPending}
