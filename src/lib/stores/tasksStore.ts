@@ -3,10 +3,11 @@ import { Time } from "../classes/Time";
 import { Day } from "../ts/enums";
 import { days } from "../constants";
 import { PrismaTaskModified } from "../ts/interfaces";
+import { dexieDB } from "../db/dexieDB";
 
 export type TaskFromStore =
   | PrismaTaskModified
-  | Omit<PrismaTaskModified, "userId">;
+  | Omit<PrismaTaskModified, "userId" | "time">;
 
 interface TasksStore {
   tasks: TaskFromStore[];
@@ -22,43 +23,82 @@ interface TasksStore {
   ) => void;
 }
 
+export function isPrismaTask(task: TaskFromStore): task is PrismaTaskModified {
+  return "time" in task;
+}
+
 export const useTasksStore = create<TasksStore>((set, get) => ({
   tasks: [],
   addTasks(newTasks) {
     const tasksToAdd: TaskFromStore[] = [];
+    const existingTasks = get().tasks;
 
     for (const task of newTasks) {
-      if (!get().tasks.includes(task)) {
+      if (existingTasks.find(({ id }) => id === task.id) == null) {
         tasksToAdd.push(task);
       }
     }
 
-    set((state) => ({ tasks: [...state.tasks, ...tasksToAdd] }));
+    set((state) => {
+      return { tasks: [...state.tasks, ...tasksToAdd] };
+    });
   },
   findTaskByDayAndTime(day, time) {
     return (
-      get().tasks.find(
-        (task) =>
-          (typeof day === "string"
-            ? days[task.day] === day
-            : task.day === day) && Time.equals(task.time, time),
-      ) ?? null
+      get().tasks.find(async (task) => {
+        if (isPrismaTask(task)) {
+          return (
+            (typeof day === "string"
+              ? days[task.day] === day
+              : task.day === day) && Time.equals(task.time, time)
+          );
+        } else {
+          const existingTime = await dexieDB.times.get(task.timeId);
+
+          if (existingTime == null) {
+            throw new Error(
+              `Time ID ${task.timeId} does not exist in times table`,
+            );
+          }
+
+          return (
+            (typeof day === "string"
+              ? days[task.day] === day
+              : task.day === day) && Time.equals(existingTime, time)
+          );
+        }
+      }) ?? null
     );
   },
-  updateExistingTask(day, time, newDetails) {
+  async updateExistingTask(day, time, newDetails) {
     const existingTasks = get().tasks;
 
-    for (let i = 0; i < get().tasks.length; i++) {
+    for (let i = 0; i < existingTasks.length; i++) {
       const task = existingTasks[i]!;
+      let areTimesEqual: boolean;
+
+      if (!isPrismaTask(task)) {
+        const existingTime = await dexieDB.times.get(task.timeId);
+
+        if (existingTime == null) {
+          throw new Error(
+            `Time ID ${task.timeId} does not exist in times table`,
+          );
+        }
+
+        areTimesEqual = Time.equals(existingTime, time);
+      } else {
+        areTimesEqual = Time.equals(task.time, time);
+      }
 
       if (
         (typeof day === "string" ? days[task.day] === day : task.day === day) &&
-        Time.equals(task.time, time)
+        areTimesEqual
       ) {
         existingTasks[i] = { ...task, ...newDetails };
       }
     }
 
-    set((state) => ({ tasks: state.tasks }));
+    set(() => ({ tasks: existingTasks }));
   },
 }));

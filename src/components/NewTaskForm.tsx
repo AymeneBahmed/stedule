@@ -28,11 +28,12 @@ import {
 import { days, priorities } from "@/lib/constants";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
-import { useTasksStore } from "@/lib/stores/tasksStore";
+import { isPrismaTask, useTasksStore } from "@/lib/stores/tasksStore";
 import { Time } from "@/lib/classes/Time";
 import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
 import { toast } from "sonner";
-import { Check } from "lucide-react";
+import { useIsGuestMode } from "@/hooks/use-is-guest-mode";
+import { dexieDB } from "@/lib/db/dexieDB";
 
 export default function NewTaskForm() {
   const { defaultDay, defaultTime, defaultTask } =
@@ -67,21 +68,94 @@ export default function NewTaskForm() {
     ),
   );
   const [submitted, setSubmitted] = useState(false);
+  const isGuestMode = useIsGuestMode();
+  const [guestModeError, setGuestModeError] = useState<string>();
 
   function onSubmit(values: z.infer<typeof newTaskSchema>) {
-    startTransition(() => {
-      addNewTaskAction(values);
+    startTransition(async () => {
+      if (isGuestMode) {
+        try {
+          const chosenTime = Time.fromString(values.time)!;
+          const existingTime = await dexieDB.times
+            .where({
+              hour: chosenTime.hour,
+              minute: chosenTime.minute,
+            })
+            .first();
+          let timeId = existingTime?.id;
+
+          if (timeId == null) {
+            timeId = await dexieDB.times.add(chosenTime);
+          }
+
+          const existingTask = await dexieDB.tasks
+            .where({ day: days.indexOf(values.day), timeId })
+            .first();
+
+          if (existingTask != null) {
+            await dexieDB.tasks.update(existingTask.id, {
+              name: values.task,
+              description: values.description,
+              priority: values.priority,
+            });
+
+            updateExistingTaskInStore(
+              values.day,
+              Time.fromString(values.time)!,
+              {
+                name: values.task,
+                description: values.description,
+                priority: values.priority,
+              },
+            );
+
+            toast.success("Updated task successfully!");
+          } else {
+            await dexieDB.tasks.add({
+              name: values.task,
+              day: days.indexOf(values.day),
+              priority: values.priority,
+              description: values.description ?? null,
+              timeId,
+            });
+
+            // Don't use addTasksToStore here because useLiveQuery listens to changes and re-renders.
+            toast.success("Added a task successfully!");
+          }
+
+          closeNewTaskForm();
+        } catch {
+          setGuestModeError("Something went wrong! Please try again.");
+        }
+      } else {
+        addNewTaskAction(values);
+      }
+
       setSubmitted(true);
     });
   }
 
   function getExistingTask() {
     const formValues = form.getValues();
-    const existingTask = tasks.find(
-      (task) =>
+    const existingTask = tasks.find(async (task) => {
+      if (isPrismaTask(task)) {
+        return (
+          days[task.day] === formValues.day &&
+          Time.equals(task.time, Time.fromString(formValues.time)!)
+        );
+      }
+
+      const existingTime = await dexieDB.times.get(task.timeId);
+
+      if (existingTime == null) {
+        throw new Error(`Time ID ${task.timeId} does not exist in times table`);
+      }
+
+      return (
         days[task.day] === formValues.day &&
-        Time.equals(task.time, Time.fromString(formValues.time)!),
-    );
+        Time.equals(existingTime, Time.fromString(formValues.time)!)
+      );
+    });
 
     if (existingTask) {
       setOldTask(existingTask);
@@ -100,7 +174,7 @@ export default function NewTaskForm() {
       }
 
       closeNewTaskForm();
-      toast(state.success, { icon: <Check /> });
+      toast.success(state.success);
     }
   }, [
     addTasksToStore,
@@ -304,8 +378,8 @@ export default function NewTaskForm() {
           />
         </div>
 
-        {typeof state?.error === "string" && (
-          <FormError message={state.error} />
+        {(state?.error || guestModeError) && (
+          <FormError message={state?.error || guestModeError || ""} />
         )}
 
         <Button disabled={isPending} className="mt-10 w-full">

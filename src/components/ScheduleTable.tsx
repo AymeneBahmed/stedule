@@ -13,7 +13,7 @@ import { Fragment, startTransition, useActionState, useEffect } from "react";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { Time } from "@prisma/client";
-import { useTasksStore } from "@/lib/stores/tasksStore";
+import { isPrismaTask, useTasksStore } from "@/lib/stores/tasksStore";
 import { PrismaTaskModified } from "@/lib/ts/interfaces";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Button } from "./ui/button";
@@ -185,11 +185,23 @@ export default function ScheduleTable({
                   </TableCell>
 
                   {[...Array(7)].map((_, j) => {
-                    const task = tasksGroupedByDay[days[j]!]?.find(
-                      (task) =>
-                        task.time.hour === time.hour &&
-                        task.time.minute === time.minute,
-                    );
+                    const task = tasksGroupedByDay[days[j]!]?.find((task) => {
+                      if (isPrismaTask(task)) {
+                        return TimeClass.equals(task.time, time);
+                      }
+
+                      const existingTime = dexieTimes?.find(
+                        (dexieTime) => dexieTime.id === task.timeId,
+                      );
+
+                      if (existingTime == null) {
+                        throw new Error(
+                          `Time ID ${task.timeId} does not exist in times table`,
+                        );
+                      }
+
+                      return TimeClass.equals(existingTime, time);
+                    });
 
                     return (
                       <TableCell
@@ -198,13 +210,7 @@ export default function ScheduleTable({
                         onClick={() => {
                           setDefaultDay(days[j]!);
                           setDefaultTime(time);
-                          setDefaultTask(
-                            (isGuestMode ? tasksFromStore : tasks).find(
-                              (task) =>
-                                days[task.day] === days[j] &&
-                                TimeClass.equals(task.time, time),
-                            ) ?? null,
-                          );
+                          setDefaultTask(task ?? null);
                           openNewTaskForm();
                         }}
                       >
