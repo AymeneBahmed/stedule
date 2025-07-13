@@ -1,10 +1,12 @@
 import ScheduleTable from "@/components/ScheduleTable";
 import Toolbar from "@/components/Toolbar";
+import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth/auth";
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { getTasks } from "@/lib/db/task";
 import { prisma } from "@/lib/prisma";
 import { Time } from "@prisma/client";
+import Link from "next/link";
 
 export default async function Home() {
   const session = await getSession();
@@ -12,7 +14,15 @@ export default async function Home() {
   // User not logged in
   if (session == null) {
     return (
-      <div className="flex min-h-full flex-col items-center justify-center gap-6 py-10 [&>div]:w-[80%] print:[&>div]:w-full">
+      <div className="relative flex min-h-full flex-col items-center justify-center gap-6 py-10 [&>div]:not-first:w-[80%] print:[&>div]:w-full">
+        <div className="absolute top-6 right-12 flex items-stretch space-x-4">
+          <Button asChild>
+            <Link href="/signup">Sign up</Link>
+          </Button>
+          <Button variant="outline">
+            <Link href="/login">Log in</Link>
+          </Button>
+        </div>
         <div className="contents print:hidden">
           <Toolbar />
         </div>
