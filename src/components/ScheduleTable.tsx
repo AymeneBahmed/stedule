@@ -240,6 +240,8 @@ export default function ScheduleTable({
                                 try {
                                   await dexieDB.tasks.delete(task!.id);
 
+                                  deleteTasks([task!.id]);
+
                                   toast.success("Removed task successfully!");
                                 } catch {
                                   // TODO: handle all possible errors
