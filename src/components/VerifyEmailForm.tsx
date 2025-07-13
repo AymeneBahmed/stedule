@@ -45,6 +45,7 @@ export default function VerifyEmailForm({ email }: { email: string }) {
           toast.success("Email verified successfully!");
 
           router.replace("/");
+          router.refresh();
         },
         onError() {
           toast.error(

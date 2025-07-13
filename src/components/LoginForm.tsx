@@ -25,6 +25,7 @@ import Link from "next/link";
 import { Checkbox } from "./ui/checkbox";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -35,6 +36,7 @@ export default function LoginForm() {
       remember: false,
     },
   });
+  const router = useRouter()
 
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
     await authClient.signIn.email(
@@ -45,7 +47,32 @@ export default function LoginForm() {
         callbackURL: "/",
       },
       {
-        onError(context) {
+        async onError(context) {
+          if (context.error.code === "EMAIL_NOT_VERIFIED") {
+            await authClient.emailOtp.sendVerificationOtp(
+              {
+                email: values.email,
+                type: "email-verification",
+              },
+              {
+                onSuccess() {
+                  toast.success("Check your inbox for verification.", {
+                    position: "top-center",
+                  });
+
+                  router.push("/verify-email")
+                },
+                onError(context) {
+                  toast.error(context.error.message, {
+                    position: "top-center",
+                  });
+                },
+              },
+            );
+
+            return;
+          }
+
           toast.error(context.error.message, { position: "top-center" });
         },
       },
