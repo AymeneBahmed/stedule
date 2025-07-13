@@ -23,6 +23,7 @@ import {
 import { LoginSchema } from "@/lib/schemas";
 import { useState } from "react";
 import FormSuccess from "./FormSuccess";
+import Link from "next/link";
 
 export default function LoginForm() {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -38,7 +39,7 @@ export default function LoginForm() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-sm">
         <CardHeader className="space-y-1">
           <CardTitle className="text-center text-2xl font-bold">
             Log in
@@ -98,6 +99,17 @@ export default function LoginForm() {
               >
                 Submit
               </Button>
+
+              <div className="text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Button
+                  variant="link"
+                  className="mt-2 p-0 text-white underline"
+                  asChild
+                >
+                  <Link href="/signup">Sign up</Link>
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
