@@ -24,6 +24,7 @@ import {
 import { SignupSchema } from "@/lib/schemas";
 import { authClient } from "@/lib/auth/auth-client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof SignupSchema>>({
@@ -127,6 +128,17 @@ export default function SignupForm() {
               >
                 Create Account
               </Button>
+
+              <div className="text-center text-sm">
+                Already have an account?{" "}
+                <Button
+                  variant="link"
+                  className="mt-2 p-0 text-white underline"
+                  asChild
+                >
+                  <Link href="/login">Log in</Link>
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
