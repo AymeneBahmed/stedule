@@ -154,7 +154,12 @@ export default function LoginForm() {
                 Submit
               </Button>
 
-              <Button variant="outline" className="mt-3 w-full" asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-3 w-full"
+                asChild
+              >
                 <Link href="/">
                   <User2Icon /> Continue without account
                 </Link>

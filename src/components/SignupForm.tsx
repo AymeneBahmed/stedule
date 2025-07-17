@@ -139,6 +139,7 @@ export default function SignupForm() {
               <div className="text-center text-sm">
                 Already have an account?{" "}
                 <Button
+                  type="button"
                   variant="link"
                   className="mt-2 p-0 underline dark:text-white"
                   asChild
