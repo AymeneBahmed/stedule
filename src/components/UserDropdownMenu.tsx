@@ -12,6 +12,7 @@ import {
 import { User } from "better-auth";
 import { authClient } from "@/lib/auth/auth-client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function UserDropdownMenu({ name, email, image }: User) {
   const router = useRouter();
@@ -40,8 +41,10 @@ export default function UserDropdownMenu({ name, email, image }: User) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-50" align="center">
-        <DropdownMenuItem>
-          <SettingsIcon /> Settings
+        <DropdownMenuItem asChild>
+          <Link href="/settings">
+            <SettingsIcon /> Settings
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
