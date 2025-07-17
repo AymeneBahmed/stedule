@@ -10,13 +10,17 @@ export default function Toolbar() {
       id="toolbar"
       className="bg-primary/15 sticky top-10 z-[1] flex space-x-2 rounded-full px-1.5 py-1 backdrop-blur-xl"
     >
-      <AddNewTimeButton />
-      <AddNewTaskButton />
-      <ThemeTogglerButton className="rounded-full" />
-      <PrintScheduleButton className="rounded-full" />
+      <AddNewTimeButton aria-label="Add a new time" />
+      <AddNewTaskButton aria-label="Add a new task" />
+      <ThemeTogglerButton className="rounded-full" aria-label="Toggle theme" />
+      <PrintScheduleButton
+        className="rounded-full"
+        aria-label="Print schedule"
+      />
       <ClearScheduleButton
         variant="destructive"
         className="!bg-destructive rounded-full"
+        aria-label="Clear schedule"
       />
     </span>
   );
