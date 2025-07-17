@@ -158,7 +158,6 @@ export default function ScheduleTable({
                         startTransition(async () => {
                           if (isGuestMode) {
                             try {
-                              // TODO: remove tasks as well from tasks store
                               const tasksCollection = dexieDB.tasks.where({
                                 timeId: time.id,
                               });
