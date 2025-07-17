@@ -1,6 +1,18 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export default function Middleware(request: NextRequest) {}
+export default function Middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const sessionCookie = request.cookies.get("better-auth.session_token");
+
+  if (
+    sessionCookie != null &&
+    ["/login", "/signup", "/verify-email"].includes(pathname)
+  ) {
+    return NextResponse.redirect(new URL("/", request.nextUrl));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
