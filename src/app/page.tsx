@@ -1,6 +1,7 @@
 import ScheduleTable from "@/components/ScheduleTable";
 import Toolbar from "@/components/Toolbar";
 import { Button } from "@/components/ui/button";
+import UserDropdownMenu from "@/components/UserDropdownMenu";
 import { getSession } from "@/lib/auth/auth";
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { getTasks } from "@/lib/db/task";
@@ -48,10 +49,13 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex min-h-full flex-col items-center justify-center gap-6 py-10 [&>div]:w-[80%] print:[&>div]:w-full">
+    <div className="relative flex min-h-full flex-col items-center justify-center gap-6 py-10 [&>div]:not-first:w-[80%] print:[&>div]:w-full">
+      <UserDropdownMenu {...session.user} />
+
       <div className="contents print:hidden">
         <Toolbar />
       </div>
+
       <ScheduleTable tasks={initialTasks} times={times} />
     </div>
   );
