@@ -140,7 +140,7 @@ export default function SignupForm() {
                 Already have an account?{" "}
                 <Button
                   variant="link"
-                  className="mt-2 p-0 text-white underline"
+                  className="mt-2 p-0 underline dark:text-white"
                   asChild
                 >
                   <Link href="/login">Log in</Link>
