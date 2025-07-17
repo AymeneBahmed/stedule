@@ -62,3 +62,25 @@ export const profileInformationSchema = z.object({
     message: "Please enter a valid email address.",
   }),
 });
+
+// TODO: remove "oldPassword" field for users that don't have a credentials account
+export const updatePasswordSchema = z
+  .object({
+    oldPassword: z.string().nonempty({
+      message: "Please enter the old password.",
+    }),
+    newPassword: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    confirmPassword: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+  })
+  .refine((data) => data.oldPassword !== data.newPassword, {
+    message: "New password must be different from old password.",
+    path: ["newPassword"],
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });

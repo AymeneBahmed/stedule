@@ -1,9 +1,10 @@
 "use server";
 
-import { getSession } from "@/lib/auth/auth";
+import { auth, getSession } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
-import { profileInformationSchema } from "@/lib/schemas";
+import { profileInformationSchema, updatePasswordSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import z from "zod";
 
 export async function updateProfileInformation(
@@ -50,5 +51,61 @@ export async function updateProfileInformation(
 
   return {
     success: "Updated profile information successfully!",
+  };
+}
+
+export async function updatePassword(
+  _prevState: unknown,
+  values: z.infer<typeof updatePasswordSchema>,
+): Promise<
+  | {
+      success?: never;
+      error: string;
+    }
+  | {
+      success: string;
+      error?: never;
+    }
+> {
+  const session = await getSession({ redirectOnNull: true });
+  const validated = updatePasswordSchema.safeParse(values);
+
+  if (validated.error) {
+    return {
+      error: "Invalid fields!",
+    };
+  }
+
+  const { oldPassword, newPassword } = validated.data;
+
+  try {
+    const authContext = await auth.$context;
+    const accounts = await authContext.internalAdapter.findAccounts(
+      session.user.id,
+    );
+    const credentialAccount = accounts.find(
+      (account) => account.providerId === "credential",
+    );
+
+    if (!credentialAccount) {
+      await auth.api.setPassword({
+        body: { newPassword },
+      });
+    } else {
+      await auth.api.changePassword({
+        headers: await headers(),
+        body: { currentPassword: oldPassword, newPassword },
+      });
+    }
+  } catch {
+    return {
+      error: "Something went wrong! Please try again",
+    };
+  }
+
+  revalidatePath("/settings");
+
+  return {
+    success: "Updated password successfully!",
   };
 }

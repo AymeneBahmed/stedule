@@ -1,4 +1,5 @@
 import { ProfileInformationForm } from "@/components/settings/ProfileInformationForm";
+import { UpdatePasswordForm } from "@/components/settings/UpdatePasswordForm";
 import {
   Card,
   CardContent,
@@ -34,6 +35,19 @@ export default async function SettingsPage() {
               defaultFullName={session.user.name}
               defaultEmail={session.user.email}
             />
+          </CardContent>
+        </Card>
+
+        {/* Password */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Password</CardTitle>
+            <CardDescription>
+              Update your password
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <UpdatePasswordForm />
           </CardContent>
         </Card>
       </div>
