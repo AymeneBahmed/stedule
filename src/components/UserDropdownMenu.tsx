@@ -44,17 +44,15 @@ export default function UserDropdownMenu({ name, email, image }: User) {
           <SettingsIcon /> Settings
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="!text-destructive">
-          <form
-            className="contents"
-            onClick={async () => {
-              await authClient.signOut();
+        <DropdownMenuItem
+          className="!text-destructive"
+          onClick={async () => {
+            await authClient.signOut();
 
-              router.refresh();
-            }}
-          >
-            <LogOutIcon className="text-destructive" /> Log out
-          </form>
+            router.refresh();
+          }}
+        >
+          <LogOutIcon className="text-destructive" /> Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
