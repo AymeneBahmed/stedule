@@ -1,3 +1,5 @@
+"use client";
+
 import { LogOutIcon, SettingsIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
@@ -8,8 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { User } from "better-auth";
+import { authClient } from "@/lib/auth/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function UserDropdownMenu({ name, email, image }: User) {
+  const router = useRouter();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,7 +45,16 @@ export default function UserDropdownMenu({ name, email, image }: User) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="!text-destructive">
-          <LogOutIcon className="text-destructive" /> Log out
+          <form
+            className="contents"
+            onClick={async () => {
+              await authClient.signOut();
+
+              router.refresh();
+            }}
+          >
+            <LogOutIcon className="text-destructive" /> Log out
+          </form>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
