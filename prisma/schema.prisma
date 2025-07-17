@@ -24,7 +24,7 @@ model Time {
   hour   Int
   minute Int
   tasks  Task[]
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   @@unique([hour, minute, userId])
