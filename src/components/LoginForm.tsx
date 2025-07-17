@@ -26,6 +26,7 @@ import { Checkbox } from "./ui/checkbox";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { User2Icon } from "lucide-react";
 
 export default function LoginForm() {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -36,7 +37,7 @@ export default function LoginForm() {
       remember: false,
     },
   });
-  const router = useRouter()
+  const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
     await authClient.signIn.email(
@@ -60,7 +61,7 @@ export default function LoginForm() {
                     position: "top-center",
                   });
 
-                  router.push("/verify-email")
+                  router.push("/verify-email");
                 },
                 onError(context) {
                   toast.error(context.error.message, {
@@ -151,6 +152,12 @@ export default function LoginForm() {
                 disabled={form.formState.isSubmitting}
               >
                 Submit
+              </Button>
+
+              <Button variant="outline" className="mt-3 w-full" asChild>
+                <Link href="/">
+                  <User2Icon /> Continue without account
+                </Link>
               </Button>
 
               <div className="text-center text-sm">
