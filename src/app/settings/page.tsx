@@ -1,5 +1,7 @@
+import { DeleteAccountForm } from "@/components/settings/DeleteAccountForm";
 import { ProfileInformationForm } from "@/components/settings/ProfileInformationForm";
 import { UpdatePasswordForm } from "@/components/settings/UpdatePasswordForm";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,6 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { getSession } from "@/lib/auth/auth";
 
 export default async function SettingsPage() {
@@ -42,12 +52,41 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Password</CardTitle>
-            <CardDescription>
-              Update your password
-            </CardDescription>
+            <CardDescription>Update your password</CardDescription>
           </CardHeader>
           <CardContent>
             <UpdatePasswordForm />
+          </CardContent>
+        </Card>
+
+        {/* Delete Account */}
+        <Card className="bg-destructive/10 border-destructive">
+          <CardHeader className="">
+            <CardTitle className="text-destructive">Delete Account</CardTitle>
+            <CardDescription className="text-destructive">
+              Please proceed with caution, this cannot be undone.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="destructive">Delete account</Button>
+              </DialogTrigger>
+
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    Are you sure you want to delete your account?
+                  </DialogTitle>
+                  <DialogDescription>
+                    This action cannot be undone and will permanently delete
+                    your account and all your data.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <DeleteAccountForm />
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
       </div>

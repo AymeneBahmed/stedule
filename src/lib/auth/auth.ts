@@ -38,6 +38,11 @@ export const auth = betterAuth({
     autoSignIn: false,
     requireEmailVerification: true,
   },
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
 });
 
 // 1. Define function overloads

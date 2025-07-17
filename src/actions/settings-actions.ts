@@ -2,7 +2,11 @@
 
 import { auth, getSession } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
-import { profileInformationSchema, updatePasswordSchema } from "@/lib/schemas";
+import {
+  deleteAccountSchema,
+  profileInformationSchema,
+  updatePasswordSchema,
+} from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import z from "zod";
@@ -107,5 +111,40 @@ export async function updatePassword(
 
   return {
     success: "Updated password successfully!",
+  };
+}
+
+export async function deleteAccount(
+  _prevState: unknown,
+  values: z.infer<typeof deleteAccountSchema>,
+) {
+  await getSession({ redirectOnNull: true });
+
+  const validated = deleteAccountSchema.safeParse(values);
+
+  if (validated.error) {
+    return {
+      error: "Invalid fields!",
+    };
+  }
+
+  try {
+    await auth.api.deleteUser({
+      headers: await headers(),
+      body: {
+        password: validated.data.password,
+        callbackURL: "/",
+      },
+    });
+  } catch {
+    return {
+      error: "Something went wrong! Please try again",
+    };
+  }
+
+  revalidatePath("/");
+
+  return {
+    success: "Account deleted successfully.",
   };
 }

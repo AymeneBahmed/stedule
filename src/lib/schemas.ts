@@ -84,3 +84,7 @@ export const updatePasswordSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const deleteAccountSchema = z.object({
+  password: z.string().nonempty("Please enter your password to continue."),
+});
