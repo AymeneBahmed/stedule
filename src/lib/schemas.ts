@@ -53,3 +53,12 @@ export const LoginSchema = z.object({
 export const VerifyEmailSchema = z.object({
   code: z.string().min(6, { message: "The code must contain 6 digits." }),
 });
+
+export const profileInformationSchema = z.object({
+  fullName: z.string().min(2, {
+    message: "Full name must be at least 2 characters.",
+  }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+});
