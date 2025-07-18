@@ -26,6 +26,8 @@ import { authClient } from "@/lib/auth/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User2Icon } from "lucide-react";
+import { GoogleLoginButton } from "./GoogleLoginButton";
+import { Separator } from "./ui/separator";
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof SignupSchema>>({
@@ -70,6 +72,14 @@ export default function SignupForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <GoogleLoginButton />
+
+          <div className="my-3 flex items-center gap-4">
+            <Separator className="flex-1" />
+            <span className="text-muted-foreground">or</span>
+            <Separator className="flex-1" />
+          </div>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="space-y-6">
