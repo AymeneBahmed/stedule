@@ -72,7 +72,10 @@ export default function SignupForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <GoogleLoginButton />
+          <div className="space-y-3">
+            <GoogleLoginButton />
+            <ContinueWithoutAccountButton className="mt-0" />
+          </div>
 
           <div className="my-3 flex items-center gap-4">
             <Separator className="flex-1" />
@@ -140,14 +143,12 @@ export default function SignupForm() {
                 Create Account
               </Button>
 
-              <ContinueWithoutAccountButton />
-
               <div className="text-center text-sm">
                 Already have an account?{" "}
                 <Button
                   type="button"
                   variant="link"
-                  className="mt-2 p-0 underline dark:text-white"
+                  className="mt-1 p-0 underline dark:text-white"
                   asChild
                 >
                   <Link href="/login">Log in</Link>
