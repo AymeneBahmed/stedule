@@ -27,6 +27,8 @@ import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { User2Icon } from "lucide-react";
+import { Separator } from "./ui/separator";
+import { GoogleLoginButton } from "./GoogleLoginButton";
 
 export default function LoginForm() {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -82,7 +84,7 @@ export default function LoginForm() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-center text-2xl font-bold">
             Log in
@@ -92,6 +94,14 @@ export default function LoginForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <GoogleLoginButton />
+
+          <div className="my-3 flex items-center gap-4">
+            <Separator className="flex-1" />
+            <span className="text-muted-foreground">or</span>
+            <Separator className="flex-1" />
+          </div>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="space-y-6">
