@@ -26,9 +26,9 @@ import { Checkbox } from "./ui/checkbox";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { User2Icon } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { GoogleLoginButton } from "./GoogleLoginButton";
+import { ContinueWithoutAccountButton } from "./ContinueWithoutAccountButton";
 
 export default function LoginForm() {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -164,16 +164,7 @@ export default function LoginForm() {
                 Submit
               </Button>
 
-              <Button
-                type="button"
-                variant="outline"
-                className="mt-3 w-full"
-                asChild
-              >
-                <Link href="/">
-                  <User2Icon /> Continue without account
-                </Link>
-              </Button>
+              <ContinueWithoutAccountButton />
 
               <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}

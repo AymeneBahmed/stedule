@@ -25,9 +25,9 @@ import { SignupSchema } from "@/lib/schemas";
 import { authClient } from "@/lib/auth/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User2Icon } from "lucide-react";
 import { GoogleLoginButton } from "./GoogleLoginButton";
 import { Separator } from "./ui/separator";
+import { ContinueWithoutAccountButton } from "./ContinueWithoutAccountButton";
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof SignupSchema>>({
@@ -140,11 +140,7 @@ export default function SignupForm() {
                 Create Account
               </Button>
 
-              <Button variant="outline" className="mt-3 w-full" asChild>
-                <Link href="/">
-                  <User2Icon /> Continue without account
-                </Link>
-              </Button>
+              <ContinueWithoutAccountButton />
 
               <div className="text-center text-sm">
                 Already have an account?{" "}
