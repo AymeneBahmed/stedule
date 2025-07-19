@@ -98,6 +98,8 @@ export const createCredentialAccountSchema = z
     path: ["confirmPassword"],
   });
 
-export const deleteAccountSchema = z.object({
-  password: z.string().nonempty("Please enter your password to continue."),
+export const deleteUserSchema = z.object({
+  delete: z.literal("DELETE", {
+    message: "Please enter the word DELETE to continue.",
+  }),
 });

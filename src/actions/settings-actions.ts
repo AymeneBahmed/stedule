@@ -4,7 +4,7 @@ import { auth, getSession } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import {
   createCredentialAccountSchema,
-  deleteAccountSchema as deleteUserSchema,
+  deleteUserSchema,
   profileInformationSchema,
   updatePasswordSchema,
 } from "@/lib/schemas";
@@ -203,6 +203,6 @@ export async function deleteUser(
   revalidatePath("/");
 
   return {
-    success: "Account deleted successfully.",
+    success: "Check your inbox to complete deletion process.",
   };
 }

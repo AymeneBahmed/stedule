@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { deleteAccountSchema } from "@/lib/schemas";
+import { deleteUserSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -19,15 +19,12 @@ import { deleteUser } from "@/actions/settings-actions";
 import { toast } from "sonner";
 
 export function DeleteUserForm() {
-  const form = useForm<z.infer<typeof deleteAccountSchema>>({
-    resolver: zodResolver(deleteAccountSchema),
-    defaultValues: {
-      password: "",
-    },
+  const form = useForm<z.infer<typeof deleteUserSchema>>({
+    resolver: zodResolver(deleteUserSchema),
   });
   const [state, deleteUserAction, isPending] = useActionState(deleteUser, null);
 
-  async function onSubmit(values: z.infer<typeof deleteAccountSchema>) {
+  async function onSubmit(values: z.infer<typeof deleteUserSchema>) {
     startTransition(() => {
       deleteUserAction(values);
     });
@@ -50,16 +47,12 @@ export function DeleteUserForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="password"
+          name="delete"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Confirm deletion</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="password"
-                  placeholder="Enter your password"
-                />
+                <Input {...field} placeholder="Enter DELETE to continue" />
               </FormControl>
               <FormMessage />
             </FormItem>

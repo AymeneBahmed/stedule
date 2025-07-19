@@ -2,7 +2,10 @@ import { betterAuth, Session, User } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { emailOTP } from "better-auth/plugins";
 import { prisma } from "../prisma";
-import { sendEmailVerificationMail } from "../mail";
+import {
+  sendDeleteUserVerificationMail,
+  sendEmailVerificationMail,
+} from "../mail";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -46,6 +49,9 @@ export const auth = betterAuth({
   user: {
     deleteUser: {
       enabled: true,
+      async sendDeleteAccountVerification({ user, url }) {
+        await sendDeleteUserVerificationMail(user.email, url);
+      },
     },
   },
 });

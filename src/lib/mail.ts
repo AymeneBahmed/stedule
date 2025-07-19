@@ -18,3 +18,15 @@ export async function sendEmailVerificationMail(email: string, otp: string) {
     html: `Here is your verification code: <strong>${otp}</strong>`,
   });
 }
+
+export async function sendDeleteUserVerificationMail(
+  email: string,
+  url: string,
+) {
+  await transporter.sendMail({
+    from: "Study Schedule <aymendd3131@gmail.com>",
+    to: email,
+    subject: "Verify deletion",
+    html: `Click here to delete your account: <strong>${url}</strong>`,
+  });
+}
