@@ -1,3 +1,4 @@
+import { CreateCredentialAccountForm } from "@/components/settings/CreateCredentialAccountForm";
 import { DeleteAccountForm } from "@/components/settings/DeleteAccountForm";
 import { ProfileInformationForm } from "@/components/settings/ProfileInformationForm";
 import { UpdatePasswordForm } from "@/components/settings/UpdatePasswordForm";
@@ -17,10 +18,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { getSession } from "@/lib/auth/auth";
+import { auth, getSession } from "@/lib/auth/auth";
+import { cn } from "@/lib/utils";
+import { headers } from "next/headers";
 
 export default async function SettingsPage() {
   const session = await getSession({ redirectOnNull: true });
+  const userAccounts = await auth.api.listUserAccounts({
+    headers: await headers(),
+  });
+  const doesUserHaveCredentialAccount = !!userAccounts.find(
+    (account) => account.provider === "credential",
+  );
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -48,14 +57,26 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Password */}
-        <Card>
+        {/* The reason why we are hiding the forms instead of not rendering them is because the success message won't display if the components are not mounted */}
+        {/* Update Password */}
+        <Card className={cn(!doesUserHaveCredentialAccount && "hidden")}>
           <CardHeader>
             <CardTitle>Password</CardTitle>
             <CardDescription>Update your password</CardDescription>
           </CardHeader>
           <CardContent>
             <UpdatePasswordForm />
+          </CardContent>
+        </Card>
+
+        {/* Create Credential Account */}
+        <Card className={cn(doesUserHaveCredentialAccount && "hidden")}>
+          <CardHeader>
+            <CardTitle>Password</CardTitle>
+            <CardDescription>Add a password to your account</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CreateCredentialAccountForm />
           </CardContent>
         </Card>
 

@@ -3,6 +3,7 @@
 import { auth, getSession } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import {
+  createCredentialAccountSchema,
   deleteAccountSchema,
   profileInformationSchema,
   updatePasswordSchema,
@@ -60,7 +61,7 @@ export async function updateProfileInformation(
 
 export async function updatePassword(
   _prevState: unknown,
-  values: z.infer<typeof updatePasswordSchema>,
+  values: Omit<z.infer<typeof updatePasswordSchema>, "oldPassword">,
 ): Promise<
   | {
       success?: never;
@@ -92,9 +93,9 @@ export async function updatePassword(
     );
 
     if (!credentialAccount) {
-      await auth.api.setPassword({
-        body: { newPassword },
-      });
+      return {
+        error: "The user doesn't have a credential account.",
+      };
     } else {
       await auth.api.changePassword({
         headers: await headers(),
@@ -111,6 +112,64 @@ export async function updatePassword(
 
   return {
     success: "Updated password successfully!",
+  };
+}
+
+export async function createCredentialAccount(
+  _prevState: unknown,
+  values: z.infer<typeof createCredentialAccountSchema>,
+): Promise<
+  | {
+      success?: never;
+      error: string;
+    }
+  | {
+      success: string;
+      error?: never;
+    }
+> {
+  const session = await getSession({ redirectOnNull: true });
+  const validated = createCredentialAccountSchema.safeParse(values);
+
+  if (validated.error) {
+    return {
+      error: "Invalid fields!",
+    };
+  }
+
+  const { password } = validated.data;
+
+  try {
+    const authContext = await auth.$context;
+    const accounts = await authContext.internalAdapter.findAccounts(
+      session.user.id,
+    );
+    const credentialAccount = accounts.find(
+      (account) => account.providerId === "credential",
+    );
+
+    if (!credentialAccount) {
+      await auth.api.setPassword({
+        headers: await headers(),
+        body: {
+          newPassword: password,
+        },
+      });
+    } else {
+      return {
+        error: "The user already have a credential account.",
+      };
+    }
+  } catch {
+    return {
+      error: "Something went wrong! Please try again",
+    };
+  }
+
+  revalidatePath("/settings");
+
+  return {
+    success: "Created a credential account successfully!",
   };
 }
 
