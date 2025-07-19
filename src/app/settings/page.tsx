@@ -1,5 +1,5 @@
 import { CreateCredentialAccountForm } from "@/components/settings/CreateCredentialAccountForm";
-import { DeleteAccountForm } from "@/components/settings/DeleteAccountForm";
+import { DeleteUserForm } from "@/components/settings/DeleteUserForm";
 import { ProfileInformationForm } from "@/components/settings/ProfileInformationForm";
 import { UpdatePasswordForm } from "@/components/settings/UpdatePasswordForm";
 import { Button } from "@/components/ui/button";
@@ -80,10 +80,10 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Delete Account */}
+        {/* Delete User */}
         <Card className="bg-destructive/10 border-destructive">
           <CardHeader className="">
-            <CardTitle className="text-destructive">Delete Account</CardTitle>
+            <CardTitle className="text-destructive">Delete Accounts</CardTitle>
             <CardDescription className="text-destructive">
               Please proceed with caution, this cannot be undone.
             </CardDescription>
@@ -91,21 +91,21 @@ export default async function SettingsPage() {
           <CardContent>
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="destructive">Delete account</Button>
+                <Button variant="destructive">Delete accounts</Button>
               </DialogTrigger>
 
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>
-                    Are you sure you want to delete your account?
+                    Are you sure you want to delete all your accounts?
                   </DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone and will permanently delete
-                    your account and all your data.
+                    This action cannot be undone and will permanently delete all
+                    your accounts and data.
                   </DialogDescription>
                 </DialogHeader>
 
-                <DeleteAccountForm />
+                <DeleteUserForm />
               </DialogContent>
             </Dialog>
           </CardContent>

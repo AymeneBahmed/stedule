@@ -15,24 +15,21 @@ import {
   FormMessage,
 } from "../ui/form";
 import { startTransition, useActionState, useEffect } from "react";
-import { deleteAccount } from "@/actions/settings-actions";
+import { deleteUser } from "@/actions/settings-actions";
 import { toast } from "sonner";
 
-export function DeleteAccountForm() {
+export function DeleteUserForm() {
   const form = useForm<z.infer<typeof deleteAccountSchema>>({
     resolver: zodResolver(deleteAccountSchema),
     defaultValues: {
       password: "",
     },
   });
-  const [state, deleteAccountAction, isPending] = useActionState(
-    deleteAccount,
-    null,
-  );
+  const [state, deleteUserAction, isPending] = useActionState(deleteUser, null);
 
   async function onSubmit(values: z.infer<typeof deleteAccountSchema>) {
     startTransition(() => {
-      deleteAccountAction(values);
+      deleteUserAction(values);
     });
   }
 
@@ -70,7 +67,7 @@ export function DeleteAccountForm() {
         />
 
         <Button type="submit" variant="destructive" disabled={isPending}>
-          {isPending ? "Deleting..." : "Delete account"}
+          {isPending ? "Deleting..." : "Delete accounts"}
         </Button>
       </form>
     </Form>

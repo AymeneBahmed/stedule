@@ -4,7 +4,7 @@ import { auth, getSession } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import {
   createCredentialAccountSchema,
-  deleteAccountSchema,
+  deleteAccountSchema as deleteUserSchema,
   profileInformationSchema,
   updatePasswordSchema,
 } from "@/lib/schemas";
@@ -173,13 +173,13 @@ export async function createCredentialAccount(
   };
 }
 
-export async function deleteAccount(
+export async function deleteUser(
   _prevState: unknown,
-  values: z.infer<typeof deleteAccountSchema>,
+  values: z.infer<typeof deleteUserSchema>,
 ) {
   await getSession({ redirectOnNull: true });
 
-  const validated = deleteAccountSchema.safeParse(values);
+  const validated = deleteUserSchema.safeParse(values);
 
   if (validated.error) {
     return {
@@ -191,7 +191,6 @@ export async function deleteAccount(
     await auth.api.deleteUser({
       headers: await headers(),
       body: {
-        password: validated.data.password,
         callbackURL: "/",
       },
     });
