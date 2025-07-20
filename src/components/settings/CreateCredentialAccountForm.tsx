@@ -92,7 +92,7 @@ export function CreateCredentialAccountForm() {
         />
 
         <Button type="submit" disabled={isPending}>
-          {isPending ? "Saving..." : "Save Changes"}
+          {isPending ? "Saving..." : "Save changes"}
         </Button>
       </form>
     </Form>

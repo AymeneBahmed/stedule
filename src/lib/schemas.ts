@@ -2,8 +2,8 @@ import { z } from "zod";
 import { days, priorities } from "./constants";
 
 export const newTaskSchema = z.object({
-  task: z.string().min(1, { message: "This field is required!" }),
-  day: z.enum(days, { message: "Invalid day!" }),
+  task: z.string().min(1, { message: "This field is required." }),
+  day: z.enum(days, { message: "Invalid day." }),
   time: z.string().refine(
     (time) => {
       const [hour, min] = time.split(":").map(Number);
@@ -18,10 +18,10 @@ export const newTaskSchema = z.object({
         min! <= 59
       );
     },
-    { message: "Invalid time!" },
+    { message: "Invalid time." },
   ),
   priority: z.enum(priorities as unknown as [(typeof priorities)[number]], {
-    message: "Invalid priority!",
+    message: "Invalid priority.",
   }),
   description: z.string().optional(),
 });
@@ -80,7 +80,7 @@ export const updatePasswordSchema = z
     path: ["newPassword"],
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Passwords do not match.",
     path: ["confirmPassword"],
   });
 
@@ -94,7 +94,7 @@ export const createCredentialAccountSchema = z
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Passwords do not match.",
     path: ["confirmPassword"],
   });
 
@@ -102,4 +102,10 @@ export const deleteUserSchema = z.object({
   delete: z.literal("DELETE", {
     message: "Please enter the word DELETE to continue.",
   }),
+});
+
+export const removePasswordSchema = z.object({
+  currentPassword: z
+    .string()
+    .nonempty({ message: "Please enter your current password to continue." }),
 });

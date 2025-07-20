@@ -6,10 +6,12 @@ import {
   createCredentialAccountSchema,
   deleteUserSchema,
   profileInformationSchema,
+  removePasswordSchema,
   updatePasswordSchema,
 } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import z from "zod";
 
 export async function updateProfileInformation(
@@ -176,7 +178,16 @@ export async function createCredentialAccount(
 export async function deleteUser(
   _prevState: unknown,
   values: z.infer<typeof deleteUserSchema>,
-) {
+): Promise<
+  | {
+      success?: never;
+      error: string;
+    }
+  | {
+      success: string;
+      error?: never;
+    }
+> {
   await getSession({ redirectOnNull: true });
 
   const validated = deleteUserSchema.safeParse(values);
@@ -205,4 +216,61 @@ export async function deleteUser(
   return {
     success: "Check your inbox to complete deletion process.",
   };
+}
+
+export async function removePassword(
+  _prevState: unknown,
+  values: z.infer<typeof removePasswordSchema>,
+): Promise<{ error: string }> {
+  const session = await getSession({ redirectOnNull: true });
+  const validated = removePasswordSchema.safeParse(values);
+
+  if (validated.error) {
+    return {
+      error: "Invalid fields!",
+    };
+  }
+
+  const { currentPassword } = validated.data;
+
+  try {
+    const authContext = await auth.$context;
+    const accounts = await authContext.internalAdapter.findAccounts(
+      session.user.id,
+    );
+    const credentialAccount = accounts.find(
+      (account) => account.providerId === "credential",
+    );
+
+    if (credentialAccount == null) {
+      return {
+        error: "The user does not have a credential account.",
+      };
+    }
+
+    if (
+      !(await authContext.password.verify({
+        password: currentPassword,
+        hash: credentialAccount.password!,
+      }))
+    ) {
+      return {
+        error: "Incorrect password.",
+      };
+    }
+
+    await auth.api.unlinkAccount({
+      headers: await headers(),
+
+      body: {
+        providerId: "credential",
+      },
+    });
+  } catch {
+    return {
+      error: "Something went wrong! Please try again.",
+    };
+  }
+
+  return redirect("/settings");
 }
