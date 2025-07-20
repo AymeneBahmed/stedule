@@ -30,3 +30,15 @@ export async function sendDeleteUserVerificationMail(
     html: `Click here to delete your account: <strong>${url}</strong>`,
   });
 }
+
+export async function sendChangeEmailVerificationMail(
+  newEmail: string,
+  url: string,
+) {
+  await transporter.sendMail({
+    from: "Study Schedule <aymendd3131@gmail.com>",
+    to: newEmail,
+    subject: "Verify new email",
+    html: `Click here to change your email: <strong>${url}</strong>`,
+  });
+}

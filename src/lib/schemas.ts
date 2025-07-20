@@ -61,6 +61,9 @@ export const profileInformationSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
+  password: z
+    .string()
+    .nonempty({ message: "Please enter your password to save changes." }),
 });
 
 export const updatePasswordSchema = z

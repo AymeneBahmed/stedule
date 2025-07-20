@@ -9,8 +9,9 @@ import {
   removePasswordSchema,
   updatePasswordSchema,
 } from "@/lib/schemas";
+import { APIError } from "better-auth";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import z from "zod";
 
@@ -36,19 +37,59 @@ export async function updateProfileInformation(
     };
   }
 
-  const { fullName, email } = validated.data;
+  const { fullName, email: newEmail, password } = validated.data;
 
   try {
+    const authContext = await auth.$context;
+    const accounts = await authContext.internalAdapter.findAccounts(
+      session.user.id,
+    );
+    const credentialAccount = accounts.find(
+      (account) => account.providerId === "credential",
+    );
+
+    // TODO: Fix later for those who don't have a credential account
+    if (!credentialAccount) {
+      return {
+        error: "You need to have a credential account to change your email.",
+      };
+    }
+
+    if (
+      session.user.email !== newEmail &&
+      (await authContext.password.verify({
+        password,
+        hash: credentialAccount.password!,
+      }))
+    ) {
+      await auth.api.changeEmail({
+        headers: await headers(),
+        body: { newEmail },
+      });
+      (await cookies()).set("newEmail", newEmail, {
+        secure: true,
+        httpOnly: true,
+        maxAge: 60 * 30, // 30 mins
+        path: "/settings",
+        sameSite: "strict",
+      });
+    }
+
     await prisma.user.update({
       where: {
         id: session.user.id,
       },
       data: {
         name: fullName,
-        email,
       },
     });
-  } catch {
+  } catch (e) {
+    if ((e as APIError).body?.code === "COULDNT_UPDATE_YOUR_EMAIL") {
+      return {
+        error: "Couldn't update your email. Please try a different email.",
+      };
+    }
+
     return {
       error: "Something went wrong! Please try again",
     };
@@ -56,8 +97,15 @@ export async function updateProfileInformation(
 
   revalidatePath("/settings");
 
+  if (session.user.email !== newEmail) {
+    return {
+      success:
+        "Updated full name successfully! Check your new email's inbox to verify the new email.",
+    };
+  }
+
   return {
-    success: "Updated profile information successfully!",
+    success: "Updated full name successfully!",
   };
 }
 
