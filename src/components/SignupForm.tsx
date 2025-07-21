@@ -51,7 +51,7 @@ export default function SignupForm() {
         async onSuccess() {
           toast.success("Check your inbox for verification.");
 
-          router.push("/verify-email");
+          router.push("/verify-email/otp");
         },
         onError() {
           toast.error("Couldn't create account! Please try again.");

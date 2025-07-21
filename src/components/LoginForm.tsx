@@ -63,7 +63,7 @@ export default function LoginForm() {
                     position: "top-center",
                   });
 
-                  router.push("/verify-email");
+                  router.push("/verify-email/otp");
                 },
                 onError(context) {
                   toast.error(context.error.message, {
