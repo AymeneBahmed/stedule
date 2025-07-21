@@ -70,6 +70,7 @@ export default async function SettingsPage() {
             <ProfileInformationForm
               defaultFullName={session.user.name}
               defaultEmail={session.user.email}
+              doesUserHavePassword={doesUserHaveCredentialAccount}
               {...(!isExistingEmailChangeRequestExpired &&
                 existingEmailChangeRequest != null && {
                   pendingNewEmailObject: {

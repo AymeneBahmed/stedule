@@ -1,25 +1,33 @@
 "use server";
 
 import { auth, getSession } from "@/lib/auth/auth";
-import { sendNewEmailVerificationMail } from "@/lib/mail";
+import {
+  sendNewEmailVerificationLinkMail,
+  sendNewProfileInformationCodeMail,
+} from "@/lib/mail";
 import { prisma } from "@/lib/prisma";
 import {
   createCredentialAccountSchema,
   deleteUserSchema,
-  profileInformationSchema,
   removePasswordSchema,
   updatePasswordSchema,
+  baseProfileInformationSchemaExtendedWithCode,
+  baseProfileInformationSchemaExtendedWithPassword,
 } from "@/lib/schemas";
 import { EmailChangeRequest } from "@prisma/client";
 import { APIError } from "better-auth";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import z from "zod";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 export async function updateProfileInformation(
   _prevState: unknown,
-  values: z.infer<typeof profileInformationSchema>,
+  values:
+    | z.infer<typeof baseProfileInformationSchemaExtendedWithPassword>
+    | z.infer<typeof baseProfileInformationSchemaExtendedWithCode>,
 ): Promise<
   | {
       success?: never;
@@ -31,7 +39,14 @@ export async function updateProfileInformation(
     }
 > {
   const session = await getSession({ redirectOnNull: true });
-  const validated = profileInformationSchema.safeParse(values);
+  let validated;
+
+  if ("password" in values) {
+    validated =
+      baseProfileInformationSchemaExtendedWithPassword.safeParse(values);
+  } else {
+    validated = baseProfileInformationSchemaExtendedWithCode.safeParse(values);
+  }
 
   if (validated.error) {
     return {
@@ -39,7 +54,15 @@ export async function updateProfileInformation(
     };
   }
 
-  const { fullName, email: newEmail, password } = validated.data;
+  const { fullName, email: newEmail } = validated.data;
+  let password: string | null = null;
+  let code: string | null = null;
+
+  if ("password" in validated.data) {
+    password = validated.data.password;
+  } else {
+    code = validated.data.code;
+  }
 
   try {
     const authContext = await auth.$context;
@@ -50,20 +73,32 @@ export async function updateProfileInformation(
       (account) => account.providerId === "credential",
     );
 
-    // TODO: Fix later for those who don't have a credential account
-    if (!credentialAccount) {
-      return {
-        error: "You need to have a credential account to change your email.",
-      };
+    if (code != null) {
+      const codeCookie = (await cookies()).get("code");
+
+      if (!bcrypt.compareSync(code, codeCookie?.value || "")) {
+        return {
+          error: "Invalid code! Please try again.",
+        };
+      }
     }
 
+    (await cookies()).delete("code");
+
     if (
-      session.user.email !== newEmail &&
-      (await authContext.password.verify({
+      password != null &&
+      credentialAccount != null &&
+      !(await authContext.password.verify({
         password,
         hash: credentialAccount.password!,
       }))
     ) {
+      return {
+        error: "Incorrect password.",
+      };
+    }
+
+    if (session.user.email !== newEmail) {
       const emailChangeRequest = await prisma.emailChangeRequest.create({
         data: {
           newEmail,
@@ -76,7 +111,10 @@ export async function updateProfileInformation(
         },
       });
 
-      await sendNewEmailVerificationMail(newEmail, emailChangeRequest.token);
+      await sendNewEmailVerificationLinkMail(
+        newEmail,
+        emailChangeRequest.token,
+      );
     }
 
     await prisma.user.update({
@@ -110,6 +148,34 @@ export async function updateProfileInformation(
 
   return {
     success: "Updated full name successfully!",
+  };
+}
+
+export async function sendNewProfileInformationCode(): Promise<
+  { success: string; error?: never } | { success?: never; error: string }
+> {
+  const { user } = await getSession({ redirectOnNull: true });
+
+  const code = crypto.randomInt(10000, 999999);
+
+  try {
+    await sendNewProfileInformationCodeMail(user.email, code);
+
+    (await cookies()).set("code", bcrypt.hashSync(code.toString()), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/settings",
+      maxAge: 300, // 5 mins
+      sameSite: "strict",
+    });
+  } catch {
+    return {
+      error: "Couldn't send the code! Please try again.",
+    };
+  }
+
+  return {
+    success: "Check your inbox for the code.",
   };
 }
 
@@ -379,7 +445,7 @@ export async function sendNewEmailVerificationLink(
       token = newEmailChangeRequest.token;
     }
 
-    await sendNewEmailVerificationMail(newEmail, token);
+    await sendNewEmailVerificationLinkMail(newEmail, token);
   } catch {
     // Revert back changes
     try {

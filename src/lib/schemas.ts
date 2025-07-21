@@ -54,17 +54,28 @@ export const verifyEmailSchema = z.object({
   code: z.string().min(6, { error: "The code must contain 6 digits." }),
 });
 
-export const profileInformationSchema = z.object({
+export const baseProfileInformationSchema = z.object({
   fullName: z.string().min(2, {
     error: "Full name must be at least 2 characters.",
   }),
   email: z.email({
     error: "Please enter a valid email address.",
   }),
-  password: z
-    .string()
-    .nonempty({ error: "Please enter your password to save changes." }),
 });
+
+export const baseProfileInformationSchemaExtendedWithPassword =
+  baseProfileInformationSchema.extend({
+    password: z.string().nonempty({
+      error: "Please enter your password to save changes.",
+    }),
+  });
+
+export const baseProfileInformationSchemaExtendedWithCode =
+  baseProfileInformationSchema.extend({
+    code: z.string().min(6, {
+      error: "The code must contain 6 digits.",
+    }),
+  });
 
 export const updatePasswordSchema = z
   .object({

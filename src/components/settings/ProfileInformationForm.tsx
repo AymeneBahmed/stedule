@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { profileInformationSchema } from "@/lib/schemas";
+import {
+  baseProfileInformationSchemaExtendedWithCode,
+  baseProfileInformationSchemaExtendedWithPassword,
+} from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -14,9 +17,17 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { startTransition, useActionState, useEffect, useId } from "react";
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+} from "react";
 import {
   sendNewEmailVerificationLink,
+  sendNewProfileInformationCode,
   updateProfileInformation,
 } from "@/actions/settings-actions";
 import { toast } from "sonner";
@@ -29,24 +40,33 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { TriangleAlert } from "lucide-react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 
 interface ProfileInformationFormProps {
   defaultFullName: string;
   defaultEmail: string;
+  doesUserHavePassword: boolean;
   pendingNewEmailObject?: { email: string; remainingHours: number };
 }
 
 export function ProfileInformationForm({
   defaultFullName,
   defaultEmail,
+  doesUserHavePassword,
   pendingNewEmailObject: pendingNewEmail,
 }: ProfileInformationFormProps) {
-  const form = useForm<z.infer<typeof profileInformationSchema>>({
-    resolver: zodResolver(profileInformationSchema),
+  const schema = useMemo(() => {
+    return doesUserHavePassword
+      ? baseProfileInformationSchemaExtendedWithPassword
+      : baseProfileInformationSchemaExtendedWithCode;
+  }, [doesUserHavePassword]);
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
       fullName: defaultFullName,
       email: defaultEmail,
       password: "",
+      code: "",
     },
   });
   const [
@@ -54,19 +74,40 @@ export function ProfileInformationForm({
     updateProfileInformationAction,
     isUpdateProfileInformationPending,
   ] = useActionState(updateProfileInformation, null);
-  const formId = useId();
   const [
     sendNewEmailVerificationLinkState,
     sendNewEmailVerificationLinkAction,
     isSendNewEmailVerificationLinkPending,
   ] = useActionState(sendNewEmailVerificationLink, null);
+  const [
+    sendNewProfileInformationCodeState,
+    sendNewProfileInformationCodeAction,
+    isSendNewProfileInformationCodePending,
+  ] = useActionState(sendNewProfileInformationCode, null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const formId = useId();
 
-  async function onSubmit(values: z.infer<typeof profileInformationSchema>) {
+  async function onSubmit(values: z.infer<typeof schema>) {
     startTransition(() => {
       updateProfileInformationAction(values);
-      form.reset();
+      form.resetField("email");
+      form.resetField("code");
+      form.resetField("password");
+      setIsDialogOpen(false);
     });
   }
+
+  useEffect(() => {
+    if (sendNewProfileInformationCodeState?.success) {
+      toast.success(sendNewProfileInformationCodeState.success);
+
+      return;
+    }
+
+    if (sendNewProfileInformationCodeState?.success) {
+      toast.error(sendNewProfileInformationCodeState.error);
+    }
+  }, [sendNewProfileInformationCodeState]);
 
   useEffect(() => {
     if (updateProfileInformationState?.success) {
@@ -173,51 +214,116 @@ export function ProfileInformationForm({
           </div>
         )}
 
-        <Dialog>
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={(isOpen) => {
+            startTransition(() => {
+              if (isOpen && !doesUserHavePassword) {
+                sendNewProfileInformationCodeAction();
+              }
+
+              setIsDialogOpen(isOpen);
+            });
+          }}
+        >
           <DialogTrigger asChild>
-            <Button type="button" disabled={isUpdateProfileInformationPending}>
+            <Button
+              type="button"
+              disabled={
+                isUpdateProfileInformationPending ||
+                isSendNewProfileInformationCodePending
+              }
+            >
               {isUpdateProfileInformationPending ? "Saving..." : "Save changes"}
             </Button>
           </DialogTrigger>
 
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                Enter your password to udpate your profile
-              </DialogTitle>
-              <DialogDescription>
-                For security reasons, please enter your password to save your
-                new details.
-              </DialogDescription>
-            </DialogHeader>
+          {doesUserHavePassword ? (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  Enter your password to udpate your profile
+                </DialogTitle>
+                <DialogDescription>
+                  For security reasons, please enter your password to save your
+                  new details.
+                </DialogDescription>
+              </DialogHeader>
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      placeholder="Enter your password"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="password"
+                        placeholder="Enter your password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Button
-              type="submit"
-              disabled={isUpdateProfileInformationPending}
-              form={formId}
-              className="mt-3"
-            >
-              Save changes
-            </Button>
-          </DialogContent>
+              <Button
+                type="submit"
+                disabled={isUpdateProfileInformationPending}
+                form={formId}
+                className="mt-3"
+              >
+                Save changes
+              </Button>
+            </DialogContent>
+          ) : (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Enter the code to udpate your profile</DialogTitle>
+                <DialogDescription>
+                  For security reasons, please enter a code sent to your inbox
+                  to save your new details.
+                  <strong className="mt-2 block">
+                    NOTE: we recommend setting a password for your account
+                    instead of using a one-time password for better security.
+                  </strong>
+                </DialogDescription>
+              </DialogHeader>
+
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Code</FormLabel>
+                    <FormControl>
+                      <InputOTP maxLength={6} {...field}>
+                        <InputOTPGroup className="!w-full *:h-10 *:grow">
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                type="submit"
+                disabled={isUpdateProfileInformationPending}
+                form={formId}
+                className="mt-3"
+              >
+                Save changes
+              </Button>
+            </DialogContent>
+          )}
         </Dialog>
       </form>
     </Form>

@@ -31,7 +31,7 @@ export async function sendDeleteUserVerificationMail(
   });
 }
 
-export async function sendNewEmailVerificationMail(
+export async function sendNewEmailVerificationLinkMail(
   newEmail: string,
   token: string,
 ) {
@@ -40,5 +40,17 @@ export async function sendNewEmailVerificationMail(
     to: newEmail,
     subject: "Verify new email",
     html: `Click here to change your email: <strong>${process.env.APP_URL}/verify-email/new-email?token=${token}</strong>`,
+  });
+}
+
+export async function sendNewProfileInformationCodeMail(
+  currentEmail: string,
+  code: number,
+) {
+  await transporter.sendMail({
+    from: "Study Schedule <aymendd3131@gmail.com>",
+    to: currentEmail,
+    subject: "Change profile information",
+    html: `Here is your code to change your profile information: <strong>${code}</strong>`,
   });
 }
