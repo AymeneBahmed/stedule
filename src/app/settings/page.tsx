@@ -19,14 +19,20 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { auth, getSession } from "@/lib/auth/auth";
+import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { headers } from "next/headers";
 
 export default async function SettingsPage() {
   const session = await getSession({ redirectOnNull: true });
-  const userAccounts = await auth.api.listUserAccounts({
-    headers: await headers(),
-  });
+  const [userAccounts, existingEmailChangeRequest] = await Promise.all([
+    auth.api.listUserAccounts({
+      headers: await headers(),
+    }),
+    prisma.emailChangeRequest.findUnique({
+      where: { userId: session.user.id },
+    }),
+  ]);
   const doesUserHaveCredentialAccount = !!userAccounts.find(
     (account) => account.provider === "credential",
   );
@@ -53,6 +59,14 @@ export default async function SettingsPage() {
             <ProfileInformationForm
               defaultFullName={session.user.name}
               defaultEmail={session.user.email}
+              {...(existingEmailChangeRequest && {
+                pendingNewEmailObject: {
+                  email: existingEmailChangeRequest.newEmail,
+                  remainingHours: new Date(
+                    existingEmailChangeRequest.expiresAt.getTime() - Date.now(),
+                  ).getHours(),
+                },
+              })}
             />
           </CardContent>
         </Card>

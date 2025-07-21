@@ -15,7 +15,10 @@ import {
   FormMessage,
 } from "../ui/form";
 import { startTransition, useActionState, useEffect, useId } from "react";
-import { updateProfileInformation } from "@/actions/settings-actions";
+import {
+  resendNewEmailVerificationLink,
+  updateProfileInformation,
+} from "@/actions/settings-actions";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -25,15 +28,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { TriangleAlert } from "lucide-react";
 
 interface ProfileInformationFormProps {
   defaultFullName: string;
   defaultEmail: string;
+  pendingNewEmailObject?: { email: string; remainingHours: number };
 }
 
 export function ProfileInformationForm({
   defaultFullName,
   defaultEmail,
+  pendingNewEmailObject: pendingNewEmail,
 }: ProfileInformationFormProps) {
   const form = useForm<z.infer<typeof profileInformationSchema>>({
     resolver: zodResolver(profileInformationSchema),
@@ -43,11 +49,17 @@ export function ProfileInformationForm({
       password: "",
     },
   });
-  const [state, updateProfileInformationAction, isPending] = useActionState(
-    updateProfileInformation,
-    null,
-  );
+  const [
+    updateProfileInformationState,
+    updateProfileInformationAction,
+    isUpdateProfileInformationPending,
+  ] = useActionState(updateProfileInformation, null);
   const formId = useId();
+  const [
+    resendNewEmailVerificationLinkState,
+    resendNewEmailVerificationLinkAction,
+    isResendNewEmailVerificationLinkPending,
+  ] = useActionState(resendNewEmailVerificationLink, null);
 
   async function onSubmit(values: z.infer<typeof profileInformationSchema>) {
     startTransition(() => {
@@ -57,16 +69,28 @@ export function ProfileInformationForm({
   }
 
   useEffect(() => {
-    if (state?.success) {
-      toast.success(state.success);
+    if (updateProfileInformationState?.success) {
+      toast.success(updateProfileInformationState.success);
 
       return;
     }
 
-    if (state?.error) {
-      toast.error(state.error.toString());
+    if (updateProfileInformationState?.error) {
+      toast.error(updateProfileInformationState.error.toString());
     }
-  }, [state]);
+  }, [updateProfileInformationState]);
+
+  useEffect(() => {
+    if (resendNewEmailVerificationLinkState?.success) {
+      toast.success(resendNewEmailVerificationLinkState.success);
+
+      return;
+    }
+
+    if (resendNewEmailVerificationLinkState?.error) {
+      toast.error(resendNewEmailVerificationLinkState.error.toString());
+    }
+  }, [resendNewEmailVerificationLinkState]);
 
   return (
     <Form {...form}>
@@ -105,10 +129,54 @@ export function ProfileInformationForm({
           )}
         />
 
+        {pendingNewEmail && (
+          <div className="mt-8 flex items-start gap-3 rounded-lg bg-orange-100 p-4 text-sm text-orange-700 dark:bg-orange-400/20 dark:text-orange-200">
+            <TriangleAlert className="mt-0.5 flex-shrink-0" size={20} />
+
+            <div>
+              <p className="font-medium">Email change requested</p>
+              <p className="mt-1">
+                To complete changing your email to{" "}
+                <strong className="break-all">{pendingNewEmail.email}</strong>:
+              </p>
+              <ul className="mt-2 list-inside list-disc space-y-1">
+                <li>
+                  Check your new email&apos;s inbox for a verification link
+                </li>
+                <li>
+                  Verify within <strong>24 hours</strong> before the link
+                  expires{" "}
+                  <strong>
+                    ({pendingNewEmail.remainingHours} hour
+                    {pendingNewEmail.remainingHours > 1 && "s"} left)
+                  </strong>
+                </li>
+                <li>
+                  Didn&apos;t receive it?{" "}
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 text-orange-700 underline dark:text-orange-200"
+                    onClick={() => {
+                      startTransition(() => {
+                        resendNewEmailVerificationLinkAction(
+                          pendingNewEmail.email,
+                        );
+                      });
+                    }}
+                    disabled={isResendNewEmailVerificationLinkPending}
+                  >
+                    Resend verification email
+                  </Button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
+
         <Dialog>
           <DialogTrigger asChild>
-            <Button type="button" disabled={isPending}>
-              {isPending ? "Saving..." : "Save changes"}
+            <Button type="button" disabled={isUpdateProfileInformationPending}>
+              {isUpdateProfileInformationPending ? "Saving..." : "Save changes"}
             </Button>
           </DialogTrigger>
 
@@ -141,7 +209,12 @@ export function ProfileInformationForm({
               )}
             />
 
-            <Button type="submit" disabled={isPending} form={formId}>
+            <Button
+              type="submit"
+              disabled={isUpdateProfileInformationPending}
+              form={formId}
+              className="mt-3"
+            >
               Save changes
             </Button>
           </DialogContent>

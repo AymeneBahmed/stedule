@@ -325,3 +325,63 @@ export async function removePassword(
 
   return redirect("/settings");
 }
+
+// Add `newEmail` parameter just in case the corresponding `EmailChangeRequest` record is deleted or not correct.
+export async function resendNewEmailVerificationLink(
+  _prevState: unknown,
+  newEmail: string,
+): Promise<
+  | {
+      success?: never;
+      error: string;
+    }
+  | {
+      success: string;
+      error?: never;
+    }
+> {
+  const { user } = await getSession({ redirectOnNull: true });
+
+  try {
+    const existingEmailChangeRequest =
+      await prisma.emailChangeRequest.findUnique({
+        where: {
+          userId: user.id,
+        },
+      });
+
+    if (existingEmailChangeRequest != null) {
+      await prisma.emailChangeRequest.update({
+        where: {
+          id: existingEmailChangeRequest.id,
+        },
+        data: {
+          expiresAt: new Date(Date.now() + 60 * 60 * 24 * 1000),
+          updatedAt: new Date(Date.now()),
+        },
+      });
+    } else {
+      await prisma.emailChangeRequest.create({
+        data: {
+          newEmail,
+          expiresAt: new Date(Date.now() + 60 * 60 * 24 * 1000),
+          user: {
+            connect: {
+              id: user.id,
+            },
+          },
+        },
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    
+    return {
+      error: "Something went wrong! Please try again.",
+    };
+  }
+
+  revalidatePath("/settings");
+
+  return { success: "Verification link resent successfully." };
+}
