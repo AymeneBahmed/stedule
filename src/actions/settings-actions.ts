@@ -373,9 +373,7 @@ export async function resendNewEmailVerificationLink(
         },
       });
     }
-  } catch (e) {
-    console.log(e);
-    
+  } catch {
     return {
       error: "Something went wrong! Please try again.",
     };
