@@ -39,9 +39,9 @@ enum Priority {
 
 model EmailChangeRequest {
   id        Int      @id @default(autoincrement())
-  userId    String
+  userId    String   @unique
   newEmail  String   @unique
-  token     String   @unique
+  token     String   @unique @default(cuid())
   createdAt DateTime @default(now())
   expiresAt DateTime
 
