@@ -10,6 +10,7 @@ import {
   removePasswordSchema,
   updatePasswordSchema,
 } from "@/lib/schemas";
+import { EmailChangeRequest } from "@prisma/client";
 import { APIError } from "better-auth";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
@@ -341,14 +342,15 @@ export async function resendNewEmailVerificationLink(
     }
 > {
   const { user } = await getSession({ redirectOnNull: true });
+  let existingEmailChangeRequest: EmailChangeRequest | null = null;
+  let token: string | null = null;
 
   try {
-    const existingEmailChangeRequest =
-      await prisma.emailChangeRequest.findUnique({
-        where: {
-          userId: user.id,
-        },
-      });
+    existingEmailChangeRequest = await prisma.emailChangeRequest.findUnique({
+      where: {
+        userId: user.id,
+      },
+    });
 
     if (existingEmailChangeRequest != null) {
       await prisma.emailChangeRequest.update({
@@ -360,8 +362,10 @@ export async function resendNewEmailVerificationLink(
           updatedAt: new Date(Date.now()),
         },
       });
+
+      token = existingEmailChangeRequest.token;
     } else {
-      await prisma.emailChangeRequest.create({
+      const newEmailChangeRequest = await prisma.emailChangeRequest.create({
         data: {
           newEmail,
           expiresAt: new Date(Date.now() + 60 * 60 * 24 * 1000),
@@ -372,8 +376,38 @@ export async function resendNewEmailVerificationLink(
           },
         },
       });
+      token = newEmailChangeRequest.token;
     }
+
+    await sendNewEmailVerificationMail(newEmail, token);
   } catch {
+    // Revert back changes
+    try {
+      if (token != null) {
+        if (token === existingEmailChangeRequest?.token) {
+          await prisma.emailChangeRequest.update({
+            where: {
+              id: existingEmailChangeRequest.id,
+            },
+            data: {
+              expiresAt: existingEmailChangeRequest.expiresAt,
+              updatedAt: existingEmailChangeRequest.updatedAt,
+            },
+          });
+        } else {
+          await prisma.emailChangeRequest.delete({
+            where: {
+              token,
+            },
+          });
+        }
+      }
+    } catch {
+      return {
+        error: "Something went wrong! Please try again.",
+      };
+    }
+
     return {
       error: "Something went wrong! Please try again.",
     };
