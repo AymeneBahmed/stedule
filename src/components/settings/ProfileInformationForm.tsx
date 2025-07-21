@@ -16,7 +16,7 @@ import {
 } from "../ui/form";
 import { startTransition, useActionState, useEffect, useId } from "react";
 import {
-  resendNewEmailVerificationLink,
+  sendNewEmailVerificationLink,
   updateProfileInformation,
 } from "@/actions/settings-actions";
 import { toast } from "sonner";
@@ -56,10 +56,10 @@ export function ProfileInformationForm({
   ] = useActionState(updateProfileInformation, null);
   const formId = useId();
   const [
-    resendNewEmailVerificationLinkState,
-    resendNewEmailVerificationLinkAction,
-    isResendNewEmailVerificationLinkPending,
-  ] = useActionState(resendNewEmailVerificationLink, null);
+    sendNewEmailVerificationLinkState,
+    sendNewEmailVerificationLinkAction,
+    isSendNewEmailVerificationLinkPending,
+  ] = useActionState(sendNewEmailVerificationLink, null);
 
   async function onSubmit(values: z.infer<typeof profileInformationSchema>) {
     startTransition(() => {
@@ -81,16 +81,16 @@ export function ProfileInformationForm({
   }, [updateProfileInformationState]);
 
   useEffect(() => {
-    if (resendNewEmailVerificationLinkState?.success) {
-      toast.success(resendNewEmailVerificationLinkState.success);
+    if (sendNewEmailVerificationLinkState?.success) {
+      toast.success(sendNewEmailVerificationLinkState.success);
 
       return;
     }
 
-    if (resendNewEmailVerificationLinkState?.error) {
-      toast.error(resendNewEmailVerificationLinkState.error.toString());
+    if (sendNewEmailVerificationLinkState?.error) {
+      toast.error(sendNewEmailVerificationLinkState.error.toString());
     }
-  }, [resendNewEmailVerificationLinkState]);
+  }, [sendNewEmailVerificationLinkState]);
 
   return (
     <Form {...form}>
@@ -158,12 +158,12 @@ export function ProfileInformationForm({
                     className="h-auto p-0 text-orange-700 underline dark:text-orange-200"
                     onClick={() => {
                       startTransition(() => {
-                        resendNewEmailVerificationLinkAction(
+                        sendNewEmailVerificationLinkAction(
                           pendingNewEmail.email,
                         );
                       });
                     }}
-                    disabled={isResendNewEmailVerificationLinkPending}
+                    disabled={isSendNewEmailVerificationLinkPending}
                   >
                     Resend verification email
                   </Button>

@@ -328,7 +328,7 @@ export async function removePassword(
 }
 
 // Add `newEmail` parameter just in case the corresponding `EmailChangeRequest` record is deleted or not correct.
-export async function resendNewEmailVerificationLink(
+export async function sendNewEmailVerificationLink(
   _prevState: unknown,
   newEmail: string,
 ): Promise<
