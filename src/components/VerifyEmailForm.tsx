@@ -19,22 +19,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { VerifyEmailSchema } from "@/lib/schemas";
+import { verifyEmailSchema } from "@/lib/schemas";
 import { authClient } from "@/lib/auth/auth-client";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function VerifyEmailForm({ email }: { email: string }) {
-  const form = useForm<z.infer<typeof VerifyEmailSchema>>({
-    resolver: zodResolver(VerifyEmailSchema),
+  const form = useForm<z.infer<typeof verifyEmailSchema>>({
+    resolver: zodResolver(verifyEmailSchema),
     defaultValues: {
       code: "",
     },
   });
   const router = useRouter();
 
-  async function onSubmit(values: z.infer<typeof VerifyEmailSchema>) {
+  async function onSubmit(values: z.infer<typeof verifyEmailSchema>) {
     await authClient.emailOtp.verifyEmail(
       {
         email,

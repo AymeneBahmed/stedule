@@ -21,7 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SignupSchema } from "@/lib/schemas";
+import { signupSchema } from "@/lib/schemas";
 import { authClient } from "@/lib/auth/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -30,8 +30,8 @@ import { Separator } from "./ui/separator";
 import { ContinueWithoutAccountButton } from "./ContinueWithoutAccountButton";
 
 export default function SignupForm() {
-  const form = useForm<z.infer<typeof SignupSchema>>({
-    resolver: zodResolver(SignupSchema),
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       fullName: "",
       email: "",
@@ -40,7 +40,7 @@ export default function SignupForm() {
   });
   const router = useRouter();
 
-  async function onSubmit(values: z.infer<typeof SignupSchema>) {
+  async function onSubmit(values: z.infer<typeof signupSchema>) {
     await authClient.signUp.email(
       {
         name: values.fullName,

@@ -20,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LoginSchema } from "@/lib/schemas";
+import { loginSchema } from "@/lib/schemas";
 import Link from "next/link";
 import { Checkbox } from "./ui/checkbox";
 import { authClient } from "@/lib/auth/auth-client";
@@ -31,8 +31,8 @@ import { GoogleLoginButton } from "./GoogleLoginButton";
 import { ContinueWithoutAccountButton } from "./ContinueWithoutAccountButton";
 
 export default function LoginForm() {
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -41,7 +41,7 @@ export default function LoginForm() {
   });
   const router = useRouter();
 
-  async function onSubmit(values: z.infer<typeof LoginSchema>) {
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
     await authClient.signIn.email(
       {
         email: values.email,
