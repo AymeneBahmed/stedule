@@ -31,14 +31,14 @@ export async function sendDeleteUserVerificationMail(
   });
 }
 
-export async function sendChangeEmailVerificationMail(
+export async function sendNewEmailVerificationMail(
   newEmail: string,
-  url: string,
+  token: string,
 ) {
   await transporter.sendMail({
     from: "Study Schedule <aymendd3131@gmail.com>",
     to: newEmail,
     subject: "Verify new email",
-    html: `Click here to change your email: <strong>${url}</strong>`,
+    html: `Click here to change your email: <strong>${process.env.APP_URL}/verify-email/new-email?token=${token}</strong>`,
   });
 }
