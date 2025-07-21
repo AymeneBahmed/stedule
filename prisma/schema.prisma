@@ -43,6 +43,7 @@ model EmailChangeRequest {
   newEmail  String   @unique
   token     String   @unique @default(cuid())
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
   expiresAt DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
