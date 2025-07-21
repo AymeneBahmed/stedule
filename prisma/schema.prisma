@@ -37,18 +37,30 @@ enum Priority {
   High
 }
 
+model EmailChangeRequest {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  newEmail  String   @unique
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
-  tasks         Task[]
-  times         Time[]
+  id                  String               @id
+  name                String
+  email               String
+  emailVerified       Boolean
+  image               String?
+  createdAt           DateTime
+  updatedAt           DateTime
+  sessions            Session[]
+  accounts            Account[]
+  tasks               Task[]
+  times               Time[]
+  emailChangeRequests EmailChangeRequest[]
 
   @@unique([email])
   @@map("user")
