@@ -1,6 +1,7 @@
 "use server";
 
 import { auth, getSession } from "@/lib/auth/auth";
+import { sendNewEmailVerificationMail } from "@/lib/mail";
 import { prisma } from "@/lib/prisma";
 import {
   createCredentialAccountSchema,
@@ -11,7 +12,7 @@ import {
 } from "@/lib/schemas";
 import { APIError } from "better-auth";
 import { revalidatePath } from "next/cache";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import z from "zod";
 
@@ -62,17 +63,19 @@ export async function updateProfileInformation(
         hash: credentialAccount.password!,
       }))
     ) {
-      await auth.api.changeEmail({
-        headers: await headers(),
-        body: { newEmail },
+      const emailChangeRequest = await prisma.emailChangeRequest.create({
+        data: {
+          newEmail,
+          expiresAt: new Date(Date.now() + 60 * 60 * 24 * 1000),
+          user: {
+            connect: {
+              id: session.user.id,
+            },
+          },
+        },
       });
-      (await cookies()).set("newEmail", newEmail, {
-        secure: true,
-        httpOnly: true,
-        maxAge: 60 * 30, // 30 mins
-        path: "/settings",
-        sameSite: "strict",
-      });
+
+      await sendNewEmailVerificationMail(newEmail, emailChangeRequest.token);
     }
 
     await prisma.user.update({
