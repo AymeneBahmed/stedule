@@ -20,7 +20,7 @@ export default function UserDropdownMenu({ name, email, image }: User) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="absolute top-8 right-14 flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white/20">
+        <div className="absolute top-8 right-14 flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-black/5 dark:hover:bg-white/20">
           <div>
             <Avatar className="size-11">
               {image && <AvatarImage src={image} />}
