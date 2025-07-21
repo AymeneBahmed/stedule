@@ -97,7 +97,7 @@ async function VerificationContent({ token }: { token: string | undefined }) {
       );
     }
 
-    if (existingEmailChangeRequest.expiresAt.getTime() > Date.now()) {
+    if (existingEmailChangeRequest.expiresAt.getTime() <= Date.now()) {
       return (
         <div className="flex min-h-full items-center justify-center">
           <Card className="max-w-md">
