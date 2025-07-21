@@ -36,6 +36,17 @@ export default async function SettingsPage() {
   const doesUserHaveCredentialAccount = !!userAccounts.find(
     (account) => account.provider === "credential",
   );
+  const isExistingEmailChangeRequestExpired =
+    existingEmailChangeRequest &&
+    existingEmailChangeRequest?.expiresAt.getTime() <= Date.now();
+
+  if (isExistingEmailChangeRequestExpired) {
+    await prisma.emailChangeRequest.delete({
+      where: {
+        id: existingEmailChangeRequest.id,
+      },
+    });
+  }
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -59,14 +70,16 @@ export default async function SettingsPage() {
             <ProfileInformationForm
               defaultFullName={session.user.name}
               defaultEmail={session.user.email}
-              {...(existingEmailChangeRequest && {
-                pendingNewEmailObject: {
-                  email: existingEmailChangeRequest.newEmail,
-                  remainingHours: new Date(
-                    existingEmailChangeRequest.expiresAt.getTime() - Date.now(),
-                  ).getHours(),
-                },
-              })}
+              {...(!isExistingEmailChangeRequestExpired &&
+                existingEmailChangeRequest != null && {
+                  pendingNewEmailObject: {
+                    email: existingEmailChangeRequest.newEmail,
+                    remainingHours: new Date(
+                      existingEmailChangeRequest.expiresAt.getTime() -
+                        Date.now(),
+                    ).getHours(),
+                  },
+                })}
             />
           </CardContent>
         </Card>
