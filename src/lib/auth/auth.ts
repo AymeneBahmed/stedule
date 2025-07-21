@@ -41,6 +41,9 @@ export const auth = betterAuth({
   ],
   emailVerification: {
     autoSignInAfterVerification: true,
+    async onEmailVerification() {
+      (await cookies()).delete("email");
+    },
   },
   emailAndPassword: {
     enabled: true,
