@@ -3,7 +3,6 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { emailOTP } from "better-auth/plugins";
 import { prisma } from "../prisma";
 import {
-  sendNewEmailVerificationMail,
   sendDeleteUserVerificationMail,
   sendEmailVerificationMail,
 } from "../mail";
@@ -55,12 +54,6 @@ export const auth = betterAuth({
       enabled: true,
       async sendDeleteAccountVerification({ user, url }) {
         await sendDeleteUserVerificationMail(user.email, url);
-      },
-    },
-    changeEmail: {
-      enabled: true,
-      async sendChangeEmailVerification({ newEmail, url }) {
-        await sendNewEmailVerificationMail(newEmail, url);
       },
     },
   },
