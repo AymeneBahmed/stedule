@@ -151,12 +151,11 @@ async function VerificationContent({ token }: { token: string | undefined }) {
             <CardContent className="text-center">
               <p>
                 This verification link expired. Links are valid for 24 hours.{" "}
-                <Button
-                  variant="link"
-                  className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
+                <RequestNewVerificationLinkButton
+                  newEmail={existingEmailChangeRequest.newEmail}
                 >
                   Get a new link
-                </Button>
+                </RequestNewVerificationLinkButton>
                 .
               </p>
             </CardContent>
