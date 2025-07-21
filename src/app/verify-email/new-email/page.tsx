@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RequestNewVerificationLinkButton } from "@/components/verify-email/new-email/RequestNewVerificationLinkButton";
+import { getSession } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -29,7 +31,47 @@ function LoadingSpinner() {
 }
 
 async function VerificationContent({ token }: { token: string | undefined }) {
+  const { user } = await getSession({ redirectOnNull: true });
+
   if (token == null) {
+    const existingEmailChangeRequest =
+      await prisma.emailChangeRequest.findUnique({
+        where: {
+          userId: user.id,
+        },
+      });
+
+    if (existingEmailChangeRequest == null) {
+      return (
+        <div className="flex min-h-full items-center justify-center">
+          <Card className="max-w-md">
+            <CardHeader>
+              <CardTitle className="text-center">
+                Invalid Verification Link
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="text-center">
+              <p>
+                This verification link is invalid or already used. Please
+                request a new verification email by{" "}
+                <Button
+                  variant="link"
+                  className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
+                  asChild
+                >
+                  <Link href="/settings">
+                    changing the email in the settings
+                  </Link>
+                </Button>
+                .
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
     return (
       <div className="flex min-h-full items-center justify-center">
         <div className="flex min-h-full items-center justify-center">
@@ -43,12 +85,11 @@ async function VerificationContent({ token }: { token: string | undefined }) {
             <CardContent className="text-center">
               <p>
                 Please check your email for the correct verification link or{" "}
-                <Button
-                  variant="link"
-                  className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
+                <RequestNewVerificationLinkButton
+                  newEmail={existingEmailChangeRequest.newEmail}
                 >
                   request a new one
-                </Button>
+                </RequestNewVerificationLinkButton>
                 .
               </p>
             </CardContent>
