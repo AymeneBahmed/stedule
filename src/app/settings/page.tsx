@@ -1,6 +1,7 @@
 import { CreateCredentialAccountForm } from "@/components/settings/CreateCredentialAccountForm";
 import { DeleteUserForm } from "@/components/settings/DeleteUserForm";
 import { ProfileInformationForm } from "@/components/settings/ProfileInformationForm";
+import { ProfilePictureForm } from "@/components/settings/ProfilePictureForm";
 import { UpdatePasswordForm } from "@/components/settings/UpdatePasswordForm";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +22,9 @@ import {
 import { auth, getSession } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
+import { ArrowLeftIcon } from "lucide-react";
 import { headers } from "next/headers";
+import Link from "next/link";
 
 export default async function SettingsPage() {
   const session = await getSession({ redirectOnNull: true });
@@ -50,11 +53,20 @@ export default async function SettingsPage() {
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your account settings and preferences
-        </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your account settings and preferences
+          </p>
+        </div>
+
+        <Button asChild>
+          <Link href="/">
+            <ArrowLeftIcon />
+            Return to schedule
+          </Link>
+        </Button>
       </div>
 
       <div className="space-y-6">
@@ -82,6 +94,17 @@ export default async function SettingsPage() {
                   },
                 })}
             />
+          </CardContent>
+        </Card>
+
+        {/* Profile Picture */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile picture</CardTitle>
+            <CardDescription>Update your profile picture</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ProfilePictureForm />
           </CardContent>
         </Card>
 
