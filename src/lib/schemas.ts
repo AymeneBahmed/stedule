@@ -123,3 +123,15 @@ export const removePasswordSchema = z.object({
     .string()
     .nonempty({ error: "Please enter your current password to continue." }),
 });
+
+export const profilePictureSchema = z.object({
+  image: z
+    .file({ error: "Please provide a file." })
+    .mime(
+      ["image/png", "image/jpeg", "image/svg+xml", "image/webp", "image/gif"],
+      {
+        error:
+          "The file must be an image with a valid format (JPG, JPEG, PNG, SVG, WEBP, GIF).",
+      },
+    ),
+});
