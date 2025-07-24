@@ -25,6 +25,7 @@ export function createImage(url: string): Promise<HTMLImageElement> {
 export async function getCroppedImg(
   imageSrc: string,
   pixelCrop: Area,
+  rotation: number = 0, // Add rotation parameter
 ): Promise<string> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
@@ -34,23 +35,39 @@ export async function getCroppedImg(
     throw new Error("Could not get canvas context");
   }
 
-  // Set canvas dimensions
+  // Calculate safe area to prevent clipping during rotation
+  const maxSize = Math.max(image.width, image.height);
+  const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));
+
+  // Set canvas dimensions to accommodate rotation
+  canvas.width = safeArea;
+  canvas.height = safeArea;
+
+  // Translate context to center and apply rotation
+  ctx.translate(safeArea / 2, safeArea / 2);
+  ctx.rotate((rotation * Math.PI) / 180);
+  ctx.translate(-safeArea / 2, -safeArea / 2);
+
+  // Draw rotated image centered in safe area
+  ctx.drawImage(
+    image,
+    safeArea / 2 - image.width / 2,
+    safeArea / 2 - image.height / 2,
+  );
+
+  // Get rotated image data
+  const data = ctx.getImageData(0, 0, safeArea, safeArea);
+
+  // Set final crop dimensions
   canvas.width = pixelCrop.width;
   canvas.height = pixelCrop.height;
 
-  // Draw cropped image
-  ctx.drawImage(
-    image,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
-    0,
-    0,
-    pixelCrop.width,
-    pixelCrop.height,
+  // Paste rotated image with correct crop position
+  ctx.putImageData(
+    data,
+    Math.round(0 - safeArea / 2 + image.width / 2 - pixelCrop.x),
+    Math.round(0 - safeArea / 2 + image.height / 2 - pixelCrop.y),
   );
 
-  // Return as base64 string
   return canvas.toDataURL("image/png");
 }

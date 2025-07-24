@@ -25,6 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogClose,
 } from "../ui/dialog";
 import Cropper, { Area } from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
@@ -39,10 +40,11 @@ export function ProfilePictureForm() {
   const session = authClient.useSession();
   const userName = session.data?.user.name;
   const userImage = session.data?.user.image;
-  const fileInput = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // State for cropping
+  const [oldImageSrc, setOldImageSrc] = useState<string | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -51,19 +53,26 @@ export function ProfilePictureForm() {
 
   // Handle file selection
   // Specifically, convert the file to an image src
-  const onFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]!;
-      const reader = new FileReader();
+  const onFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files.length > 0) {
+        const file = e.target.files[0]!;
+        const reader = new FileReader();
 
-      reader.addEventListener("load", () => {
-        setImageSrc(reader.result as string);
-        setIsDialogOpen(true);
-      });
+        reader.addEventListener("load", () => {
+          if (imageSrc != null) {
+            setOldImageSrc(imageSrc);
+          }
 
-      reader.readAsDataURL(file);
-    }
-  }, []);
+          setImageSrc(reader.result as string);
+          setIsDialogOpen(true);
+        });
+
+        reader.readAsDataURL(file);
+      }
+    },
+    [imageSrc],
+  );
 
   // Handle crop completion
   const onCropComplete = useCallback(
@@ -78,7 +87,11 @@ export function ProfilePictureForm() {
     if (!imageSrc || !croppedAreaPixels) return;
 
     try {
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const croppedImage = await getCroppedImg(
+        imageSrc,
+        croppedAreaPixels,
+        rotation,
+      );
 
       // Convert base64 to File object
       const file = await fetch(croppedImage)
@@ -102,14 +115,15 @@ export function ProfilePictureForm() {
       // Close dialog and reset states
       setIsDialogOpen(false);
       setImageSrc(null);
+      setOldImageSrc(null);
       setCrop({ x: 0, y: 0 });
       setZoom(1);
     } catch {
       toast.error("Something went wrong! Please try again.");
     }
-  }, [croppedAreaPixels, imageSrc, form]);
+  }, [imageSrc, croppedAreaPixels, rotation, form]);
 
-  function onSubmit() {}
+  function onSubmit(values: z.infer<typeof profilePictureSchema>) {}
 
   return (
     <Form {...form}>
@@ -122,14 +136,14 @@ export function ProfilePictureForm() {
               <div>
                 <FormControl className="hidden">
                   <Input
-                    ref={fileInput}
+                    ref={fileInputRef}
                     type="file"
                     accept="image/*"
                     onChange={onFileChange}
                   />
                 </FormControl>
 
-                {imageSrc && !isDialogOpen ? (
+                {(imageSrc && !isDialogOpen) || oldImageSrc ? (
                   <>
                     <div>
                       <div>The old image:</div>
@@ -157,7 +171,7 @@ export function ProfilePictureForm() {
                               fieldState.error &&
                                 "ring-destructive text-destructive ring",
                             )}
-                            onClick={() => fileInput.current?.click()}
+                            onClick={() => fileInputRef.current?.click()}
                           >
                             <CameraIcon />
                             Change picture
@@ -177,7 +191,7 @@ export function ProfilePictureForm() {
                         <Avatar className="size-17">
                           <AvatarImage
                             className="object-cover"
-                            src={imageSrc}
+                            src={oldImageSrc ?? imageSrc ?? undefined}
                             alt="Profile Picture"
                           />
                           <AvatarFallback>
@@ -214,7 +228,7 @@ export function ProfilePictureForm() {
                           fieldState.error &&
                             "ring-destructive text-destructive ring",
                         )}
-                        onClick={() => fileInput.current?.click()}
+                        onClick={() => fileInputRef.current?.click()}
                       >
                         <CameraIcon />
                         Change picture
@@ -235,6 +249,16 @@ export function ProfilePictureForm() {
         <Dialog
           open={isDialogOpen}
           onOpenChange={(isOpen) => {
+            // THIS FUNCTION WON'T EXECUTE WHEN CLICKING ON "SET NEW PROFILE PICTURE"
+            if (!isOpen) {
+              if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+              }
+
+              setImageSrc(oldImageSrc);
+              setOldImageSrc(null);
+            }
+
             setIsDialogOpen(isOpen);
           }}
         >
@@ -299,13 +323,11 @@ export function ProfilePictureForm() {
             </div>
 
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsDialogOpen(false)}
-              >
-                Cancel
-              </Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button type="button" onClick={handleSaveCroppedImage}>
                 Set new profile picture
               </Button>
