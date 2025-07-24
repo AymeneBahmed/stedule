@@ -15,7 +15,7 @@ interface TasksStore {
   findTaskByDayAndTime: (
     day: Day | (typeof days)[number],
     time: Time,
-  ) => TaskFromStore | null;
+  ) => Promise<TaskFromStore | null>;
   updateExistingTask: (
     day: Day | (typeof days)[number],
     time: Time,
@@ -44,32 +44,38 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
       return { tasks: [...state.tasks, ...tasksToAdd] };
     });
   },
-  findTaskByDayAndTime(day, time) {
-    return (
-      get().tasks.find(async (task) => {
-        if (isPrismaTask(task)) {
-          return (
-            (typeof day === "string"
-              ? days[task.day] === day
-              : task.day === day) && Time.equals(task.time, time)
-          );
-        } else {
-          const existingTime = await dexieDB.times.get(task.timeId);
+  async findTaskByDayAndTime(day, time) {
+    const tasks = get().tasks;
 
-          if (existingTime == null) {
-            throw new Error(
-              `Time ID ${task.timeId} does not exist in times table`,
-            );
-          }
-
-          return (
-            (typeof day === "string"
-              ? days[task.day] === day
-              : task.day === day) && Time.equals(existingTime, time)
-          );
+    for (const task of tasks) {
+      if (isPrismaTask(task)) {
+        if (
+          (typeof day === "string"
+            ? days[task.day] === day
+            : task.day === day) &&
+          Time.equals(task.time, time)
+        ) {
+          return task;
         }
-      }) ?? null
-    );
+
+        continue;
+      }
+
+      const existingDexieTime = await dexieDB.times.get(task.timeId);
+
+      if (existingDexieTime == null) {
+        throw new Error(`Time ID ${task.timeId} does not exist in times table`);
+      }
+
+      if (
+        (typeof day === "string" ? days[task.day] === day : task.day === day) &&
+        Time.equals(existingDexieTime, time)
+      ) {
+        return task;
+      }
+    }
+
+    return null;
   },
   async updateExistingTask(day, time, newDetails) {
     const existingTasks = get().tasks;
