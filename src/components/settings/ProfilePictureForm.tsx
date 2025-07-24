@@ -27,8 +27,8 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import Cropper, { Area } from "react-easy-crop";
-import "react-easy-crop/react-easy-crop.css"; 
-import { getCroppedImg } from "@/lib/utils"; 
+import "react-easy-crop/react-easy-crop.css";
+import { getCroppedImg } from "@/lib/utils";
 import { Slider } from "../ui/slider";
 import { toast } from "sonner";
 
@@ -313,7 +313,7 @@ export function ProfilePictureForm() {
           </DialogContent>
         </Dialog>
 
-        <Button disabled={imageSrc == null} className="mt-2">
+        <Button disabled={imageSrc == null || isDialogOpen} className="mt-2">
           Save changes
         </Button>
       </form>
