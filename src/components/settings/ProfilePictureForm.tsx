@@ -18,7 +18,19 @@ import { CameraIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { authClient } from "@/lib/auth/auth-client";
 import { cn } from "@/lib/utils";
-import { useRef } from "react";
+import { useRef, useState, useCallback } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../ui/dialog";
+import Cropper, { Area } from "react-easy-crop";
+import "react-easy-crop/react-easy-crop.css"; 
+import { getCroppedImg } from "@/lib/utils"; 
+import { Slider } from "../ui/slider";
+import { toast } from "sonner";
 
 export function ProfilePictureForm() {
   const form = useForm<z.infer<typeof profilePictureSchema>>({
@@ -28,8 +40,76 @@ export function ProfilePictureForm() {
   const userName = session.data?.user.name;
   const userImage = session.data?.user.image;
   const fileInput = useRef<HTMLInputElement>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  function onSubmit(values: z.infer<typeof profilePictureSchema>) {}
+  // State for cropping
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+
+  // Handle file selection
+  // Specifically, convert the file to an image src
+  const onFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0]!;
+      const reader = new FileReader();
+
+      reader.addEventListener("load", () => {
+        setImageSrc(reader.result as string);
+        setIsDialogOpen(true);
+      });
+
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  // Handle crop completion
+  const onCropComplete = useCallback(
+    (_croppedArea: Area, croppedAreaPixels: Area) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    [],
+  );
+
+  // Handle saving the cropped image
+  const handleSaveCroppedImage = useCallback(async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
+
+    try {
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+
+      // Convert base64 to File object
+      const file = await fetch(croppedImage)
+        .then((res) => res.blob())
+        .then(
+          (blob) =>
+            new File([blob], "profile-picture.png", { type: "image/png" }),
+        );
+
+      // Update form value and preview
+      form.setValue("image", file);
+
+      const reader = new FileReader();
+
+      reader.addEventListener("load", () => {
+        setImageSrc(reader.result as string);
+      });
+
+      reader.readAsDataURL(file);
+
+      // Close dialog and reset states
+      setIsDialogOpen(false);
+      setImageSrc(null);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+    } catch {
+      toast.error("Something went wrong! Please try again.");
+    }
+  }, [croppedAreaPixels, imageSrc, form]);
+
+  function onSubmit() {}
 
   return (
     <Form {...form}>
@@ -37,61 +117,205 @@ export function ProfilePictureForm() {
         <FormField
           control={form.control}
           name="image"
-          render={({ field, fieldState }) => (
+          render={({ fieldState }) => (
             <FormItem>
-              <div className="flex gap-4">
+              <div>
                 <FormControl className="hidden">
                   <Input
                     ref={fileInput}
                     type="file"
                     accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files?.[0]) {
-                        field.onChange(e.target.files[0]);
-                      }
-                    }}
+                    onChange={onFileChange}
                   />
                 </FormControl>
 
-                <Avatar className="size-17">
-                  <AvatarImage
-                    className="object-cover"
-                    src={userImage ?? undefined}
-                    alt="Profile Picture"
-                  />
-                  <AvatarFallback>
-                    {userName
-                      ?.split(" ")
-                      .map((part) => part[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
+                {imageSrc && !isDialogOpen ? (
+                  <>
+                    <div>
+                      <div>The old image:</div>
 
-                <FormLabel className="flex-col items-start justify-center">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className={cn(
-                      fieldState.error &&
-                        "ring-destructive text-destructive ring",
-                    )}
-                    onClick={() => fileInput.current?.click()}
-                  >
-                    <CameraIcon />
-                    Change picture
-                  </Button>
+                      <div className="mt-2 flex gap-4">
+                        <Avatar className="size-17">
+                          <AvatarImage
+                            className="object-cover"
+                            src={userImage ?? undefined}
+                            alt="Profile Picture"
+                          />
+                          <AvatarFallback>
+                            {userName
+                              ?.split(" ")
+                              .map((part) => part[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
 
-                  <div className="text-muted-foreground text-xs">
-                    JPG, JPEG, PNG, SVG, WEBP or GIF
+                        <FormLabel className="flex-col items-start justify-center">
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            className={cn(
+                              fieldState.error &&
+                                "ring-destructive text-destructive ring",
+                            )}
+                            onClick={() => fileInput.current?.click()}
+                          >
+                            <CameraIcon />
+                            Change picture
+                          </Button>
+
+                          <div className="text-muted-foreground text-xs">
+                            JPG, JPEG, PNG, SVG, WEBP or GIF
+                          </div>
+                        </FormLabel>
+                      </div>
+                    </div>
+
+                    <div className="mt-3">
+                      <div>The new image:</div>
+
+                      <div className="mt-2 flex gap-4">
+                        <Avatar className="size-17">
+                          <AvatarImage
+                            className="object-cover"
+                            src={imageSrc}
+                            alt="Profile Picture"
+                          />
+                          <AvatarFallback>
+                            {userName
+                              ?.split(" ")
+                              .map((part) => part[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex gap-4">
+                    <Avatar className="size-17">
+                      <AvatarImage
+                        className="object-cover"
+                        src={userImage ?? undefined}
+                        alt="Profile Picture"
+                      />
+                      <AvatarFallback>
+                        {userName
+                          ?.split(" ")
+                          .map((part) => part[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <FormLabel className="flex-col items-start justify-center">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className={cn(
+                          fieldState.error &&
+                            "ring-destructive text-destructive ring",
+                        )}
+                        onClick={() => fileInput.current?.click()}
+                      >
+                        <CameraIcon />
+                        Change picture
+                      </Button>
+
+                      <div className="text-muted-foreground text-xs">
+                        JPG, JPEG, PNG, SVG, WEBP or GIF
+                      </div>
+                    </FormLabel>
                   </div>
-                </FormLabel>
+                )}
               </div>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button>Save changes</Button>
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={(isOpen) => {
+            setIsDialogOpen(isOpen);
+          }}
+        >
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Crop your new profile picture</DialogTitle>
+            </DialogHeader>
+
+            {/* Cropping Interface */}
+            <div className="relative h-[400px] w-full rounded-md bg-gray-500 dark:bg-gray-100">
+              {imageSrc && (
+                <Cropper
+                  image={imageSrc}
+                  crop={crop}
+                  zoom={zoom}
+                  rotation={rotation}
+                  aspect={1} // Square aspect ratio
+                  onCropChange={setCrop}
+                  onCropComplete={onCropComplete}
+                  onZoomChange={setZoom}
+                  onRotationChange={setRotation}
+                  cropShape="round" // Circular crop
+                  showGrid={false}
+                  classes={{
+                    containerClassName: "rounded-md absolute inset-0",
+                    mediaClassName: "rounded-md",
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Zoom Controls */}
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-medium">Zoom</label>
+              <Slider
+                value={[zoom]}
+                min={1}
+                max={3}
+                step={0.1}
+                onValueChange={(value) => {
+                  if (value?.[0]) {
+                    setZoom(value[0]);
+                  }
+                }}
+              />
+            </div>
+
+            {/* rotation Controls */}
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-medium">Rotation</label>
+              <Slider
+                value={[rotation]}
+                min={1}
+                max={361}
+                step={0.1}
+                onValueChange={(value) => {
+                  if (value?.[0]) {
+                    setRotation((value[0] - 1) % 361);
+                  }
+                }}
+              />
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="button" onClick={handleSaveCroppedImage}>
+                Set new profile picture
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Button disabled={imageSrc == null} className="mt-2">
+          Save changes
+        </Button>
       </form>
     </Form>
   );
