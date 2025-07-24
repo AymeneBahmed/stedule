@@ -230,6 +230,7 @@ export function ProfileInformationForm({
             <Button
               type="button"
               disabled={
+                !form.formState.isDirty ||
                 isUpdateProfileInformationPending ||
                 isSendNewProfileInformationCodePending
               }
@@ -316,7 +317,9 @@ export function ProfileInformationForm({
 
               <Button
                 type="submit"
-                disabled={isUpdateProfileInformationPending}
+                disabled={
+                  !form.formState.isDirty || isUpdateProfileInformationPending
+                }
                 form={formId}
                 className="mt-3"
               >
