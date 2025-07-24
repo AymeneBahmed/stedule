@@ -28,7 +28,7 @@ import {
 import { days, priorities } from "@/lib/constants";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
-import { isPrismaTask, useTasksStore } from "@/lib/stores/tasksStore";
+import { TaskFromStore, useTasksStore } from "@/lib/stores/tasksStore";
 import { Time } from "@/lib/classes/Time";
 import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
 import { toast } from "sonner";
@@ -54,22 +54,18 @@ export default function NewTaskForm() {
   const [state, addNewTaskAction, isPending] = useActionState(addNewTask, null);
   const { closeNewTaskForm } = useShouldOpenNewTaskFormStore();
   const {
-    tasks,
     findTaskByDayAndTime,
     updateExistingTask: updateExistingTaskInStore,
     addTasks: addTasksToStore,
   } = useTasksStore();
   const { editTaskModeEnabled, enableEditTaskMode, disableEditTaskMode } =
     useEditTaskModeStore();
-  const [oldTask, setOldTask] = useState(
-    findTaskByDayAndTime(
-      form.getValues("day"),
-      Time.fromString(form.getValues("time"))!,
-    ),
-  );
+  const [oldTask, setOldTask] = useState<TaskFromStore | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const isGuestMode = useIsGuestMode();
   const [guestModeError, setGuestModeError] = useState<string>();
+  const day = form.watch("day");
+  const timeString = form.watch("time");
 
   function onSubmit(values: z.infer<typeof newTaskSchema>) {
     startTransition(async () => {
@@ -135,27 +131,17 @@ export default function NewTaskForm() {
     });
   }
 
-  function getExistingTask() {
-    const formValues = form.getValues();
-    const existingTask = tasks.find(async (task) => {
-      if (isPrismaTask(task)) {
-        return (
-          days[task.day] === formValues.day &&
-          Time.equals(task.time, Time.fromString(formValues.time)!)
-        );
-      }
+  async function getExistingTask() {
+    // I don't know why the day and timeString variables (The ones above outside of this functino) are not working.
+    const day = form.getValues("day");
+    const timeString = form.getValues("time");
+    const time = Time.fromString(timeString);
 
-      const existingTime = await dexieDB.times.get(task.timeId);
+    if (time == null) {
+      return;
+    }
 
-      if (existingTime == null) {
-        throw new Error(`Time ID ${task.timeId} does not exist in times table`);
-      }
-
-      return (
-        days[task.day] === formValues.day &&
-        Time.equals(existingTime, Time.fromString(formValues.time)!)
-      );
-    });
+    const existingTask = await findTaskByDayAndTime(day, time);
 
     if (existingTask) {
       setOldTask(existingTask);
@@ -164,6 +150,18 @@ export default function NewTaskForm() {
       disableEditTaskMode();
     }
   }
+
+  useEffect(() => {
+    const time = Time.fromString(timeString);
+
+    if (time == null) {
+      return;
+    }
+
+    (async () => {
+      setOldTask(await findTaskByDayAndTime(day, time));
+    })();
+  }, [day, findTaskByDayAndTime, form, timeString]);
 
   useEffect(() => {
     if (submitted && state?.success) {
@@ -240,14 +238,14 @@ export default function NewTaskForm() {
               <FormItem>
                 <FormLabel>Day</FormLabel>
                 <Select
-                  onValueChange={(value) => {
+                  onValueChange={async (value) => {
                     field.onChange(value);
 
                     if (
                       form.getValues("time").length === 5 &&
                       !form.getFieldState("time").invalid
                     ) {
-                      getExistingTask();
+                      await getExistingTask();
                     }
                   }}
                   defaultValue={field.value}
@@ -281,7 +279,7 @@ export default function NewTaskForm() {
                     placeholder="hh:mm"
                     className="bg-secondary border-gray-400"
                     {...field}
-                    onInput={(e) => {
+                    onInput={async (e) => {
                       const value = e.currentTarget.value.replace(
                         /[^0-9]/g,
                         "",
@@ -298,6 +296,7 @@ export default function NewTaskForm() {
 
                       // Move cursor to correct position
                       e.currentTarget.value = newValue;
+
                       if (newValue.length === 2 && value.length > 2) {
                         e.currentTarget.setSelectionRange(3, 3);
                       } else if (newValue.length === 2) {
@@ -317,7 +316,7 @@ export default function NewTaskForm() {
                         e.currentTarget.value.length === 5 &&
                         Time.fromString(e.currentTarget.value) != null
                       ) {
-                        getExistingTask();
+                        await getExistingTask();
                       }
                     }}
                   />
