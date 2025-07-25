@@ -46,7 +46,9 @@ export const loginSchema = z.object({
   email: z.email({
     error: "Please enter a valid email address.",
   }),
-  password: z.string().min(1),
+  password: z.string().min(1, {
+    error: "Please enter a password.",
+  }),
   remember: z.boolean().default(false),
 });
 
