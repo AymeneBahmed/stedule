@@ -13,6 +13,7 @@ import {
   updatePasswordSchema,
   baseProfileInformationSchemaExtendedWithCode,
   baseProfileInformationSchemaExtendedWithPassword,
+  profilePictureSchema,
 } from "@/lib/schemas";
 import { EmailChangeRequest } from "@prisma/client";
 import { APIError } from "better-auth";
@@ -22,6 +23,7 @@ import { redirect } from "next/navigation";
 import z from "zod";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
+import { put } from "@vercel/blob";
 
 export async function updateProfileInformation(
   _prevState: unknown,
@@ -482,4 +484,45 @@ export async function sendNewEmailVerificationLink(
   revalidatePath("/settings");
 
   return { success: "Verification link resent successfully." };
+}
+
+export async function updateProfilePicture(
+  _prevState: unknown,
+  values: z.infer<typeof profilePictureSchema>,
+): Promise<
+  { success: string; error?: never } | { success?: never; error: string }
+> {
+  const { user } = await getSession({ redirectOnNull: true });
+
+  const validated = profilePictureSchema.safeParse(values);
+
+  if (validated.error) {
+    return {
+      error: "Invalid fields!",
+    };
+  }
+
+  const { image } = validated.data;
+
+  try {
+    const blob = await put(image.name, image, {
+      access: "public",
+      addRandomSuffix: true,
+    });
+    const authContext = await auth.$context;
+
+    await authContext.internalAdapter.updateUser(user.id, {
+      image: blob.url,
+    });
+  } catch {
+    return {
+      error: "Something went wrong! Please try again.",
+    };
+  }
+
+  revalidatePath("/settings");
+
+  return {
+    success: "Profile picture updated successfully.",
+  };
 }

@@ -18,7 +18,14 @@ import { CameraIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { authClient } from "@/lib/auth/auth-client";
 import { cn } from "@/lib/utils";
-import { useRef, useState, useCallback } from "react";
+import {
+  useRef,
+  useState,
+  useCallback,
+  useActionState,
+  startTransition,
+  useEffect,
+} from "react";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +39,7 @@ import "react-easy-crop/react-easy-crop.css";
 import { getCroppedImg } from "@/lib/utils";
 import { Slider } from "../ui/slider";
 import { toast } from "sonner";
+import { updateProfilePicture } from "@/actions/settings-actions";
 
 export function ProfilePictureForm() {
   const form = useForm<z.infer<typeof profilePictureSchema>>({
@@ -41,6 +49,10 @@ export function ProfilePictureForm() {
   const userName = session.data?.user.name;
   const userImage = session.data?.user.image;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [state, updateProfilePictureAction, isPending] = useActionState(
+    updateProfilePicture,
+    null,
+  );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // State for cropping
@@ -57,6 +69,17 @@ export function ProfilePictureForm() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files.length > 0) {
         const file = e.target.files[0]!;
+
+        if (file.size > 2_000_000) {
+          form.setError("image", {
+            message: "The max file size limit is 2 MB.",
+          });
+
+          return;
+        } else {
+          form.clearErrors("image");
+        }
+
         const reader = new FileReader();
 
         reader.addEventListener("load", () => {
@@ -71,7 +94,7 @@ export function ProfilePictureForm() {
         reader.readAsDataURL(file);
       }
     },
-    [imageSrc],
+    [form, imageSrc],
   );
 
   // Handle crop completion
@@ -123,7 +146,25 @@ export function ProfilePictureForm() {
     }
   }, [imageSrc, croppedAreaPixels, rotation, form]);
 
-  function onSubmit(values: z.infer<typeof profilePictureSchema>) {}
+  function onSubmit(values: z.infer<typeof profilePictureSchema>) {
+    startTransition(() => {
+      updateProfilePictureAction(values);
+    });
+  }
+
+  useEffect(() => {
+    if (state?.success) {
+      toast.success(state.success);
+      form.reset();
+      window.location.reload();
+
+      return;
+    }
+
+    if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [form, state]);
 
   return (
     <Form {...form}>
@@ -335,7 +376,10 @@ export function ProfilePictureForm() {
           </DialogContent>
         </Dialog>
 
-        <Button disabled={imageSrc == null || isDialogOpen} className="mt-2">
+        <Button
+          disabled={imageSrc == null || isDialogOpen || isPending}
+          className="mt-2"
+        >
           Save changes
         </Button>
       </form>
