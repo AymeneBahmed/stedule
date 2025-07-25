@@ -127,6 +127,7 @@ export const removePasswordSchema = z.object({
 export const profilePictureSchema = z.object({
   image: z
     .file({ error: "Please provide a file." })
+    .max(2_000_000, { error: "The max file size limit is 2 MB." })
     .mime(
       ["image/png", "image/jpeg", "image/svg+xml", "image/webp", "image/gif"],
       {
