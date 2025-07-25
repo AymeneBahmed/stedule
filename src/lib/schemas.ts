@@ -49,7 +49,7 @@ export const loginSchema = z.object({
   password: z.string().min(1, {
     error: "Please enter a password.",
   }),
-  remember: z.boolean().default(false),
+  remember: z.boolean().optional(),
 });
 
 export const verifyEmailSchema = z.object({
