@@ -3,10 +3,9 @@ import Toolbar from "@/components/Toolbar";
 import { Button } from "@/components/ui/button";
 import UserDropdownMenu from "@/components/UserDropdownMenu";
 import { getSession } from "@/lib/auth/auth";
-import { Time as TimeClass } from "@/lib/classes/Time";
 import { getTasksWithTimesByUserId } from "@/lib/db/task";
+import { getTimesByUserId } from "@/lib/db/time";
 import { prisma } from "@/lib/prisma";
-import { Time } from "@prisma/client";
 import Link from "next/link";
 
 export default async function Home() {
@@ -32,18 +31,17 @@ export default async function Home() {
     );
   }
 
-  const initialTasks = (await getTasksWithTimesByUserId(session.user.id)) ?? [];
-  const times = (await prisma.time.findMany()).toSorted((a, b) =>
-    a.hour === b.hour ? a.minute - b.minute : a.hour - b.hour,
-  ) as (TimeClass & Time)[];
+  const userId = session.user.id;
+  const initialTasks = (await getTasksWithTimesByUserId(userId)) ?? [];
+  const times = (await getTimesByUserId(userId)) ?? [];
 
   // The second condition make sure to not insert multiple default times if they already exist.
-  if (initialTasks.length === 0 && times.length === 0) {
+  if (times.length === 0) {
     await prisma.time.createMany({
       data: Array.from({ length: 8 }, (_, i) => ({
         hour: i + 8,
         minute: 0,
-        userId: session.user.id,
+        userId: userId,
       })),
     });
   }
