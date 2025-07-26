@@ -1,9 +1,10 @@
 import { prisma } from "../prisma";
 import { PrismaTaskModified } from "../ts/interfaces";
 
-export async function getTasks() {
+export async function getTasksWithTimesByUserId(userId: string) {
   try {
     return (await prisma.task.findMany({
+      where: { userId },
       include: { time: true },
     })) as PrismaTaskModified[];
   } catch {

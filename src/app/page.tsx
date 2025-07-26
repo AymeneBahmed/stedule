@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import UserDropdownMenu from "@/components/UserDropdownMenu";
 import { getSession } from "@/lib/auth/auth";
 import { Time as TimeClass } from "@/lib/classes/Time";
-import { getTasks } from "@/lib/db/task";
+import { getTasksWithTimesByUserId } from "@/lib/db/task";
 import { prisma } from "@/lib/prisma";
 import { Time } from "@prisma/client";
 import Link from "next/link";
@@ -32,7 +32,7 @@ export default async function Home() {
     );
   }
 
-  const initialTasks = (await getTasks()) ?? [];
+  const initialTasks = (await getTasksWithTimesByUserId(session.user.id)) ?? [];
   const times = (await prisma.time.findMany()).toSorted((a, b) =>
     a.hour === b.hour ? a.minute - b.minute : a.hour - b.hour,
   ) as (TimeClass & Time)[];
