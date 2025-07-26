@@ -25,21 +25,16 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { put } from "@vercel/blob";
 
+type SucessOrError =
+  | { success?: never; error: string }
+  | { success: string; error?: never };
+
 export async function updateProfileInformation(
   _prevState: unknown,
   values:
     | z.infer<typeof baseProfileInformationSchemaExtendedWithPassword>
     | z.infer<typeof baseProfileInformationSchemaExtendedWithCode>,
-): Promise<
-  | {
-      success?: never;
-      error: string;
-    }
-  | {
-      success: string;
-      error?: never;
-    }
-> {
+): Promise<SucessOrError> {
   const session = await getSession({ redirectOnNull: true });
   let validated;
 
@@ -153,9 +148,7 @@ export async function updateProfileInformation(
   };
 }
 
-export async function sendNewProfileInformationCode(): Promise<
-  { success: string; error?: never } | { success?: never; error: string }
-> {
+export async function sendNewProfileInformationCode(): Promise<SucessOrError> {
   const { user } = await getSession({ redirectOnNull: true });
 
   const code = crypto.randomInt(10000, 999999);
@@ -184,16 +177,7 @@ export async function sendNewProfileInformationCode(): Promise<
 export async function updatePassword(
   _prevState: unknown,
   values: Omit<z.infer<typeof updatePasswordSchema>, "oldPassword">,
-): Promise<
-  | {
-      success?: never;
-      error: string;
-    }
-  | {
-      success: string;
-      error?: never;
-    }
-> {
+): Promise<SucessOrError> {
   const session = await getSession({ redirectOnNull: true });
   const validated = updatePasswordSchema.safeParse(values);
 
@@ -240,16 +224,7 @@ export async function updatePassword(
 export async function createCredentialAccount(
   _prevState: unknown,
   values: z.infer<typeof createCredentialAccountSchema>,
-): Promise<
-  | {
-      success?: never;
-      error: string;
-    }
-  | {
-      success: string;
-      error?: never;
-    }
-> {
+): Promise<SucessOrError> {
   const session = await getSession({ redirectOnNull: true });
   const validated = createCredentialAccountSchema.safeParse(values);
 
@@ -298,16 +273,7 @@ export async function createCredentialAccount(
 export async function deleteUser(
   _prevState: unknown,
   values: z.infer<typeof deleteUserSchema>,
-): Promise<
-  | {
-      success?: never;
-      error: string;
-    }
-  | {
-      success: string;
-      error?: never;
-    }
-> {
+): Promise<SucessOrError> {
   await getSession({ redirectOnNull: true });
 
   const validated = deleteUserSchema.safeParse(values);
@@ -399,16 +365,7 @@ export async function removePassword(
 export async function sendNewEmailVerificationLink(
   _prevState: unknown,
   newEmail: string,
-): Promise<
-  | {
-      success?: never;
-      error: string;
-    }
-  | {
-      success: string;
-      error?: never;
-    }
-> {
+): Promise<SucessOrError> {
   const { user } = await getSession({ redirectOnNull: true });
   let existingEmailChangeRequest: EmailChangeRequest | null = null;
   let token: string | null = null;
@@ -489,9 +446,7 @@ export async function sendNewEmailVerificationLink(
 export async function updateProfilePicture(
   _prevState: unknown,
   values: z.infer<typeof profilePictureSchema>,
-): Promise<
-  { success: string; error?: never } | { success?: never; error: string }
-> {
+): Promise<SucessOrError> {
   const { user } = await getSession({ redirectOnNull: true });
 
   const validated = profilePictureSchema.safeParse(values);
