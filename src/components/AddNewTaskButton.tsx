@@ -35,6 +35,7 @@ export default function AddNewTaskButton(
         } else {
           closeNewTaskForm();
 
+          // This avoid NewTaskForm from layout shifting
           setTimeout(() => {
             setDefaultDay(null);
             setDefaultTime(null);
