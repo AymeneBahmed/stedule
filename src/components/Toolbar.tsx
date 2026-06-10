@@ -10,7 +10,7 @@ export default function Toolbar() {
   return (
     <span
       id="toolbar"
-      className="bg-primary/15 sticky top-10 z-[1] flex space-x-2 rounded-full px-1.5 py-1 backdrop-blur-xl"
+      className="bg-primary/15 dark:bg-primary/30 sticky top-10 z-[1] flex space-x-2 rounded-full px-1.5 py-1 backdrop-blur-xl"
     >
       <AddNewTimeButton aria-label="Add a new time" />
       <AddNewTaskButton aria-label="Add a new task" />
