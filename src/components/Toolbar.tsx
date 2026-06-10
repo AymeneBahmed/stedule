@@ -1,3 +1,5 @@
+"use client";
+
 import AddNewTaskButton from "./AddNewTaskButton";
 import AddNewTimeButton from "./AddNewTimeButton";
 import ClearScheduleButton from "./ClearScheduleButton";
