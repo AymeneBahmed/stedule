@@ -260,7 +260,7 @@ export default function NewTaskForm() {
                     </SelectTrigger>
                   </FormControl>
 
-                  <SelectContent>
+                  <SelectContent id="day-selector">
                     {days.map((day) => (
                       <SelectItem key={day} value={day}>
                         {day.charAt(0).toUpperCase() + day.slice(1)}
@@ -347,7 +347,7 @@ export default function NewTaskForm() {
                     </SelectTrigger>
                   </FormControl>
 
-                  <SelectContent>
+                  <SelectContent id="priority-selector">
                     {priorities.map((pri) => (
                       <SelectItem key={pri} value={pri}>
                         {pri}
