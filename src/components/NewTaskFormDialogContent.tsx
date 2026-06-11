@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
+import { Badge } from "./ui/badge";
 
 export default function NewTaskFormDialogContent() {
   const { editTaskModeEnabled } = useEditTaskModeStore();
@@ -16,16 +17,11 @@ export default function NewTaskFormDialogContent() {
   return (
     <DialogContent className="gap-0">
       <DialogHeader>
-        <DialogTitle>
+        <DialogTitle className="flex items-center gap-2">
           What do you want to do?{" "}
-          <span
-            className={cn(
-              "rounded bg-blue-700 px-2 py-0.5 text-sm text-white",
-              !editTaskModeEnabled && "invisible",
-            )}
-          >
-            Edit
-          </span>
+          <Badge className={cn(!editTaskModeEnabled && "invisible")}>
+            Edit Mode
+          </Badge>
         </DialogTitle>
         <DialogDescription className="sr-only">
           Create a task and add an optional description such as notes.
