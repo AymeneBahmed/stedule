@@ -212,7 +212,11 @@ export default function NewTaskForm() {
           </ol>
         </div>
       )}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-5">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="mt-5"
+        id="new-task-form"
+      >
         <div className="space-y-4">
           <FormField
             control={form.control}
