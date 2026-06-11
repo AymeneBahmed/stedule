@@ -2,17 +2,10 @@
 
 import { Button } from "./ui/button";
 import { ClipboardList } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
+import { Dialog, DialogTrigger } from "./ui/dialog";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
-import NewTaskForm from "./NewTaskForm";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
+import NewTaskFormDialogContent from "./NewTaskFormDialogContent";
 
 export default function AddNewTaskButton(
   props: React.ComponentProps<typeof Button>,
@@ -35,7 +28,7 @@ export default function AddNewTaskButton(
         } else {
           closeNewTaskForm();
 
-          // This avoid NewTaskForm from layout shifting
+          // This prevents NewTaskForm from layout shifting
           setTimeout(() => {
             setDefaultDay(null);
             setDefaultTime(null);
@@ -50,16 +43,7 @@ export default function AddNewTaskButton(
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>What do you want to do?</DialogTitle>
-          <DialogDescription className="sr-only">
-            Add new time
-          </DialogDescription>
-        </DialogHeader>
-
-        <NewTaskForm />
-      </DialogContent>
+      <NewTaskFormDialogContent />
     </Dialog>
   );
 }
