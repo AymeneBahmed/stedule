@@ -29,6 +29,34 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Run Playwright Tests
+
+If you're using Debian/Ubuntu based distros, first install Playwright OS-specific dependencies:
+
+```bash
+npx playwright install-deps
+```
+
+Then, you can just run tests with the following command:
+
+```bash
+npx playwright test
+```
+
+If you're NOT using a distro that uses `apt`, the best solution is to run the tests inside an **Ubuntu Container** using `distrobox`.  
+For example, with `dnf`:
+
+```bash
+# Install distrobox and podman
+sudo dnf install -y distrobox podman
+
+# Install Ubuntu v24.04 image
+distrobox create -i ubuntu:24.04 --name playwright-env\n
+
+# Now you can run Debian/Ubuntu commands such as apt inside the Ubuntu Container
+distrobox enter playwright-env
+```
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
