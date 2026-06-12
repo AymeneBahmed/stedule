@@ -21,7 +21,7 @@ export default function Toolbar() {
       />
       <ClearScheduleButton
         variant="destructive"
-        className="!bg-destructive rounded-full"
+        className="rounded-full"
         aria-label="Clear schedule"
       />
     </span>
