@@ -34,6 +34,7 @@ import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
 import { toast } from "sonner";
 import { useIsGuestMode } from "@/hooks/use-is-guest-mode";
 import { dexieDB } from "@/lib/db/dexieDB";
+import { Textarea } from "./ui/textarea";
 
 export default function NewTaskForm() {
   const { defaultDay, defaultTime, defaultTask } =
@@ -369,7 +370,7 @@ export default function NewTaskForm() {
                   <em className="text-muted-foreground">(Optional)</em>
                 </FormLabel>
                 <FormControl className="mt-1!">
-                  <Input
+                  <Textarea
                     placeholder="Solve an exercise and write some code..."
                     className="bg-secondary border-gray-400"
                     {...field}
