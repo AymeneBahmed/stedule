@@ -1,5 +1,7 @@
 import { Priority } from "@prisma/client";
 
+export const APP_NAME = "Stedule";
+
 export const days = [
   "sunday",
   "monday",
