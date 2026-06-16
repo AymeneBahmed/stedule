@@ -22,13 +22,13 @@ test("create & update task", async ({ page }) => {
   await page.getByRole("button", { name: "Submit" }).click();
   await page.waitForTimeout(1000);
 
-  expect(firstEmptyCell).not.toHaveText("Cook Spaghetti");
+  await expect(firstEmptyCell).not.toHaveText("Cook Spaghetti");
 
   // Note that the seperator between AM and PM hours is considered a tr element
   const scheduleBodyTrElements = page.locator("tbody tr");
 
   // check if 22:42 was added to the table
-  expect(scheduleBodyTrElements).toHaveCount(10);
+  await expect(scheduleBodyTrElements).toHaveCount(10);
 
   const newTaskCell = scheduleBodyTrElements.last().locator("td").nth(6);
 
