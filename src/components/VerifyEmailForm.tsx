@@ -25,7 +25,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export default function VerifyEmailForm({ email }: { email: string }) {
+export function VerifyEmailForm({ email }: { email: string }) {
   const form = useForm<z.infer<typeof verifyEmailSchema>>({
     resolver: zodResolver(verifyEmailSchema),
     defaultValues: {

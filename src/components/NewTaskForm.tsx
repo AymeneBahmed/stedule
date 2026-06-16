@@ -17,7 +17,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { addNewTask } from "@/actions/task-actions";
-import FormError from "./FormError";
+import { FormError } from "./FormError";
 import {
   Select,
   SelectContent,
@@ -36,7 +36,7 @@ import { useIsGuestMode } from "@/hooks/use-is-guest-mode";
 import { dexieDB } from "@/lib/db/dexieDB";
 import { Textarea } from "./ui/textarea";
 
-export default function NewTaskForm() {
+export function NewTaskForm() {
   const { defaultDay, defaultTime, defaultTask } =
     useNewTaskFormDefaultValuesStore();
   const form = useForm<z.infer<typeof newTaskSchema>>({

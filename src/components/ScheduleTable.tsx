@@ -44,7 +44,7 @@ interface RegularModeProps extends BaseScheduleTableProps {
 
 type ScheduleTableProps = GuestModeProps | RegularModeProps;
 
-export default function ScheduleTable({
+export function ScheduleTable({
   times,
   tasks,
   isGuestMode,

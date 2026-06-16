@@ -7,7 +7,7 @@ import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFor
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import NewTaskFormDialogContent from "./NewTaskFormDialogContent";
 
-export default function AddNewTaskButton(
+export function AddNewTaskButton(
   props: React.ComponentProps<typeof Button>,
 ) {
   const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =

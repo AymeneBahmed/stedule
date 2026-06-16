@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import NewTaskForm from "./NewTaskForm";
+import { NewTaskForm } from "./NewTaskForm";
 import {
   DialogContent,
   DialogDescription,

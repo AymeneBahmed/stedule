@@ -14,7 +14,7 @@ import { authClient } from "@/lib/auth/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function UserDropdownMenu({ name, email, image }: User) {
+export function UserDropdownMenu({ name, email, image }: User) {
   const router = useRouter();
 
   return (

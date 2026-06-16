@@ -24,7 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import RemovePasswordForm from "./RemovePasswordForm";
+import { RemovePasswordForm } from "./RemovePasswordForm";
 
 export function UpdatePasswordForm() {
   const form = useForm<z.infer<typeof updatePasswordSchema>>({

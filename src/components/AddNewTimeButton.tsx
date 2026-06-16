@@ -10,7 +10,7 @@ import {
 } from "./ui/dialog";
 import NewTimeForm from "./NewTimeForm";
 
-export default function AddNewTimeButton(
+export function AddNewTimeButton(
   props: React.ComponentProps<typeof Button>,
 ) {
   return (

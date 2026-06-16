@@ -1,4 +1,4 @@
-import VerifyEmailForm from "@/components/VerifyEmailForm";
+import { VerifyEmailForm } from "@/components/VerifyEmailForm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 

@@ -16,7 +16,7 @@ import { startTransition, useActionState, useEffect } from "react";
 import { removePassword } from "@/actions/settings-actions";
 import { toast } from "sonner";
 
-export default function RemovePasswordForm() {
+export function RemovePasswordForm() {
   const form = useForm<z.infer<typeof removePasswordSchema>>({
     resolver: zodResolver(removePasswordSchema),
     defaultValues: {

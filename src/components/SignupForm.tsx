@@ -29,7 +29,7 @@ import { GoogleLoginButton } from "./GoogleLoginButton";
 import { Separator } from "./ui/separator";
 import { ContinueWithoutAccountButton } from "./ContinueWithoutAccountButton";
 
-export default function SignupForm() {
+export function SignupForm() {
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {

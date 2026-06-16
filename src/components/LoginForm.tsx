@@ -30,7 +30,7 @@ import { Separator } from "./ui/separator";
 import { GoogleLoginButton } from "./GoogleLoginButton";
 import { ContinueWithoutAccountButton } from "./ContinueWithoutAccountButton";
 
-export default function LoginForm() {
+export function LoginForm() {
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {

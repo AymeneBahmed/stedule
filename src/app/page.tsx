@@ -1,7 +1,7 @@
-import ScheduleTable from "@/components/ScheduleTable";
-import Toolbar from "@/components/Toolbar";
+import { ScheduleTable } from "@/components/ScheduleTable";
+import { Toolbar } from "@/components/Toolbar";
 import { Button } from "@/components/ui/button";
-import UserDropdownMenu from "@/components/UserDropdownMenu";
+import { UserDropdownMenu } from "@/components/UserDropdownMenu";
 import { getSession } from "@/lib/auth/auth";
 import { getTasksWithTimesByUserId } from "@/lib/db/task";
 import { getTimesByUserId } from "@/lib/db/time";
@@ -26,6 +26,7 @@ export default async function Home() {
         <div className="contents print:hidden">
           <Toolbar />
         </div>
+
         <ScheduleTable isGuestMode={true} />
       </div>
     );

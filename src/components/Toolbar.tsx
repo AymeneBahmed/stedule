@@ -1,12 +1,12 @@
 "use client";
 
-import AddNewTaskButton from "./AddNewTaskButton";
-import AddNewTimeButton from "./AddNewTimeButton";
-import ClearScheduleButton from "./ClearScheduleButton";
-import PrintScheduleButton from "./PrintScheduleButton";
-import ThemeTogglerButton from "./ThemeTogglerButton";
+import { AddNewTaskButton } from "./AddNewTaskButton";
+import { AddNewTimeButton } from "./AddNewTimeButton";
+import { ClearScheduleButton } from "./ClearScheduleButton";
+import { PrintScheduleButton } from "./PrintScheduleButton";
+import { ThemeTogglerButton } from "./ThemeTogglerButton";
 
-export default function Toolbar() {
+export function Toolbar() {
   return (
     <span
       id="toolbar"

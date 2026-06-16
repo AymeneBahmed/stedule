@@ -6,7 +6,7 @@ import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
 import dynamic from "next/dynamic";
 
-function PrintScheduleButton({
+function PrintScheduleButtonComp({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const scheduleTableRef = useRef<HTMLTableElement>(
@@ -24,6 +24,9 @@ function PrintScheduleButton({
   );
 }
 
-export default dynamic(() => Promise.resolve(PrintScheduleButton), {
-  ssr: false,
-});
+export const PrintScheduleButton = dynamic(
+  () => Promise.resolve(PrintScheduleButtonComp),
+  {
+    ssr: false,
+  },
+);

@@ -20,7 +20,7 @@ import { useIsGuestMode } from "@/hooks/use-is-guest-mode";
 import { dexieDB } from "@/lib/db/dexieDB";
 import { useTasksStore } from "@/lib/stores/tasksStore";
 
-function ClearScheduleButton({
+export function ClearScheduleButton({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const [state, clearScheduleAction] = useActionState(clearSchedule, null);
@@ -87,5 +87,3 @@ function ClearScheduleButton({
     </AlertDialog>
   );
 }
-
-export default ClearScheduleButton;

@@ -5,7 +5,9 @@ import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-function ThemeTogglerButton({ ...props }: React.ComponentProps<typeof Button>) {
+export function ThemeTogglerButton({
+  ...props
+}: React.ComponentProps<typeof Button>) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -29,5 +31,3 @@ function ThemeTogglerButton({ ...props }: React.ComponentProps<typeof Button>) {
     </Button>
   );
 }
-
-export default ThemeTogglerButton;
