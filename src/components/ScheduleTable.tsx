@@ -228,7 +228,7 @@ export function ScheduleTable({
                           size="icon"
                           variant="destructive"
                           className={cn(
-                            "!bg-destructive absolute top-2 right-2 hidden size-8",
+                            "absolute top-2 right-2 hidden size-8",
                             task != null && "group-hover:flex",
                           )}
                           onClick={(e) => {
