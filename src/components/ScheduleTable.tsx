@@ -106,170 +106,168 @@ export function ScheduleTable({
   }, [removeTaskActionState]);
 
   return (
-    <>
-      <Table
-        id="schedule-table"
-        className="table-fixed border border-black dark:border-white print:absolute print:top-9 print:left-1/2 print:w-[80%] print:-translate-x-1/2"
-      >
-        <TableHeader>
-          <TableRow className="border-black dark:border-white">
-            {/* Additional empty cell */}
-            <TableHead className="bg-secondary"></TableHead>
+    <Table
+      id="schedule-table"
+      className="table-fixed border border-black dark:border-white print:absolute print:top-9 print:left-1/2 print:w-[80%] print:-translate-x-1/2"
+    >
+      <TableHeader>
+        <TableRow className="border-black dark:border-white">
+          {/* Additional empty cell */}
+          <TableHead className="bg-secondary"></TableHead>
 
-            {days.map((day) => (
-              <TableHead
-                key={day}
-                className="bg-secondary border-l border-black text-center text-black dark:border-white dark:text-white"
-              >
-                {day.toUpperCase()}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
+          {days.map((day) => (
+            <TableHead
+              key={day}
+              className="bg-secondary border-l border-black text-center text-black dark:border-white dark:text-white"
+            >
+              {day.toUpperCase()}
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
 
-        <TableBody>
-          {(isGuestMode ? dexieTimes : times)?.map(
-            (time, i, currentTimesArray) => (
-              <Fragment key={time.id}>
-                {/* A seperator row between the hours <= 12 and > 12 */}
-                {time.hour >= 13 &&
-                  currentTimesArray[i - 1] != null &&
-                  currentTimesArray[i - 1]!.hour < 13 && (
-                    <TableRow className="h-[1rem] border-black dark:border-white">
-                      <TableCell className="bg-secondary text-center font-bold"></TableCell>
+      <TableBody>
+        {(isGuestMode ? dexieTimes : times)?.map(
+          (time, i, currentTimesArray) => (
+            <Fragment key={time.id}>
+              {/* A seperator row between the hours <= 12 and > 12 */}
+              {time.hour >= 13 &&
+                currentTimesArray[i - 1] != null &&
+                currentTimesArray[i - 1]!.hour < 13 && (
+                  <TableRow className="h-[1rem] border-black dark:border-white">
+                    <TableCell className="bg-secondary text-center font-bold"></TableCell>
 
-                      {[...Array(7)].map((_, i) => (
-                        <TableCell
-                          key={i}
-                          className="bg-secondary border-l border-black dark:border-white"
-                        />
-                      ))}
-                    </TableRow>
-                  )}
-
-                <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
-                  {/* Time cell (the first cell of each row) */}
-                  <TableCell className="bg-secondary group relative text-center font-bold">
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      className="absolute top-2 right-2 hidden size-8 group-hover:flex"
-                      onClick={async () => {
-                        startTransition(async () => {
-                          if (isGuestMode) {
-                            try {
-                              const tasksCollection = dexieDB.tasks.where({
-                                timeId: time.id,
-                              });
-                              const tasksIDs = (
-                                await tasksCollection.toArray()
-                              ).map(({ id }) => id);
-
-                              await Promise.all([
-                                dexieDB.times.delete(time.id),
-                                tasksCollection.delete(),
-                              ]);
-
-                              deleteTasks(tasksIDs);
-
-                              toast.success(
-                                `Removed time ${TimeClass.toString(time.hour, time.minute)} successfully!`,
-                              );
-                            } catch {
-                              // TODO: handle all possible errors
-                              toast.error(
-                                `Something went wrong! Please try again.`,
-                              );
-                            }
-                          } else {
-                            removeTimeAction(time.id);
-                          }
-                        });
-                      }}
-                      disabled={removeTimeActionPending}
-                    >
-                      <Trash2Icon />
-                    </Button>
-
-                    <div className="contents">
-                      {TimeClass.toString(time.hour, time.minute)}
-                    </div>
-                  </TableCell>
-
-                  {[...Array(7)].map((_, j) => {
-                    const task = tasksGroupedByDay[days[j]!]?.find((task) => {
-                      if (isPrismaTask(task)) {
-                        return TimeClass.equals(task.time, time);
-                      }
-
-                      const existingTime = dexieTimes?.find(
-                        (dexieTime) => dexieTime.id === task.timeId,
-                      );
-
-                      if (existingTime == null) {
-                        return;
-                      }
-
-                      return TimeClass.equals(existingTime, time);
-                    });
-
-                    return (
+                    {[...Array(7)].map((_, i) => (
                       <TableCell
-                        key={j}
-                        className="hover:bg-muted/70 active:bg-muted/90 cell group relative cursor-pointer border-l border-black py-6 text-center break-words hyphens-auto whitespace-break-spaces dark:border-white"
-                        onClick={() => {
-                          setDefaultDay(days[j]!);
-                          setDefaultTime(time);
-                          setDefaultTask(task ?? null);
-                          openNewTaskForm();
-                        }}
-                      >
-                        <Button
-                          size="icon"
-                          variant="destructive"
-                          className={cn(
-                            "absolute top-2 right-2 hidden size-8",
-                            task != null && "group-hover:flex",
-                          )}
-                          onClick={(e) => {
-                            e.stopPropagation();
+                        key={i}
+                        className="bg-secondary border-l border-black dark:border-white"
+                      />
+                    ))}
+                  </TableRow>
+                )}
 
-                            startTransition(async () => {
-                              if (isGuestMode) {
-                                try {
-                                  await dexieDB.tasks.delete(task!.id);
-
-                                  deleteTasks([task!.id]);
-
-                                  toast.success("Removed task successfully!");
-                                } catch {
-                                  // TODO: handle all possible errors
-                                  toast.error(
-                                    "Something went wrong! Please try again.",
-                                  );
-                                }
-                              } else {
-                                removeTaskAction(task!.id);
-                              }
+              <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
+                {/* Time cell (the first cell of each row) */}
+                <TableCell className="bg-secondary group relative text-center font-bold">
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    className="absolute top-2 right-2 hidden size-8 group-hover:flex"
+                    onClick={async () => {
+                      startTransition(async () => {
+                        if (isGuestMode) {
+                          try {
+                            const tasksCollection = dexieDB.tasks.where({
+                              timeId: time.id,
                             });
-                          }}
-                          disabled={removeTaskActionPending}
-                        >
-                          <Trash2Icon />
-                        </Button>
+                            const tasksIDs = (
+                              await tasksCollection.toArray()
+                            ).map(({ id }) => id);
 
-                        <div className="line-clamp-3 flex min-h-8 items-center justify-center text-ellipsis">
-                          {task?.name}
-                        </div>
-                      </TableCell>
+                            await Promise.all([
+                              dexieDB.times.delete(time.id),
+                              tasksCollection.delete(),
+                            ]);
+
+                            deleteTasks(tasksIDs);
+
+                            toast.success(
+                              `Removed time ${TimeClass.toString(time.hour, time.minute)} successfully!`,
+                            );
+                          } catch {
+                            // TODO: handle all possible errors
+                            toast.error(
+                              `Something went wrong! Please try again.`,
+                            );
+                          }
+                        } else {
+                          removeTimeAction(time.id);
+                        }
+                      });
+                    }}
+                    disabled={removeTimeActionPending}
+                  >
+                    <Trash2Icon />
+                  </Button>
+
+                  <div className="contents">
+                    {TimeClass.toString(time.hour, time.minute)}
+                  </div>
+                </TableCell>
+
+                {[...Array(7)].map((_, j) => {
+                  const task = tasksGroupedByDay[days[j]!]?.find((task) => {
+                    if (isPrismaTask(task)) {
+                      return TimeClass.equals(task.time, time);
+                    }
+
+                    const existingTime = dexieTimes?.find(
+                      (dexieTime) => dexieTime.id === task.timeId,
                     );
-                  })}
-                </TableRow>
-              </Fragment>
-            ),
-          )}
-        </TableBody>
-      </Table>
-    </>
+
+                    if (existingTime == null) {
+                      return;
+                    }
+
+                    return TimeClass.equals(existingTime, time);
+                  });
+
+                  return (
+                    <TableCell
+                      key={j}
+                      className="hover:bg-muted/70 active:bg-muted/90 cell group relative cursor-pointer border-l border-black py-6 text-center break-words hyphens-auto whitespace-break-spaces dark:border-white"
+                      onClick={() => {
+                        setDefaultDay(days[j]!);
+                        setDefaultTime(time);
+                        setDefaultTask(task ?? null);
+                        openNewTaskForm();
+                      }}
+                    >
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        className={cn(
+                          "absolute top-2 right-2 hidden size-8",
+                          task != null && "group-hover:flex",
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+
+                          startTransition(async () => {
+                            if (isGuestMode) {
+                              try {
+                                await dexieDB.tasks.delete(task!.id);
+
+                                deleteTasks([task!.id]);
+
+                                toast.success("Removed task successfully!");
+                              } catch {
+                                // TODO: handle all possible errors
+                                toast.error(
+                                  "Something went wrong! Please try again.",
+                                );
+                              }
+                            } else {
+                              removeTaskAction(task!.id);
+                            }
+                          });
+                        }}
+                        disabled={removeTaskActionPending}
+                      >
+                        <Trash2Icon />
+                      </Button>
+
+                      <div className="line-clamp-3 flex min-h-8 items-center justify-center text-ellipsis">
+                        {task?.name}
+                      </div>
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            </Fragment>
+          ),
+        )}
+      </TableBody>
+    </Table>
   );
 }
