@@ -4,6 +4,7 @@ import { Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function ThemeTogglerButton({
   ...props
@@ -26,8 +27,14 @@ export function ThemeTogglerButton({
   }
 
   return (
-    <Button size="icon" onClick={toggleDarkMode} {...props}>
-      {theme === "dark" ? <Moon /> : <Sun />}
-    </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button size="icon" onClick={toggleDarkMode} {...props}>
+          {theme === "dark" ? <Moon /> : <Sun />}
+        </Button>
+      </TooltipTrigger>
+
+      <TooltipContent>Change Theme</TooltipContent>
+    </Tooltip>
   );
 }

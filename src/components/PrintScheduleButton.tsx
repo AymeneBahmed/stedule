@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
 import dynamic from "next/dynamic";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 function PrintScheduleButtonComp({
   ...props
@@ -18,9 +19,15 @@ function PrintScheduleButtonComp({
   });
 
   return (
-    <Button size="icon" onClick={reactToPrintFn} {...props}>
-      <DownloadIcon />
-    </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button size="icon" onClick={reactToPrintFn} {...props}>
+          <DownloadIcon />
+        </Button>
+      </TooltipTrigger>
+
+      <TooltipContent>Print Schedule</TooltipContent>
+    </Tooltip>
   );
 }
 

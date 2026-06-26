@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { useIsGuestMode } from "@/hooks/use-is-guest-mode";
 import { dexieDB } from "@/lib/db/dexieDB";
 import { useTasksStore } from "@/lib/stores/tasksStore";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function ClearScheduleButton({
   ...props
@@ -54,36 +55,42 @@ export function ClearScheduleButton({
   }, [state?.error]);
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button size="icon" {...props}>
-          <RefreshCcw />
-        </Button>
-      </AlertDialogTrigger>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button size="icon" {...props}>
+              <RefreshCcw />
+            </Button>
+          </AlertDialogTrigger>
 
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Clear the schedule?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently reset your
-            current schedule.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Clear the schedule?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently reset your
+                current schedule.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
 
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <form onClick={handleSubmit}>
-            <AlertDialogAction type="submit" asChild>
-              <Button
-                variant="destructive"
-                className="bg-destructive text-white"
-              >
-                Clear
-              </Button>
-            </AlertDialogAction>
-          </form>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <form onClick={handleSubmit}>
+                <AlertDialogAction type="submit" asChild>
+                  <Button
+                    variant="destructive"
+                    className="bg-destructive text-white"
+                  >
+                    Clear
+                  </Button>
+                </AlertDialogAction>
+              </form>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </TooltipTrigger>
+
+      <TooltipContent>Print Schedule</TooltipContent>
+    </Tooltip>
   );
 }

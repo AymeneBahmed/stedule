@@ -9,28 +9,33 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import NewTimeForm from "./NewTimeForm";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-export function AddNewTimeButton(
-  props: React.ComponentProps<typeof Button>,
-) {
+export function AddNewTimeButton(props: React.ComponentProps<typeof Button>) {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button size="icon" className="rounded-full" {...props}>
-          <Clock className="scale-125" />
-        </Button>
-      </DialogTrigger>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button size="icon" className="rounded-full" {...props}>
+              <Clock className="scale-125" />
+            </Button>
+          </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add time</DialogTitle>
-          <DialogDescription className="sr-only">
-            Add new time
-          </DialogDescription>
-        </DialogHeader>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add time</DialogTitle>
+              <DialogDescription className="sr-only">
+                Add new time
+              </DialogDescription>
+            </DialogHeader>
 
-        <NewTimeForm />
-      </DialogContent>
-    </Dialog>
+            <NewTimeForm />
+          </DialogContent>
+        </Dialog>
+      </TooltipTrigger>
+
+      <TooltipContent>Add Time</TooltipContent>
+    </Tooltip>
   );
 }

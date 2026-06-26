@@ -13,50 +13,18 @@ export function Toolbar() {
       id="toolbar"
       className="bg-primary/15 dark:bg-primary/30 sticky top-10 z-[1] flex space-x-2 rounded-full px-1.5 py-1 backdrop-blur-xl"
     >
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <AddNewTimeButton aria-label="Add a new time" />
-        </TooltipTrigger>
-        <TooltipContent>Add Time</TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <AddNewTaskButton aria-label="Add a new task" />
-        </TooltipTrigger>
-        <TooltipContent>Add Task</TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <ThemeTogglerButton
-            className="rounded-full"
-            aria-label="Toggle theme"
-          />
-        </TooltipTrigger>
-        <TooltipContent>Change Theme</TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <PrintScheduleButton
-            className="rounded-full"
-            aria-label="Print schedule"
-          />
-        </TooltipTrigger>
-        <TooltipContent>Print Schedule</TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <ClearScheduleButton
-            variant="destructive"
-            className="rounded-full"
-            aria-label="Clear schedule"
-          />
-        </TooltipTrigger>
-        <TooltipContent>Clear Schedule</TooltipContent>
-      </Tooltip>
+      <AddNewTimeButton aria-label="Add a new time" />
+      <AddNewTaskButton aria-label="Add a new task" />
+      <ThemeTogglerButton className="rounded-full" aria-label="Toggle theme" />
+      <PrintScheduleButton
+        className="rounded-full"
+        aria-label="Print schedule"
+      />
+      <ClearScheduleButton
+        variant="destructive"
+        className="rounded-full"
+        aria-label="Clear schedule"
+      />
     </span>
   );
 }
