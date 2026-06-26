@@ -23,6 +23,8 @@ test("CRUD task", async ({ page }) => {
   await page.waitForTimeout(1000);
 
   await expect(firstEmptyCell).not.toHaveText("Cook Spaghetti");
+  // add this because sometimes scheduleBodyTrElements doesn't register the new time row
+  await page.waitForTimeout(1200);
 
   // Note that the seperator between AM and PM hours is considered a tr element
   const scheduleBodyTrElements = page.locator("tbody tr");
@@ -86,4 +88,17 @@ test("CRUD task", async ({ page }) => {
       page.getByRole("textbox", { name: "Description (Optional)" }),
     ).toHaveValue("Add something special"),
   ]);
+
+  // focus on dialog so "Escape" can work
+  await page.keyboard.press("Escape");
+  await newTaskCell.hover();
+
+  // Check if delete button works
+  const newTaskCellDeleteButton = page.locator(
+    "tr:nth-child(10) > td:nth-child(7) > .shrink-0",
+  );
+
+  await expect(newTaskCellDeleteButton).toBeVisible();
+  await newTaskCellDeleteButton.click();
+  await expect(newTaskCell).toHaveText("");
 });
