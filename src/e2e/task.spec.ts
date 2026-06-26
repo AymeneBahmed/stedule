@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("create & update task", async ({ page }) => {
+test("CRUD task", async ({ page }) => {
   await page.goto("/");
 
   const firstEmptyCell = page.locator("tbody td").nth(1);
