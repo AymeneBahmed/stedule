@@ -1,14 +1,7 @@
 "use client";
 
 import { days } from "@/lib/constants";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./ui/table";
+import { Table, TableBody, TableCell, TableRow } from "./ui/table";
 import { Fragment, startTransition, useActionState, useEffect } from "react";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
@@ -25,6 +18,7 @@ import { removeTask } from "@/actions/task-actions";
 import { useLiveQuery } from "dexie-react-hooks";
 import { dexieDB } from "@/lib/db/dexieDB";
 import { Hour } from "@/lib/ts/types";
+import { ScheduleTableHeader } from "./ScheduleTableHeader";
 
 interface BaseScheduleTableProps {
   isGuestMode?: boolean;
@@ -110,21 +104,7 @@ export function ScheduleTable({
       id="schedule-table"
       className="table-fixed border border-black dark:border-white print:absolute print:top-9 print:left-1/2 print:w-[80%] print:-translate-x-1/2"
     >
-      <TableHeader>
-        <TableRow className="border-black dark:border-white">
-          {/* Additional empty cell */}
-          <TableHead className="bg-secondary"></TableHead>
-
-          {days.map((day) => (
-            <TableHead
-              key={day}
-              className="bg-secondary border-l border-black text-center text-black dark:border-white dark:text-white"
-            >
-              {day.toUpperCase()}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
+      <ScheduleTableHeader />
 
       <TableBody>
         {(isGuestMode ? dexieTimes : times)?.map(
