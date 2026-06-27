@@ -5,7 +5,6 @@ import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { Fragment, startTransition, useActionState, useEffect } from "react";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
-import { Time } from "@prisma/client";
 import {
   isPrismaTask,
   TaskFromStore,
@@ -37,7 +36,7 @@ interface GuestModeProps extends BaseScheduleTableProps {
 
 interface RegularModeProps extends BaseScheduleTableProps {
   isGuestMode?: false;
-  times: (TimeClass & Time)[];
+  times: PrismaTimeModified[];
   tasks: PrismaTaskModified[];
 }
 
