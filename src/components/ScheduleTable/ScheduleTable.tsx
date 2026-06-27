@@ -189,29 +189,31 @@ export function ScheduleTable({
                   </div>
                 </TableCell>
 
-                {[...Array(7)].map((_, j) => {
-                  const task = tasksGroupedByDay[days[j]!]?.find((task) => {
-                    if (isPrismaTask(task)) {
-                      return TimeClass.equals(task.time, time);
-                    }
+                {[...Array(7)].map((_, dayIndex) => {
+                  const task = tasksGroupedByDay[days[dayIndex]!]?.find(
+                    (task) => {
+                      if (isPrismaTask(task)) {
+                        return TimeClass.equals(task.time, time);
+                      }
 
-                    const existingTime = dexieTimes?.find(
-                      (dexieTime) => dexieTime.id === task.timeId,
-                    );
+                      const existingTime = dexieTimes?.find(
+                        (dexieTime) => dexieTime.id === task.timeId,
+                      );
 
-                    if (existingTime == null) {
-                      return;
-                    }
+                      if (existingTime == null) {
+                        return;
+                      }
 
-                    return TimeClass.equals(existingTime, time);
-                  });
+                      return TimeClass.equals(existingTime, time);
+                    },
+                  );
 
                   return (
                     <TableCell
-                      key={j}
+                      key={dayIndex}
                       className="hover:bg-muted/70 active:bg-muted/90 cell group relative cursor-pointer border-l border-black py-6 text-center break-words hyphens-auto whitespace-break-spaces dark:border-white"
                       onClick={() => {
-                        setDefaultDay(days[j]!);
+                        setDefaultDay(days[dayIndex]!);
                         setDefaultTime(time);
                         setDefaultTask(task ?? null);
                         openNewTaskForm();
