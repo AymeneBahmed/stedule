@@ -23,6 +23,7 @@ import { dexieDB } from "@/lib/db/dexieDB";
 import { Hour } from "@/lib/ts/types";
 import { ScheduleTableHeader } from "./ScheduleTableHeader";
 import { ScheduleTableTimeSeparator } from "./ScheduleTableTimeSeparator";
+import { ScheduleTableTimeCell } from "./ScheduleTableTimeCell";
 
 interface BaseScheduleTableProps {
   isGuestMode?: boolean;
@@ -173,21 +174,11 @@ export function ScheduleTable({
 
               <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
                 {/* Time cell (the first cell of each row) */}
-                <TableCell className="bg-secondary group relative text-center font-bold">
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="absolute top-2 right-2 hidden size-8 group-hover:flex"
-                    onClick={() => handleDeleteTime(time)}
-                    disabled={removeTimeActionPending}
-                  >
-                    <Trash2Icon />
-                  </Button>
-
-                  <div className="contents">
-                    {TimeClass.toString(time.hour, time.minute)}
-                  </div>
-                </TableCell>
+                <ScheduleTableTimeCell
+                  onDelete={() => handleDeleteTime(time)}
+                  disabled={removeTimeActionPending}
+                  time={time}
+                />
 
                 {[...Array(7)].map((_, dayIndex) => {
                   const task = tasksGroupedByDay[days[dayIndex]!]?.find(
