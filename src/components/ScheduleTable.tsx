@@ -19,6 +19,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { dexieDB } from "@/lib/db/dexieDB";
 import { Hour } from "@/lib/ts/types";
 import { ScheduleTableHeader } from "./ScheduleTableHeader";
+import { ScheduleTableTimeSeparator } from "./ScheduleTableTimeSeparator";
 
 interface BaseScheduleTableProps {
   isGuestMode?: boolean;
@@ -110,20 +111,11 @@ export function ScheduleTable({
         {(isGuestMode ? dexieTimes : times)?.map(
           (time, i, currentTimesArray) => (
             <Fragment key={time.id}>
-              {/* A seperator row between the hours <= 12 and > 12 */}
+              {/* A separator row between the hours <= 12 and > 12 */}
               {time.hour >= 13 &&
                 currentTimesArray[i - 1] != null &&
                 currentTimesArray[i - 1]!.hour < 13 && (
-                  <TableRow className="h-[1rem] border-black dark:border-white">
-                    <TableCell className="bg-secondary text-center font-bold"></TableCell>
-
-                    {[...Array(7)].map((_, i) => (
-                      <TableCell
-                        key={i}
-                        className="bg-secondary border-l border-black dark:border-white"
-                      />
-                    ))}
-                  </TableRow>
+                  <ScheduleTableTimeSeparator />
                 )}
 
               <TableRow className="h-[5rem] border-black hover:bg-transparent dark:border-white">
