@@ -6,7 +6,11 @@ import { Fragment, startTransition, useActionState, useEffect } from "react";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { Time } from "@prisma/client";
-import { isPrismaTask, useTasksStore } from "@/lib/stores/tasksStore";
+import {
+  isPrismaTask,
+  TaskFromStore,
+  useTasksStore,
+} from "@/lib/stores/tasksStore";
 import { PrismaTaskModified, PrismaTimeModified } from "@/lib/ts/interfaces";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Button } from "./ui/button";
@@ -131,6 +135,25 @@ export function ScheduleTable({
     });
   }
 
+  function handleDeleteTask(task: TaskFromStore | undefined) {
+    startTransition(async () => {
+      if (isGuestMode) {
+        try {
+          await dexieDB.tasks.delete(task!.id);
+
+          deleteTasks([task!.id]);
+
+          toast.success("Removed task successfully!");
+        } catch {
+          // TODO: handle all possible errors
+          toast.error("Something went wrong! Please try again.");
+        }
+      } else {
+        removeTaskAction(task!.id);
+      }
+    });
+  }
+
   return (
     <Table
       id="schedule-table"
@@ -205,24 +228,7 @@ export function ScheduleTable({
                         onClick={(e) => {
                           e.stopPropagation();
 
-                          startTransition(async () => {
-                            if (isGuestMode) {
-                              try {
-                                await dexieDB.tasks.delete(task!.id);
-
-                                deleteTasks([task!.id]);
-
-                                toast.success("Removed task successfully!");
-                              } catch {
-                                // TODO: handle all possible errors
-                                toast.error(
-                                  "Something went wrong! Please try again.",
-                                );
-                              }
-                            } else {
-                              removeTaskAction(task!.id);
-                            }
-                          });
+                          handleDeleteTask(task);
                         }}
                         disabled={removeTaskActionPending}
                       >
