@@ -7,7 +7,7 @@ import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaul
 import { Time as TimeClass } from "@/lib/classes/Time";
 import { Time } from "@prisma/client";
 import { isPrismaTask, useTasksStore } from "@/lib/stores/tasksStore";
-import { PrismaTaskModified } from "@/lib/ts/interfaces";
+import { PrismaTaskModified, PrismaTimeModified } from "@/lib/ts/interfaces";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { Button } from "./ui/button";
 import { Trash2Icon } from "lucide-react";
@@ -100,6 +100,37 @@ export function ScheduleTable({
     }
   }, [removeTaskActionState]);
 
+  function handleDeleteTime(time: Omit<PrismaTimeModified, "userId">) {
+    startTransition(async () => {
+      if (isGuestMode) {
+        try {
+          const tasksCollection = dexieDB.tasks.where({
+            timeId: time.id,
+          });
+          const tasksIDs = (await tasksCollection.toArray()).map(
+            ({ id }) => id,
+          );
+
+          await Promise.all([
+            dexieDB.times.delete(time.id),
+            tasksCollection.delete(),
+          ]);
+
+          deleteTasks(tasksIDs);
+
+          toast.success(
+            `Removed time ${TimeClass.toString(time.hour, time.minute)} successfully!`,
+          );
+        } catch {
+          // TODO: handle all possible errors
+          toast.error(`Something went wrong! Please try again.`);
+        }
+      } else {
+        removeTimeAction(time.id);
+      }
+    });
+  }
+
   return (
     <Table
       id="schedule-table"
@@ -125,38 +156,7 @@ export function ScheduleTable({
                     size="icon"
                     variant="destructive"
                     className="absolute top-2 right-2 hidden size-8 group-hover:flex"
-                    onClick={async () => {
-                      startTransition(async () => {
-                        if (isGuestMode) {
-                          try {
-                            const tasksCollection = dexieDB.tasks.where({
-                              timeId: time.id,
-                            });
-                            const tasksIDs = (
-                              await tasksCollection.toArray()
-                            ).map(({ id }) => id);
-
-                            await Promise.all([
-                              dexieDB.times.delete(time.id),
-                              tasksCollection.delete(),
-                            ]);
-
-                            deleteTasks(tasksIDs);
-
-                            toast.success(
-                              `Removed time ${TimeClass.toString(time.hour, time.minute)} successfully!`,
-                            );
-                          } catch {
-                            // TODO: handle all possible errors
-                            toast.error(
-                              `Something went wrong! Please try again.`,
-                            );
-                          }
-                        } else {
-                          removeTimeAction(time.id);
-                        }
-                      });
-                    }}
+                    onClick={() => handleDeleteTime(time)}
                     disabled={removeTimeActionPending}
                   >
                     <Trash2Icon />
