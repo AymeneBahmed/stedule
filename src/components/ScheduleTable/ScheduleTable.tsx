@@ -1,7 +1,7 @@
 "use client";
 
 import { days } from "@/lib/constants";
-import { Table, TableBody, TableCell, TableRow } from "./ui/table";
+import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { Fragment, startTransition, useActionState, useEffect } from "react";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
@@ -13,7 +13,7 @@ import {
 } from "@/lib/stores/tasksStore";
 import { PrismaTaskModified, PrismaTimeModified } from "@/lib/ts/interfaces";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Trash2Icon } from "lucide-react";
 import { removeTime } from "@/actions/time-actions";
 import { toast } from "sonner";

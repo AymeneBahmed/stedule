@@ -1,4 +1,4 @@
-import { ScheduleTable } from "@/components/ScheduleTable";
+import { ScheduleTable } from "@/components/ScheduleTable/ScheduleTable";
 import { Toolbar } from "@/components/Toolbar";
 import { Button } from "@/components/ui/button";
 import { UserDropdownMenu } from "@/components/UserDropdownMenu";
