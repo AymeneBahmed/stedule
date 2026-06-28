@@ -10,7 +10,12 @@ export function GoogleLoginButton(props: React.ComponentProps<typeof Button>) {
   }
 
   return (
-    <Button className="w-full" onClick={loginWithGoogle} {...props}>
+    <Button
+      className="w-full"
+      onClick={loginWithGoogle}
+      {...props}
+      variant="secondary"
+    >
       <img src="google-icon.svg" alt="" className="size-5" />
       <span>Continue with Google</span>
     </Button>

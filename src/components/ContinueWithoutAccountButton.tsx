@@ -1,7 +1,6 @@
 import React from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { User2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function ContinueWithoutAccountButton(
@@ -10,14 +9,12 @@ export function ContinueWithoutAccountButton(
   return (
     <Button
       type="button"
-      variant="outline"
+      variant="link"
       asChild
       {...props}
-      className={cn("mt-3 w-full", props.className)}
+      className={cn("text-muted-foreground mt-3 w-full", props.className)}
     >
-      <Link href="/">
-        <User2Icon /> Continue without account
-      </Link>
+      <Link href="/">Continue without account</Link>
     </Button>
   );
 }

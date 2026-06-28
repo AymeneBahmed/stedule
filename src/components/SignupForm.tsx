@@ -140,7 +140,7 @@ export function SignupForm() {
                 className="mt-10 w-full"
                 disabled={form.formState.isSubmitting}
               >
-                Create Account
+                Create account
               </Button>
 
               <div className="text-center text-sm">
