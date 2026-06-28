@@ -2,7 +2,7 @@
 
 import { days } from "@/lib/constants";
 import { Table, TableBody, TableRow } from "../ui/table";
-import { Fragment, startTransition, useActionState, useEffect } from "react";
+import { Fragment, startTransition, useEffect } from "react";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
 import {
@@ -12,9 +12,7 @@ import {
 } from "@/lib/stores/tasksStore";
 import { PrismaTaskModified, PrismaTimeModified } from "@/lib/ts/interfaces";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
-import { removeTime } from "@/actions/time-actions";
 import { toast } from "sonner";
-import { removeTask } from "@/actions/task-actions";
 import { useLiveQuery } from "dexie-react-hooks";
 import { dexieDB } from "@/lib/db/dexieDB";
 import { Hour } from "@/lib/ts/types";
@@ -22,6 +20,7 @@ import { ScheduleTableHeader } from "./ScheduleTableHeader";
 import { ScheduleTableTimeSeparator } from "./ScheduleTableTimeSeparator";
 import { ScheduleTableTimeCell } from "./ScheduleTableTimeCell";
 import { ScheduleTableTaskCell } from "./ScheduleTableTaskCell";
+import { useScheduleActions } from "@/hooks/use-schedule-actions";
 
 interface BaseScheduleTableProps {
   isGuestMode?: boolean;
@@ -63,10 +62,12 @@ export function ScheduleTable({
     useNewTaskFormDefaultValuesStore();
   const { openNewTaskForm } = useShouldOpenNewTaskFormStore();
 
-  const [removeTimeActionState, removeTimeAction, removeTimeActionPending] =
-    useActionState(removeTime, null);
-  const [removeTaskActionState, removeTaskAction, removeTaskActionPending] =
-    useActionState(removeTask, null);
+  const {
+    removeTimeAction,
+    removeTimeActionPending,
+    removeTaskAction,
+    removeTaskActionPending,
+  } = useScheduleActions();
 
   // Sync state & data side effects
   useEffect(() => {
@@ -94,20 +95,6 @@ export function ScheduleTable({
     isGuestMode,
     serverTasks,
   ]);
-
-  // Show time deletion state notification
-  // prettier-ignore
-  useEffect(() => {
-    if (removeTimeActionState?.error) toast.error(removeTimeActionState.error);
-    if (removeTimeActionState?.success) toast.success(removeTimeActionState.success);
-  }, [removeTimeActionState]);
-
-  // Show task deletion state notification
-  // prettier-ignore
-  useEffect(() => {
-    if (removeTaskActionState?.error) toast.error(removeTaskActionState.error);
-    if (removeTaskActionState?.success) toast.success(removeTaskActionState.success);
-  }, [removeTaskActionState]);
 
   // Handlers
   function handleDeleteTime(time: Omit<PrismaTimeModified, "userId">) {
