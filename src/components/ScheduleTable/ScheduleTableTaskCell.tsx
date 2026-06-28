@@ -1,7 +1,6 @@
 import { Trash2Icon } from "lucide-react";
 import { Button } from "../ui/button";
 import { TableCell } from "../ui/table";
-import { cn } from "@/lib/utils";
 
 interface ScheduleTableTaskCellProps {
   taskName?: string;
@@ -27,7 +26,7 @@ export function ScheduleTableTaskCell({
           variant="destructive"
           className="absolute top-2 right-2 hidden size-8 group-hover:flex"
           onClick={(e) => {
-            // Stop propagation to preven NewTaskForm from opening
+            // Stop propagation to prevent NewTaskForm from opening
             e.stopPropagation();
             onDelete();
           }}
