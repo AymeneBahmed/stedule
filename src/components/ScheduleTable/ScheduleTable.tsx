@@ -25,19 +25,16 @@ import { useScheduleActions } from "@/hooks/use-schedule-actions";
 interface BaseScheduleTableProps {
   isGuestMode?: boolean;
 }
-
 interface GuestModeProps extends BaseScheduleTableProps {
   isGuestMode: true;
   serverTimes?: never;
   serverTasks?: never;
 }
-
 interface RegularModeProps extends BaseScheduleTableProps {
   isGuestMode?: false;
   serverTimes: PrismaTimeModified[];
   serverTasks: PrismaTaskModified[];
 }
-
 type ScheduleTableProps = GuestModeProps | RegularModeProps;
 
 export function ScheduleTable({
