@@ -27,7 +27,9 @@ interface TasksStore {
 export function isPrismaTask(task: TaskFromStore): task is PrismaTaskModified {
   return "time" in task;
 }
-
+/**
+ * This store saves tasks so we don't have to fetch data multiple times from the server
+ */
 export const useTasksStore = create<TasksStore>((set, get) => ({
   tasks: [],
   addTasks(newTasks) {
