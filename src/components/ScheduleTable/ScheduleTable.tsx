@@ -1,7 +1,7 @@
 "use client";
 
 import { days } from "@/lib/constants";
-import { Table, TableBody, TableCell, TableRow } from "../ui/table";
+import { Table, TableBody, TableRow } from "../ui/table";
 import { Fragment, startTransition, useActionState, useEffect } from "react";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
 import { Time as TimeClass } from "@/lib/classes/Time";
@@ -12,11 +12,8 @@ import {
 } from "@/lib/stores/tasksStore";
 import { PrismaTaskModified, PrismaTimeModified } from "@/lib/ts/interfaces";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
-import { Button } from "../ui/button";
-import { Trash2Icon } from "lucide-react";
 import { removeTime } from "@/actions/time-actions";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { removeTask } from "@/actions/task-actions";
 import { useLiveQuery } from "dexie-react-hooks";
 import { dexieDB } from "@/lib/db/dexieDB";
@@ -24,6 +21,7 @@ import { Hour } from "@/lib/ts/types";
 import { ScheduleTableHeader } from "./ScheduleTableHeader";
 import { ScheduleTableTimeSeparator } from "./ScheduleTableTimeSeparator";
 import { ScheduleTableTimeCell } from "./ScheduleTableTimeCell";
+import { ScheduleTableTaskCell } from "./ScheduleTableTaskCell";
 
 interface BaseScheduleTableProps {
   isGuestMode?: boolean;
@@ -143,13 +141,13 @@ export function ScheduleTable({
     });
   }
 
-  function handleDeleteTask(task: TaskFromStore | undefined) {
+  function handleDeleteTask(taskId: TaskFromStore["id"]) {
     startTransition(async () => {
       if (isGuestMode) {
         try {
-          await dexieDB.tasks.delete(task!.id);
+          await dexieDB.tasks.delete(taskId);
 
-          deleteTasksFromStore([task!.id]);
+          deleteTasksFromStore([taskId]);
 
           toast.success("Removed task successfully!");
         } catch {
@@ -157,7 +155,7 @@ export function ScheduleTable({
           toast.error("Something went wrong! Please try again.");
         }
       } else {
-        removeTaskAction(task!.id);
+        removeTaskAction(taskId);
       }
     });
   }
@@ -189,56 +187,36 @@ export function ScheduleTable({
                 />
 
                 {[...Array(7)].map((_, dayIndex) => {
+                  // Task is undefined for empty cells
                   const task = tasksGroupedByDay[days[dayIndex]!]?.find(
                     (task) => {
                       if (isPrismaTask(task)) {
                         return TimeClass.equals(task.time, time);
                       }
 
-                      const existingTime = dexieTimes?.find(
+                      const matchedDexieTime = dexieTimes?.find(
                         (dexieTime) => dexieTime.id === task.timeId,
                       );
 
-                      if (existingTime == null) {
-                        return;
-                      }
-
-                      return TimeClass.equals(existingTime, time);
+                      return matchedDexieTime
+                        ? TimeClass.equals(matchedDexieTime, time)
+                        : false;
                     },
                   );
 
                   return (
-                    <TableCell
+                    <ScheduleTableTaskCell
                       key={dayIndex}
-                      className="hover:bg-muted/70 active:bg-muted/90 cell group relative cursor-pointer border-l border-black py-6 text-center break-words hyphens-auto whitespace-break-spaces dark:border-white"
+                      taskName={task?.name}
+                      disabled={removeTaskActionPending}
                       onClick={() => {
                         setDefaultDay(days[dayIndex]!);
                         setDefaultTime(time);
                         setDefaultTask(task ?? null);
                         openNewTaskForm();
                       }}
-                    >
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        className={cn(
-                          "absolute top-2 right-2 hidden size-8",
-                          task != null && "group-hover:flex",
-                        )}
-                        onClick={(e) => {
-                          e.stopPropagation();
-
-                          handleDeleteTask(task);
-                        }}
-                        disabled={removeTaskActionPending}
-                      >
-                        <Trash2Icon />
-                      </Button>
-
-                      <div className="line-clamp-3 flex min-h-8 items-center justify-center text-ellipsis">
-                        {task?.name}
-                      </div>
-                    </TableCell>
+                      onDelete={() => task != null && handleDeleteTask(task.id)}
+                    />
                   );
                 })}
               </TableRow>
