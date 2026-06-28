@@ -31,48 +31,55 @@ interface BaseScheduleTableProps {
 
 interface GuestModeProps extends BaseScheduleTableProps {
   isGuestMode: true;
-  times?: never;
-  tasks?: never;
+  serverTimes?: never;
+  serverTasks?: never;
 }
 
 interface RegularModeProps extends BaseScheduleTableProps {
   isGuestMode?: false;
-  times: PrismaTimeModified[];
-  tasks: PrismaTaskModified[];
+  serverTimes: PrismaTimeModified[];
+  serverTasks: PrismaTaskModified[];
 }
 
 type ScheduleTableProps = GuestModeProps | RegularModeProps;
 
 export function ScheduleTable({
-  times,
-  tasks,
+  serverTimes,
+  serverTasks,
   isGuestMode,
 }: ScheduleTableProps) {
   const dexieTimes = useLiveQuery(() => dexieDB.times.toArray());
   const dexieTasks = useLiveQuery(() => dexieDB.tasks.toArray());
-  const { tasks: tasksFromStore, addTasks, deleteTasks } = useTasksStore();
+
+  const {
+    tasks: tasksFromStore,
+    addTasks: addTasksToStore,
+    deleteTasks: deleteTasksFromStore,
+  } = useTasksStore();
   const tasksGroupedByDay = Object.groupBy(
-    isGuestMode ? tasksFromStore : tasks,
-    ({ day }) => days[day],
+    isGuestMode ? tasksFromStore : serverTasks,
+    (task) => days[task.day],
   );
+
   const { setDefaultDay, setDefaultTime, setDefaultTask } =
     useNewTaskFormDefaultValuesStore();
   const { openNewTaskForm } = useShouldOpenNewTaskFormStore();
+
   const [removeTimeActionState, removeTimeAction, removeTimeActionPending] =
     useActionState(removeTime, null);
   const [removeTaskActionState, removeTaskAction, removeTaskActionPending] =
     useActionState(removeTask, null);
 
+  // Sync state & data side effects
   useEffect(() => {
     if (!isGuestMode) {
-      addTasks(tasks);
-    }
+      // add tasks to the store
+      addTasksToStore(serverTasks);
+    } else {
+      // Wait for dexie to fetch tasks from IndexedDB then add them to the store
+      if (dexieTasks != null) addTasksToStore(dexieTasks);
 
-    if (isGuestMode) {
-      if (dexieTasks != null) {
-        addTasks(dexieTasks);
-      }
-
+      // Add default times if IndexedDB is empty.
       if (dexieTimes?.length === 0) {
         dexieDB.times.bulkAdd(
           Array.from({ length: 8 }, (_, i) => ({
@@ -82,28 +89,29 @@ export function ScheduleTable({
         );
       }
     }
-  }, [addTasks, dexieTasks, dexieTimes?.length, isGuestMode, tasks]);
+  }, [
+    addTasksToStore,
+    dexieTasks,
+    dexieTimes?.length,
+    isGuestMode,
+    serverTasks,
+  ]);
 
+  // Show time deletion state notification
+  // prettier-ignore
   useEffect(() => {
-    if (removeTimeActionState?.error) {
-      toast.error(removeTimeActionState.error);
-    }
-
-    if (removeTimeActionState?.success) {
-      toast.success(removeTimeActionState.success);
-    }
+    if (removeTimeActionState?.error) toast.error(removeTimeActionState.error);
+    if (removeTimeActionState?.success) toast.success(removeTimeActionState.success);
   }, [removeTimeActionState]);
 
+  // Show task deletion state notification
+  // prettier-ignore
   useEffect(() => {
-    if (removeTaskActionState?.error) {
-      toast.error(removeTaskActionState.error);
-    }
-
-    if (removeTaskActionState?.success) {
-      toast.success(removeTaskActionState.success);
-    }
+    if (removeTaskActionState?.error) toast.error(removeTaskActionState.error);
+    if (removeTaskActionState?.success) toast.success(removeTaskActionState.success);
   }, [removeTaskActionState]);
 
+  // Handlers
   function handleDeleteTime(time: Omit<PrismaTimeModified, "userId">) {
     startTransition(async () => {
       if (isGuestMode) {
@@ -120,7 +128,7 @@ export function ScheduleTable({
             tasksCollection.delete(),
           ]);
 
-          deleteTasks(tasksIDs);
+          deleteTasksFromStore(tasksIDs);
 
           toast.success(
             `Removed time ${TimeClass.toString(time.hour, time.minute)} successfully!`,
@@ -141,7 +149,7 @@ export function ScheduleTable({
         try {
           await dexieDB.tasks.delete(task!.id);
 
-          deleteTasks([task!.id]);
+          deleteTasksFromStore([task!.id]);
 
           toast.success("Removed task successfully!");
         } catch {
@@ -162,7 +170,7 @@ export function ScheduleTable({
       <ScheduleTableHeader />
 
       <TableBody>
-        {(isGuestMode ? dexieTimes : times)?.map(
+        {(isGuestMode ? dexieTimes : serverTimes)?.map(
           (time, i, currentTimesArray) => (
             <Fragment key={time.id}>
               {/* A separator row between the hours <= 12 and > 12 */}

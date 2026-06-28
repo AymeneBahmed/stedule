@@ -55,7 +55,7 @@ export default async function Home() {
         <Toolbar />
       </div>
 
-      <ScheduleTable tasks={initialTasks} times={times} />
+      <ScheduleTable serverTasks={initialTasks} serverTimes={times} />
     </div>
   );
 }
