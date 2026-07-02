@@ -44,6 +44,8 @@ export default async function Home() {
         minute: 0,
         userId: userId,
       })),
+      // Add this because Github Actions throw duplication error when running playwright tests
+      skipDuplicates: true,
     });
   }
 
