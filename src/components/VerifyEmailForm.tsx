@@ -48,6 +48,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
           router.refresh();
         },
         onError() {
+          // TODO: handle a bug where a new code isn't sent after the old one expires
           toast.error(
             "Couldn't verify email! Please check your inbox for a new code.",
           );
