@@ -6,6 +6,7 @@ import { getSession } from "@/lib/auth/auth";
 import { getTasksWithTimesByUserId } from "@/lib/db/task";
 import { getTimesByUserId } from "@/lib/db/time";
 import { prisma } from "@/lib/prisma";
+import { PrismaTimeModified } from "@/lib/ts/interfaces";
 import Link from "next/link";
 
 export default async function Home() {
@@ -34,11 +35,11 @@ export default async function Home() {
 
   const userId = session.user.id;
   const initialTasks = (await getTasksWithTimesByUserId(userId)) ?? [];
-  const times = (await getTimesByUserId(userId)) ?? [];
+  let times = (await getTimesByUserId(userId)) ?? [];
 
   // The second condition make sure to not insert multiple default times if they already exist.
   if (times.length === 0) {
-    await prisma.time.createMany({
+    times = (await prisma.time.createManyAndReturn({
       data: Array.from({ length: 8 }, (_, i) => ({
         hour: i + 8,
         minute: 0,
@@ -46,7 +47,7 @@ export default async function Home() {
       })),
       // Add this because Github Actions throw duplication error when running playwright tests
       skipDuplicates: true,
-    });
+    })) as PrismaTimeModified[];
   }
 
   return (
