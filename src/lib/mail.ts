@@ -12,6 +12,11 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendEmailVerificationMail(email: string, otp: string) {
+  if (process.env.NODE_ENV === "test" || process.env.GITHUB_ACTIONS) {
+    console.log(`[TEST MODE] Internal email skip. OTP for ${email} is: ${otp}`);
+    return;
+  }
+
   await transporter.sendMail({
     from: `${APP_NAME} <aymendd3131@gmail.com>`,
     to: email,
