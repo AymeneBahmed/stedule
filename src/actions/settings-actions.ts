@@ -36,14 +36,10 @@ export async function updateProfileInformation(
     | z.infer<typeof baseProfileInformationSchemaExtendedWithCode>,
 ): Promise<SucessOrError> {
   const session = await getSession({ redirectOnNull: true });
-  let validated;
-
-  if ("password" in values) {
-    validated =
-      baseProfileInformationSchemaExtendedWithPassword.safeParse(values);
-  } else {
-    validated = baseProfileInformationSchemaExtendedWithCode.safeParse(values);
-  }
+  const validated =
+    "password" in values
+      ? baseProfileInformationSchemaExtendedWithPassword.safeParse(values)
+      : baseProfileInformationSchemaExtendedWithCode.safeParse(values);
 
   if (validated.error) {
     return {
