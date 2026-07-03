@@ -17,7 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { startTransition, useId, useMemo, useState } from "react";
+import { startTransition, useId, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -43,11 +43,10 @@ export function ProfileInformationForm({
   doesUserHavePassword,
   pendingNewEmailObject: pendingNewEmail,
 }: ProfileInformationFormProps) {
-  const schema = useMemo(() => {
-    return doesUserHavePassword
-      ? baseProfileInformationSchemaExtendedWithPassword
-      : baseProfileInformationSchemaExtendedWithCode;
-  }, [doesUserHavePassword]);
+  const schema = doesUserHavePassword
+    ? baseProfileInformationSchemaExtendedWithPassword
+    : baseProfileInformationSchemaExtendedWithCode;
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
