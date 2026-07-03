@@ -17,20 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import {
-  startTransition,
-  useActionState,
-  useEffect,
-  useId,
-  useMemo,
-  useState,
-} from "react";
-import {
-  sendNewEmailVerificationLink,
-  sendNewProfileInformationCode,
-  updateProfileInformation,
-} from "@/actions/settings-actions";
-import { toast } from "sonner";
+import { startTransition, useId, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +28,7 @@ import {
 } from "../ui/dialog";
 import { TriangleAlert } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
+import { useProfileInformationActions } from "@/hooks/use-profile-information-actions";
 
 interface ProfileInformationFormProps {
   defaultFullName: string;
@@ -69,21 +57,14 @@ export function ProfileInformationForm({
       code: "",
     },
   });
-  const [
-    updateProfileInformationState,
+  const {
     updateProfileInformationAction,
     isUpdateProfileInformationPending,
-  ] = useActionState(updateProfileInformation, null);
-  const [
-    sendNewEmailVerificationLinkState,
     sendNewEmailVerificationLinkAction,
     isSendNewEmailVerificationLinkPending,
-  ] = useActionState(sendNewEmailVerificationLink, null);
-  const [
-    sendNewProfileInformationCodeState,
     sendNewProfileInformationCodeAction,
     isSendNewProfileInformationCodePending,
-  ] = useActionState(sendNewProfileInformationCode, null);
+  } = useProfileInformationActions();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const formId = useId();
 
@@ -96,42 +77,6 @@ export function ProfileInformationForm({
       setIsDialogOpen(false);
     });
   }
-
-  useEffect(() => {
-    if (sendNewProfileInformationCodeState?.success) {
-      toast.success(sendNewProfileInformationCodeState.success);
-
-      return;
-    }
-
-    if (sendNewProfileInformationCodeState?.success) {
-      toast.error(sendNewProfileInformationCodeState.error);
-    }
-  }, [sendNewProfileInformationCodeState]);
-
-  useEffect(() => {
-    if (updateProfileInformationState?.success) {
-      toast.success(updateProfileInformationState.success);
-
-      return;
-    }
-
-    if (updateProfileInformationState?.error) {
-      toast.error(updateProfileInformationState.error.toString());
-    }
-  }, [updateProfileInformationState]);
-
-  useEffect(() => {
-    if (sendNewEmailVerificationLinkState?.success) {
-      toast.success(sendNewEmailVerificationLinkState.success);
-
-      return;
-    }
-
-    if (sendNewEmailVerificationLinkState?.error) {
-      toast.error(sendNewEmailVerificationLinkState.error.toString());
-    }
-  }, [sendNewEmailVerificationLinkState]);
 
   return (
     <Form {...form}>
