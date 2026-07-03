@@ -74,9 +74,7 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Update your personal information and profile picture
-            </CardDescription>
+            <CardDescription>Update your personal information</CardDescription>
           </CardHeader>
           <CardContent>
             <ProfileInformationForm
