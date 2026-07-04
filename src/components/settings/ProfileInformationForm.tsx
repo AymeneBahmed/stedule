@@ -115,47 +115,15 @@ export function ProfileInformationForm({
         />
 
         {pendingNewEmail && (
-          <div className="mt-8 flex items-start gap-3 rounded-lg bg-orange-100 p-4 text-sm text-orange-700 dark:bg-orange-400/20 dark:text-orange-200">
-            <TriangleAlert className="mt-0.5 flex-shrink-0" size={20} />
-
-            <div>
-              <p className="font-medium">Email change requested</p>
-              <p className="mt-1">
-                To complete changing your email to{" "}
-                <strong className="break-all">{pendingNewEmail.email}</strong>:
-              </p>
-              <ul className="mt-2 list-inside list-disc space-y-1">
-                <li>
-                  Check your new email&apos;s inbox for a verification link
-                </li>
-                <li>
-                  Verify within <strong>24 hours</strong> before the link
-                  expires{" "}
-                  <strong>
-                    ({pendingNewEmail.remainingHours} hour
-                    {pendingNewEmail.remainingHours > 1 && "s"} left)
-                  </strong>
-                </li>
-                <li>
-                  Didn&apos;t receive it?{" "}
-                  <Button
-                    variant="link"
-                    className="h-auto p-0 text-orange-700 underline dark:text-orange-200"
-                    onClick={() => {
-                      startTransition(() => {
-                        sendNewEmailVerificationLinkAction(
-                          pendingNewEmail.email,
-                        );
-                      });
-                    }}
-                    disabled={isSendNewEmailVerificationLinkPending}
-                  >
-                    Resend verification email
-                  </Button>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <EmailChangeRequestedSection
+            disabled={isSendNewEmailVerificationLinkPending}
+            pendingNewEmail={pendingNewEmail}
+            onClick={() =>
+              startTransition(() => {
+                sendNewEmailVerificationLinkAction(pendingNewEmail.email);
+              })
+            }
+          />
         )}
 
         <Dialog
@@ -274,5 +242,52 @@ export function ProfileInformationForm({
         </Dialog>
       </form>
     </Form>
+  );
+}
+
+interface EmailChangeRequestedSectionProps {
+  disabled: boolean;
+  pendingNewEmail: { email: string; remainingHours: number };
+  onClick: () => void;
+}
+
+function EmailChangeRequestedSection({
+  disabled,
+  pendingNewEmail,
+  onClick,
+}: EmailChangeRequestedSectionProps) {
+  return (
+    <div className="mt-8 flex items-start gap-3 rounded-lg bg-orange-100 p-4 text-sm text-orange-700 dark:bg-orange-400/20 dark:text-orange-200">
+      <TriangleAlert className="mt-0.5 flex-shrink-0" size={20} />
+
+      <div>
+        <p className="font-medium">Email change requested</p>
+        <p className="mt-1">
+          To complete changing your email to{" "}
+          <strong className="break-all">{pendingNewEmail.email}</strong>:
+        </p>
+        <ul className="mt-2 list-inside list-disc space-y-1">
+          <li>Check your new email&apos;s inbox for a verification link</li>
+          <li>
+            Verify within <strong>24 hours</strong> before the link expires{" "}
+            <strong>
+              ({pendingNewEmail.remainingHours} hour
+              {pendingNewEmail.remainingHours > 1 && "s"} left)
+            </strong>
+          </li>
+          <li>
+            Didn&apos;t receive it?{" "}
+            <Button
+              variant="link"
+              className="h-auto p-0 text-orange-700 underline dark:text-orange-200"
+              onClick={onClick}
+              disabled={disabled}
+            >
+              Resend verification email
+            </Button>
+          </li>
+        </ul>
+      </div>
+    </div>
   );
 }
