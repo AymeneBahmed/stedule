@@ -73,7 +73,7 @@ export function ScheduleTable({
       addTasksToStore(serverTasks);
     } else {
       // Wait for dexie to fetch tasks from IndexedDB then add them to the store
-      if (dexieTasks != null) addTasksToStore(dexieTasks);
+      if (dexieTasks) addTasksToStore(dexieTasks);
 
       // Add default times if IndexedDB is empty.
       if (dexieTimes?.length === 0) {
@@ -157,7 +157,7 @@ export function ScheduleTable({
             <Fragment key={time.id}>
               {/* A separator row between the hours <= 12 and > 12 */}
               {time.hour >= 13 &&
-                currentTimesArray[i - 1] != null &&
+                currentTimesArray[i - 1] &&
                 currentTimesArray[i - 1]!.hour < 13 && (
                   <ScheduleTableTimeSeparator />
                 )}
@@ -199,7 +199,7 @@ export function ScheduleTable({
                         setDefaultTask(task ?? null);
                         openNewTaskForm();
                       }}
-                      onDelete={() => task != null && handleDeleteTask(task.id)}
+                      onDelete={() => task && handleDeleteTask(task.id)}
                     />
                   );
                 })}

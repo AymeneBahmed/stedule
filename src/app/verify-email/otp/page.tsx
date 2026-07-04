@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 export default async function VerifyEmailOtpPage() {
   const emailCookie = (await cookies()).get("email");
 
-  if (emailCookie == null) {
+  if (!emailCookie) {
     redirect("/login");
   }
 

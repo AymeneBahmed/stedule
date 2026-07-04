@@ -5,7 +5,7 @@ export default function proxy(request: NextRequest) {
   const sessionCookie = request.cookies.get("better-auth.session_token");
 
   if (
-    sessionCookie != null &&
+    sessionCookie &&
     ["/login", "/signup", "/verify-email"].includes(pathname)
   ) {
     return NextResponse.redirect(new URL("/", request.nextUrl));

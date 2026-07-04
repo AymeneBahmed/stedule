@@ -37,7 +37,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
     const existingTasks = get().tasks;
 
     for (const task of newTasks) {
-      if (existingTasks.find(({ id }) => id === task.id) == null) {
+      if (!existingTasks.find(({ id }) => id === task.id)) {
         tasksToAdd.push(task);
       }
     }
@@ -65,7 +65,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 
       const existingDexieTime = await dexieDB.times.get(task.timeId);
 
-      if (existingDexieTime == null) {
+      if (!existingDexieTime) {
         throw new Error(`Time ID ${task.timeId} does not exist in times table`);
       }
 
@@ -89,7 +89,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
       if (!isPrismaTask(task)) {
         const existingTime = await dexieDB.times.get(task.timeId);
 
-        if (existingTime == null) {
+        if (!existingTime) {
           throw new Error(
             `Time ID ${task.timeId} does not exist in times table`,
           );

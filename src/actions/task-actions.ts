@@ -35,7 +35,7 @@ export async function addNewTask(
       },
     });
 
-    if (existingTask != null) {
+    if (existingTask) {
       task = (await prisma.task.update({
         where: { id: existingTask.id },
         data: {

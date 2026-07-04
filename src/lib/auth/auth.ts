@@ -77,7 +77,7 @@ export async function getSession({
     headers: await headers(),
   });
 
-  if (session == null) {
+  if (!session) {
     if (redirectOnNull) {
       redirect("/login"); // Never returns when redirecting
     } else {

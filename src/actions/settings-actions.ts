@@ -66,7 +66,7 @@ export async function updateProfileInformation(
       (account) => account.providerId === "credential",
     );
 
-    if (code != null) {
+    if (code) {
       const codeCookie = (await cookies()).get("code");
 
       if (!bcrypt.compareSync(code, codeCookie?.value || "")) {
@@ -79,8 +79,8 @@ export async function updateProfileInformation(
     (await cookies()).delete("code");
 
     if (
-      password != null &&
-      credentialAccount != null &&
+      password &&
+      credentialAccount &&
       !(await authContext.password.verify({
         password,
         hash: credentialAccount.password!,
@@ -324,7 +324,7 @@ export async function removePassword(
       (account) => account.providerId === "credential",
     );
 
-    if (credentialAccount == null) {
+    if (!credentialAccount) {
       return {
         error: "The user does not have a credential account.",
       };
@@ -373,7 +373,7 @@ export async function sendNewEmailVerificationLink(
       },
     });
 
-    if (existingEmailChangeRequest != null) {
+    if (existingEmailChangeRequest) {
       await prisma.emailChangeRequest.update({
         where: {
           id: existingEmailChangeRequest.id,
@@ -404,7 +404,7 @@ export async function sendNewEmailVerificationLink(
   } catch {
     // Revert back changes
     try {
-      if (token != null) {
+      if (token) {
         if (token === existingEmailChangeRequest?.token) {
           await prisma.emailChangeRequest.update({
             where: {

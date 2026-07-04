@@ -82,7 +82,7 @@ export default async function SettingsPage() {
               defaultEmail={session.user.email}
               doesUserHavePassword={doesUserHaveCredentialAccount}
               {...(!isExistingEmailChangeRequestExpired &&
-                existingEmailChangeRequest != null && {
+                existingEmailChangeRequest && {
                   pendingNewEmailObject: {
                     email: existingEmailChangeRequest.newEmail,
                     remainingHours: new Date(

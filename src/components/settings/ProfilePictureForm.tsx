@@ -83,7 +83,7 @@ export function ProfilePictureForm() {
         const reader = new FileReader();
 
         reader.addEventListener("load", () => {
-          if (imageSrc != null) {
+          if (imageSrc) {
             setOldImageSrc(imageSrc);
           }
 
@@ -377,7 +377,7 @@ export function ProfilePictureForm() {
         </Dialog>
 
         <Button
-          disabled={imageSrc == null || isDialogOpen || isPending}
+          disabled={!imageSrc || isDialogOpen || isPending}
           className="mt-2"
         >
           Save changes

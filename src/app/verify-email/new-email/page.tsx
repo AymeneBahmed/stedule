@@ -33,7 +33,7 @@ function LoadingSpinner() {
 async function VerificationContent({ token }: { token: string | undefined }) {
   const { user } = await getSession({ redirectOnNull: true });
 
-  if (token == null) {
+  if (!token) {
     const existingEmailChangeRequest =
       await prisma.emailChangeRequest.findUnique({
         where: {
@@ -41,7 +41,7 @@ async function VerificationContent({ token }: { token: string | undefined }) {
         },
       });
 
-    if (existingEmailChangeRequest == null) {
+    if (!existingEmailChangeRequest) {
       return (
         <div className="flex min-h-full items-center justify-center">
           <Card className="max-w-md">
@@ -107,7 +107,7 @@ async function VerificationContent({ token }: { token: string | undefined }) {
         },
       });
 
-    if (existingEmailChangeRequest == null) {
+    if (!existingEmailChangeRequest) {
       return (
         <div className="flex min-h-full items-center justify-center">
           <Card className="max-w-md">

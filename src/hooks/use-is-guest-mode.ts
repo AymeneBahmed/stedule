@@ -8,7 +8,7 @@ export function useIsGuestMode() {
     (async () => {
       const session = await authClient.getSession();
 
-      if (session.data == null) {
+      if (!session.data) {
         setIsGuestMode(true);
       }
     })();

@@ -44,10 +44,9 @@ export function NewTaskForm() {
     defaultValues: {
       task: defaultTask?.name ?? "",
       day: defaultDay ?? undefined,
-      time:
-        defaultTime == null
-          ? ""
-          : `${defaultTime.hour.toString().padStart(2, "0")}:${defaultTime.minute.toString().padStart(2, "0")}`,
+      time: !defaultTime
+        ? ""
+        : `${defaultTime.hour.toString().padStart(2, "0")}:${defaultTime.minute.toString().padStart(2, "0")}`,
       priority: defaultTask?.priority ?? "Unspecified",
       description: defaultTask?.description ?? "",
     },
@@ -81,7 +80,7 @@ export function NewTaskForm() {
             .first();
           let timeId = existingTime?.id;
 
-          if (timeId == null) {
+          if (!timeId) {
             timeId = await dexieDB.times.add(chosenTime);
           }
 
@@ -89,7 +88,7 @@ export function NewTaskForm() {
             .where({ day: days.indexOf(values.day), timeId })
             .first();
 
-          if (existingTask != null) {
+          if (existingTask) {
             await dexieDB.tasks.update(existingTask.id, {
               name: values.task,
               description: values.description,
@@ -138,7 +137,7 @@ export function NewTaskForm() {
     const timeString = form.getValues("time");
     const time = Time.fromString(timeString);
 
-    if (time == null) {
+    if (!time) {
       return;
     }
 
@@ -155,7 +154,7 @@ export function NewTaskForm() {
   useEffect(() => {
     const time = Time.fromString(timeString);
 
-    if (time == null) {
+    if (!time) {
       return;
     }
 
@@ -186,7 +185,7 @@ export function NewTaskForm() {
   ]);
 
   useEffect(() => {
-    if (defaultTask != null) {
+    if (defaultTask) {
       enableEditTaskMode();
     } else {
       disableEditTaskMode();
@@ -319,7 +318,7 @@ export function NewTaskForm() {
 
                       if (
                         e.currentTarget.value.length === 5 &&
-                        Time.fromString(e.currentTarget.value) != null
+                        Time.fromString(e.currentTarget.value)
                       ) {
                         await getExistingTask();
                       }

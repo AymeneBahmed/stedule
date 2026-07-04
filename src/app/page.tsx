@@ -13,7 +13,7 @@ export default async function Home() {
   const session = await getSession();
 
   // User not logged in
-  if (session == null) {
+  if (!session) {
     return (
       <div className="relative flex min-h-full flex-col items-center justify-center gap-6 py-10 [&>div]:not-first:w-[80%] print:[&>div]:w-full">
         <div className="absolute top-6 right-12 flex items-stretch space-x-4">
