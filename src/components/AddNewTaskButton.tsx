@@ -2,17 +2,28 @@
 
 import { Button } from "./ui/button";
 import { ClipboardList } from "lucide-react";
-import { Dialog, DialogTrigger } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
 import { useShouldOpenNewTaskFormStore } from "@/lib/stores/shouldOpenNewTaskFormStore";
 import { useNewTaskFormDefaultValuesStore } from "@/lib/stores/newTaskFormDefaultValuesStore";
-import NewTaskFormDialogContent from "./NewTaskFormDialogContent";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useEditTaskModeStore } from "@/lib/stores/editTaskModeStore";
+import { Badge } from "./ui/badge";
+import { NewTaskForm } from "./NewTaskForm";
+import { cn } from "@/lib/utils";
 
 export function AddNewTaskButton(props: React.ComponentProps<typeof Button>) {
   const { shouldOpenNewTaskForm, openNewTaskForm, closeNewTaskForm } =
     useShouldOpenNewTaskFormStore();
   const { setDefaultDay, setDefaultTime, setDefaultTask } =
     useNewTaskFormDefaultValuesStore();
+  const { editTaskModeEnabled } = useEditTaskModeStore();
 
   return (
     <Dialog
@@ -47,7 +58,21 @@ export function AddNewTaskButton(props: React.ComponentProps<typeof Button>) {
         </Tooltip>
       </DialogTrigger>
 
-      <NewTaskFormDialogContent />
+      <DialogContent className="gap-0">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            What do you want to do?{" "}
+            <Badge className={cn(!editTaskModeEnabled && "invisible")}>
+              Edit Mode
+            </Badge>
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            Create a task and add an optional description such as notes.
+          </DialogDescription>
+        </DialogHeader>
+
+        <NewTaskForm />
+      </DialogContent>
     </Dialog>
   );
 }
