@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import NewTimeForm from "./NewTimeForm";
+import { NewTimeForm } from "./NewTimeForm";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function AddNewTimeButton(props: React.ComponentProps<typeof Button>) {

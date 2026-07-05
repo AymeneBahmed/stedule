@@ -22,7 +22,7 @@ import { useIsGuestMode } from "@/hooks/use-is-guest-mode";
 import { dexieDB } from "@/lib/db/dexieDB";
 import { Time } from "@/lib/classes/Time";
 
-export default function NewTimeForm() {
+export function NewTimeForm() {
   const form = useForm<z.infer<typeof newTimeSchema>>({
     resolver: zodResolver(newTimeSchema),
     defaultValues: {
