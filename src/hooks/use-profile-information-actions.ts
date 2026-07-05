@@ -1,4 +1,5 @@
 import {
+  checkIfUserCanChangeEmail,
   sendNewEmailVerificationLink,
   sendNewProfileInformationCode,
   updateProfileInformation,
@@ -7,6 +8,14 @@ import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 
 export function useProfileInformationActions() {
+  const [
+    // This doesn't have a SUCCESS notification toast because it will conflict with the 6-digit code toast.
+    // The ERROR notification is covered outside this hook so another developer (or the future me) doesn't get confused
+    // when they see 
+    checkIfUserCanChangeEmailState,
+    checkIfUserCanChangeEmailAction,
+    isCheckIfUserCanChangeEmailPending,
+  ] = useActionState(checkIfUserCanChangeEmail, null);
   const [
     updateProfileInformationState,
     updateProfileInformationAction,
@@ -60,6 +69,9 @@ export function useProfileInformationActions() {
   }, [sendNewEmailVerificationLinkState]);
 
   return {
+    checkIfUserCanChangeEmailState,
+    checkIfUserCanChangeEmailAction,
+    isCheckIfUserCanChangeEmailPending,
     updateProfileInformationAction,
     isUpdateProfileInformationPending,
     sendNewEmailVerificationLinkAction,

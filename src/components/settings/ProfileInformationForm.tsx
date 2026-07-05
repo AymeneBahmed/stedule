@@ -17,7 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { startTransition, useId, useState } from "react";
+import { startTransition, useEffect, useId, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,7 @@ import {
 import { TriangleAlert } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 import { useProfileInformationActions } from "@/hooks/use-profile-information-actions";
+import { toast } from "sonner";
 
 interface ProfileInformationFormProps {
   defaultFullName: string;
@@ -57,6 +58,9 @@ export function ProfileInformationForm({
     },
   });
   const {
+    checkIfUserCanChangeEmailState,
+    checkIfUserCanChangeEmailAction,
+    isCheckIfUserCanChangeEmailPending,
     updateProfileInformationAction,
     isUpdateProfileInformationPending,
     sendNewEmailVerificationLinkAction,
@@ -76,6 +80,23 @@ export function ProfileInformationForm({
       setIsDialogOpen(false);
     });
   }
+
+  useEffect(() => {
+    // This code will only execute when user tries to change email
+    if (checkIfUserCanChangeEmailState?.success) {
+      if (!doesUserHavePassword) {
+        startTransition(() => {
+          sendNewProfileInformationCodeAction();
+        });
+      }
+      setIsDialogOpen(true);
+      return;
+    }
+
+    if (checkIfUserCanChangeEmailState?.error) {
+      toast.error(checkIfUserCanChangeEmailState.error);
+    }
+  }, [checkIfUserCanChangeEmailState]);
 
   return (
     <Form {...form}>
@@ -129,12 +150,20 @@ export function ProfileInformationForm({
         <Dialog
           open={isDialogOpen}
           onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setIsDialogOpen(false);
+              return;
+            }
+
             startTransition(() => {
-              if (isOpen && !doesUserHavePassword) {
-                sendNewProfileInformationCodeAction();
+              if (form.formState.dirtyFields.email) {
+                checkIfUserCanChangeEmailAction(form.getValues("email"));
+                return;
               }
 
-              setIsDialogOpen(isOpen);
+              // This activates in case the user didn't change email.
+              sendNewProfileInformationCodeAction();
+              setIsDialogOpen(true);
             });
           }}
         >
@@ -143,9 +172,11 @@ export function ProfileInformationForm({
               type="button"
               disabled={
                 !form.formState.isDirty ||
+                isCheckIfUserCanChangeEmailPending ||
                 isUpdateProfileInformationPending ||
                 isSendNewProfileInformationCodePending
               }
+              onClick={() => {}}
             >
               {isUpdateProfileInformationPending ? "Saving..." : "Save changes"}
             </Button>

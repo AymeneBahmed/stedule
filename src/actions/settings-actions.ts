@@ -477,3 +477,44 @@ export async function updateProfilePicture(
     success: "Profile picture updated successfully.",
   };
 }
+
+export async function checkIfUserCanChangeEmail(
+  _prevState: unknown,
+  newEmail: string,
+): Promise<SucessOrError> {
+  const errorMessage =
+    "This email cannot be used. Please try a different email.";
+
+  try {
+    const { user } = await getSession({ redirectOnNull: true });
+
+    await new Promise((res) =>
+      setTimeout(() => {
+        res(null);
+      }, 2000),
+    );
+
+    const isNewEmailAvailable =
+      (await prisma.user.count({
+        where: {
+          email: newEmail,
+          id: { not: user.id },
+        },
+      })) === 0;
+
+    if (!isNewEmailAvailable) {
+      throw new Error(errorMessage);
+    }
+
+    return {
+      success: "This email can be used.",
+    };
+  } catch (e) {
+    return {
+      error:
+        (e as Error).message === errorMessage
+          ? errorMessage
+          : "Something went wrong! Please try again.",
+    };
+  }
+}
