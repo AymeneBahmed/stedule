@@ -47,16 +47,16 @@ export function AddNewTaskButton(props: React.ComponentProps<typeof Button>) {
         }
       }}
     >
-      <DialogTrigger asChild onClick={openNewTaskForm}>
-        <Tooltip>
-          <TooltipTrigger asChild>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild onClick={openNewTaskForm}>
             <Button size="icon" className="rounded-full" {...props}>
               <ClipboardList className="scale-125" />
             </Button>
-          </TooltipTrigger>
-          <TooltipContent>Add Task</TooltipContent>
-        </Tooltip>
-      </DialogTrigger>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Add Task</TooltipContent>
+      </Tooltip>
 
       <DialogContent className="gap-0">
         <DialogHeader>

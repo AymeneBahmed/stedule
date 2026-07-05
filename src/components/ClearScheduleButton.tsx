@@ -56,16 +56,16 @@ export function ClearScheduleButton({
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Tooltip>
-          <TooltipTrigger asChild>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <AlertDialogTrigger asChild>
             <Button size="icon" {...props}>
               <RefreshCcw />
             </Button>
-          </TooltipTrigger>
-          <TooltipContent>Print Schedule</TooltipContent>
-        </Tooltip>
-      </AlertDialogTrigger>
+          </AlertDialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Print Schedule</TooltipContent>
+      </Tooltip>
 
       <AlertDialogContent>
         <AlertDialogHeader>
