@@ -15,40 +15,39 @@ export function AddNewTaskButton(props: React.ComponentProps<typeof Button>) {
     useNewTaskFormDefaultValuesStore();
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Dialog
-          open={shouldOpenNewTaskForm}
-          onOpenChange={(open) => {
-            if (open) {
-              setDefaultDay(null);
-              setDefaultTime(null);
-              setDefaultTask(null);
+    <Dialog
+      open={shouldOpenNewTaskForm}
+      onOpenChange={(open) => {
+        if (open) {
+          setDefaultDay(null);
+          setDefaultTime(null);
+          setDefaultTask(null);
 
-              openNewTaskForm();
-            } else {
-              closeNewTaskForm();
+          openNewTaskForm();
+        } else {
+          closeNewTaskForm();
 
-              // This prevents NewTaskForm from layout shifting
-              setTimeout(() => {
-                setDefaultDay(null);
-                setDefaultTime(null);
-                setDefaultTask(null);
-              }, 100);
-            }
-          }}
-        >
-          <DialogTrigger asChild onClick={openNewTaskForm}>
+          // This prevents NewTaskForm from layout shifting
+          setTimeout(() => {
+            setDefaultDay(null);
+            setDefaultTime(null);
+            setDefaultTask(null);
+          }, 100);
+        }
+      }}
+    >
+      <DialogTrigger asChild onClick={openNewTaskForm}>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button size="icon" className="rounded-full" {...props}>
               <ClipboardList className="scale-125" />
             </Button>
-          </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Add Task</TooltipContent>
+        </Tooltip>
+      </DialogTrigger>
 
-          <NewTaskFormDialogContent />
-        </Dialog>
-      </TooltipTrigger>
-
-      <TooltipContent>Add Task</TooltipContent>
-    </Tooltip>
+      <NewTaskFormDialogContent />
+    </Dialog>
   );
 }

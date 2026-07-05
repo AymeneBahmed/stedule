@@ -13,29 +13,28 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function AddNewTimeButton(props: React.ComponentProps<typeof Button>) {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Dialog>
-          <DialogTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button size="icon" className="rounded-full" {...props}>
               <Clock className="scale-125" />
             </Button>
-          </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Add Time</TooltipContent>
+        </Tooltip>
+      </DialogTrigger>
 
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add time</DialogTitle>
-              <DialogDescription className="sr-only">
-                Add new time
-              </DialogDescription>
-            </DialogHeader>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add time</DialogTitle>
+          <DialogDescription className="sr-only">
+            Add new time
+          </DialogDescription>
+        </DialogHeader>
 
-            <NewTimeForm />
-          </DialogContent>
-        </Dialog>
-      </TooltipTrigger>
-
-      <TooltipContent>Add Time</TooltipContent>
-    </Tooltip>
+        <NewTimeForm />
+      </DialogContent>
+    </Dialog>
   );
 }

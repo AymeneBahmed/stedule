@@ -1,11 +1,8 @@
-"use client";
-
 import { AddNewTaskButton } from "./AddNewTaskButton";
 import { AddNewTimeButton } from "./AddNewTimeButton";
 import { ClearScheduleButton } from "./ClearScheduleButton";
 import { PrintScheduleButton } from "./PrintScheduleButton";
 import { ThemeTogglerButton } from "./ThemeTogglerButton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function Toolbar() {
   return (

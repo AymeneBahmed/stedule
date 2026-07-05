@@ -55,42 +55,41 @@ export function ClearScheduleButton({
   }, [state?.error]);
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button size="icon" {...props}>
               <RefreshCcw />
             </Button>
-          </AlertDialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Print Schedule</TooltipContent>
+        </Tooltip>
+      </AlertDialogTrigger>
 
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Clear the schedule?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently reset your
-                current schedule.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Clear the schedule?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently reset your
+            current schedule.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <form onClick={handleSubmit}>
-                <AlertDialogAction type="submit" asChild>
-                  <Button
-                    variant="destructive"
-                    className="bg-destructive text-white"
-                  >
-                    Clear
-                  </Button>
-                </AlertDialogAction>
-              </form>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </TooltipTrigger>
-
-      <TooltipContent>Print Schedule</TooltipContent>
-    </Tooltip>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <form onClick={handleSubmit}>
+            <AlertDialogAction type="submit" asChild>
+              <Button
+                variant="destructive"
+                className="bg-destructive text-white"
+              >
+                Clear
+              </Button>
+            </AlertDialogAction>
+          </form>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
