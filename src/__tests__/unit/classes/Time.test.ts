@@ -23,4 +23,18 @@ describe("Time Class", () => {
     // @ts-expect-error
     expect(() => Time.toString(3, 200)).toThrow();
   });
+
+  test("equals()", () => {
+    const timeA = new Time(10, 30);
+    const timeB = new Time(10, 30);
+    const timeC = new Time(11, 30);
+    const timeD = new Time(10, 45);
+    const timeE = new Time(23, 59);
+
+    expect(Time.equals(timeA, timeB)).toBe(true);
+    expect(Time.equals(timeA, timeA)).toBe(true);
+    expect(Time.equals(timeA, timeC)).toBe(false);
+    expect(Time.equals(timeA, timeD)).toBe(false);
+    expect(Time.equals(timeA, timeE)).toBe(false);
+  });
 });
