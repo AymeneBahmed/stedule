@@ -89,14 +89,22 @@ export function ProfileInformationForm({
           sendNewProfileInformationCodeAction();
         });
       }
-      setIsDialogOpen(true);
+
+      queueMicrotask(() => {
+        setIsDialogOpen(true);
+      });
+
       return;
     }
 
     if (checkIfUserCanChangeEmailState?.error) {
       toast.error(checkIfUserCanChangeEmailState.error);
     }
-  }, [checkIfUserCanChangeEmailState]);
+  }, [
+    checkIfUserCanChangeEmailState,
+    doesUserHavePassword,
+    sendNewProfileInformationCodeAction,
+  ]);
 
   return (
     <Form {...form}>
