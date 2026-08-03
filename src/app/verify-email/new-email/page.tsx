@@ -110,7 +110,7 @@ async function VerificationContent({ token }: { token: string | undefined }) {
                 request a new verification email by{" "}
                 <Button
                   variant="link"
-                  className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
+                  className="ml-0 px-0 pt-0 text-[1rem] underline dark:text-white"
                   asChild
                 >
                   <Link href="/settings">
@@ -173,7 +173,7 @@ async function VerificationContent({ token }: { token: string | undefined }) {
                 Your email address has been updated.{" "}
                 <Button
                   variant="link"
-                  className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
+                  className="ml-0 px-0 pt-0 text-[1rem] underline dark:text-white"
                   asChild
                 >
                   <Link href="/">Return to the app</Link>
@@ -194,7 +194,7 @@ async function VerificationContent({ token }: { token: string | undefined }) {
                 An unexpected error occurred. Please try again later.{" "}
                 <Button
                   variant="link"
-                  className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
+                  className="ml-0 px-0 pt-0 text-[1rem] underline dark:text-white"
                   asChild
                 >
                   <Link href="/">Return to the app</Link>
