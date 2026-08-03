@@ -37,4 +37,32 @@ describe("Time Class", () => {
     expect(Time.equals(timeA, timeD)).toBe(false);
     expect(Time.equals(timeA, timeE)).toBe(false);
   });
+
+  test("fromString()", () => {
+    // Valid daytime string
+    const morning = Time.fromString("10:30");
+    expect(morning).not.toBeNull();
+    expect(morning!.hour).toBe(10);
+    expect(morning!.minute).toBe(30);
+
+    const midnight = Time.fromString("00:00");
+    const endOfDay = Time.fromString("23:59");
+    expect(midnight).not.toBeNull();
+    expect(midnight!.hour).toBe(0);
+    expect(endOfDay).not.toBeNull();
+    expect(endOfDay!.minute).toBe(59);
+
+    // Out-of-range values
+    expect(Time.fromString("24:00")).toBeNull();
+    expect(Time.fromString("23:60")).toBeNull();
+
+    // Negative values
+    expect(Time.fromString("-1:30")).toBeNull();
+    expect(Time.fromString("12:-15")).toBeNull();
+
+    // Wrong format
+    expect(Time.fromString("aa:bb")).toBeNull();
+    expect(Time.fromString("12")).toBeNull();
+    expect(Time.fromString("")).toBeNull();
+  });
 });
