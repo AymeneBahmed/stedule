@@ -14,6 +14,10 @@ export class Time {
   }
 
   static toString(hour: Hour, minute: Minute): string {
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 60) {
+      throw new Error("Invalid time parameters");
+    }
+
     return `${hour < 10 ? "0" : ""}${hour}:${minute < 10 ? "0" : ""}${minute}`;
   }
 
