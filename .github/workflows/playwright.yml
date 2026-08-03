@@ -46,6 +46,8 @@ jobs:
           npx prisma db push --accept-data-loss
       - name: Build application
         run: npm run build # Compiles your app so "npm run start" will work
+      - name: Run Vitest tests
+        run: npm run test
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
