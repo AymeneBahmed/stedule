@@ -5,6 +5,10 @@ export class Time {
   minute: Minute;
 
   constructor(hour: Hour, minute: Minute) {
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 60) {
+      throw new Error("Time constructor received invalid time parameters");
+    }
+
     this.hour = hour;
     this.minute = minute;
   }
