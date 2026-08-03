@@ -162,7 +162,13 @@ export function ProfileInformationForm({
               }
 
               // This activates in case the user didn't change email.
-              sendNewProfileInformationCodeAction();
+              if (
+                form.formState.dirtyFields.fullName &&
+                !doesUserHavePassword
+              ) {
+                sendNewProfileInformationCodeAction();
+              }
+
               setIsDialogOpen(true);
             });
           }}
