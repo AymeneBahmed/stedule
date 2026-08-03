@@ -18,6 +18,8 @@ export function PrintScheduleButton({
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // Disable synchronous state update error because the workaround using useSyncExternalStore is ugly
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
 
     scheduleTableRef.current = document.querySelector("#schedule-table");
