@@ -7,7 +7,6 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
-// TODO: fix this page later to handle sending a new verification request
 export default async function VerifyEmailNewEmailPage({
   searchParams,
 }: {
@@ -30,93 +29,81 @@ function LoadingSpinner() {
   );
 }
 
-async function VerificationContent({ token }: { token: string | undefined }) {
-  const { user } = await getSession({ redirectOnNull: true });
+type VerificationResult =
+  | { status: "NO_REQUEST" }
+  | { status: "PENDING_REQUEST"; newEmail: string }
+  | { status: "INVALID_TOKEN" }
+  | { status: "EXPIRED_TOKEN"; newEmail: string }
+  | { status: "SUCCESS" }
+  | { status: "ERROR" };
 
+async function processEmailVerification(
+  token: string | undefined,
+  userId: string,
+): Promise<VerificationResult> {
   if (!token) {
     const existingEmailChangeRequest =
       await prisma.emailChangeRequest.findUnique({
-        where: {
-          userId: user.id,
-        },
+        where: { userId },
       });
 
     if (!existingEmailChangeRequest) {
-      return (
-        <div className="flex min-h-full items-center justify-center">
-          <Card className="max-w-md">
-            <CardHeader>
-              <CardTitle className="text-center">
-                Invalid Verification Link
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="text-center">
-              <p>
-                This verification link is invalid or already used. Please
-                request a new verification email by{" "}
-                <Button
-                  variant="link"
-                  className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
-                  asChild
-                >
-                  <Link href="/settings">
-                    changing the email in the settings
-                  </Link>
-                </Button>
-                .
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      );
+      return { status: "NO_REQUEST" };
     }
 
-    return (
-      <div className="flex min-h-full items-center justify-center">
-        <div className="flex min-h-full items-center justify-center">
-          <Card className="max-w-md">
-            <CardHeader>
-              <CardTitle className="text-center">
-                Invalid Verification Link
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="text-center">
-              <p>
-                Please check your email for the correct verification link or{" "}
-                <RequestNewVerificationLinkButton
-                  newEmail={existingEmailChangeRequest.newEmail}
-                >
-                  request a new one
-                </RequestNewVerificationLinkButton>
-                .
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
+    return {
+      status: "PENDING_REQUEST",
+      newEmail: existingEmailChangeRequest.newEmail,
+    };
   }
 
   try {
     const existingEmailChangeRequest =
       await prisma.emailChangeRequest.findUnique({
-        where: {
-          token,
-        },
+        where: { token },
       });
 
     if (!existingEmailChangeRequest) {
-      return (
-        <div className="flex min-h-full items-center justify-center">
-          <Card className="max-w-md">
+      return { status: "INVALID_TOKEN" };
+    }
+
+    if (existingEmailChangeRequest.expiresAt <= new Date()) {
+      return {
+        status: "EXPIRED_TOKEN",
+        newEmail: existingEmailChangeRequest.newEmail,
+      };
+    }
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: existingEmailChangeRequest.userId },
+        data: { email: existingEmailChangeRequest.newEmail },
+      }),
+      prisma.emailChangeRequest.delete({
+        where: { id: existingEmailChangeRequest.id },
+      }),
+    ]);
+
+    return { status: "SUCCESS" };
+  } catch {
+    return { status: "ERROR" };
+  }
+}
+
+async function VerificationContent({ token }: { token: string | undefined }) {
+  const { user } = await getSession({ redirectOnNull: true });
+  const result = await processEmailVerification(token, user.id);
+
+  return (
+    <div className="flex min-h-full items-center justify-center">
+      <Card className="max-w-md">
+        {result.status === "NO_REQUEST" || result.status === "INVALID_TOKEN" ? (
+          <>
             <CardHeader>
               <CardTitle className="text-center">
                 Invalid Verification Link
               </CardTitle>
             </CardHeader>
-
             <CardContent className="text-center">
               <p>
                 This verification link is invalid or already used. Please
@@ -133,102 +120,91 @@ async function VerificationContent({ token }: { token: string | undefined }) {
                 .
               </p>
             </CardContent>
-          </Card>
-        </div>
-      );
-    }
+          </>
+        ) : null}
 
-    if (existingEmailChangeRequest.expiresAt.getTime() <= Date.now()) {
-      return (
-        <div className="flex min-h-full items-center justify-center">
-          <Card className="max-w-md">
+        {result.status === "PENDING_REQUEST" ? (
+          <>
+            <CardHeader>
+              <CardTitle className="text-center">
+                Invalid Verification Link
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p>
+                Please check your email for the correct verification link or{" "}
+                <RequestNewVerificationLinkButton newEmail={result.newEmail}>
+                  request a new one
+                </RequestNewVerificationLinkButton>
+                .
+              </p>
+            </CardContent>
+          </>
+        ) : null}
+
+        {result.status === "EXPIRED_TOKEN" ? (
+          <>
             <CardHeader>
               <CardTitle className="text-center">
                 Verification Expired
               </CardTitle>
             </CardHeader>
-
             <CardContent className="text-center">
               <p>
                 This verification link expired. Links are valid for 24 hours.{" "}
-                <RequestNewVerificationLinkButton
-                  newEmail={existingEmailChangeRequest.newEmail}
-                >
+                <RequestNewVerificationLinkButton newEmail={result.newEmail}>
                   Get a new link
                 </RequestNewVerificationLinkButton>
                 .
               </p>
             </CardContent>
-          </Card>
-        </div>
-      );
-    }
+          </>
+        ) : null}
 
-    // Valid token case
-    await prisma.$transaction([
-      prisma.user.update({
-        where: {
-          id: existingEmailChangeRequest.userId,
-        },
-        data: {
-          email: existingEmailChangeRequest.newEmail,
-        },
-      }),
-      prisma.emailChangeRequest.delete({
-        where: {
-          id: existingEmailChangeRequest.id,
-        },
-      }),
-    ]);
+        {result.status === "SUCCESS" ? (
+          <>
+            <CardHeader>
+              <CardTitle className="text-center">
+                Email Updated Successfully
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p>
+                Your email address has been updated.{" "}
+                <Button
+                  variant="link"
+                  className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
+                  asChild
+                >
+                  <Link href="/">Return to the app</Link>
+                </Button>
+                .
+              </p>
+            </CardContent>
+          </>
+        ) : null}
 
-    return (
-      <div className="flex min-h-full items-center justify-center">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center">
-              Email Updated Successfully
-            </CardTitle>
-          </CardHeader>
-
-          <CardContent className="text-center">
-            <p>
-              Your email address has been updated.{" "}
-              <Button
-                variant="link"
-                className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
-                asChild
-              >
-                <Link href="/">Return to the app</Link>
-              </Button>
-              .
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  } catch {
-    return (
-      <div className="flex min-h-full items-center justify-center">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center">Verification Failed</CardTitle>
-          </CardHeader>
-
-          <CardContent className="text-center">
-            <p>
-              An unexpected error occurred. Please try again later.{" "}
-              <Button
-                variant="link"
-                className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
-                asChild
-              >
-                <Link href="/">Return to the app</Link>
-              </Button>
-              .
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+        {result.status === "ERROR" ? (
+          <>
+            <CardHeader>
+              <CardTitle className="text-center">Verification Failed</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p>
+                An unexpected error occurred. Please try again later.{" "}
+                <Button
+                  variant="link"
+                  className="ml-0 px-0 pt-0 text-[1rem] underline hover:text-white"
+                  asChild
+                >
+                  <Link href="/">Return to the app</Link>
+                </Button>
+                .
+              </p>
+            </CardContent>
+          </>
+        ) : null}
+      </Card>
+    </div>
+  );
 }
