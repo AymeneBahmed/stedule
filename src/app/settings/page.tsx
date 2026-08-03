@@ -26,30 +26,30 @@ import { ArrowLeftIcon } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 
+function getRemainingHours(expiresAt: Date): number {
+  const diffMs = expiresAt.getTime() - Date.now();
+
+  return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60)));
+}
+
 export default async function SettingsPage() {
   const session = await getSession({ redirectOnNull: true });
+
   const [userAccounts, existingEmailChangeRequest] = await Promise.all([
     auth.api.listUserAccounts({
       headers: await headers(),
     }),
-    prisma.emailChangeRequest.findUnique({
-      where: { userId: session.user.id },
+    prisma.emailChangeRequest.findFirst({
+      where: {
+        userId: session.user.id,
+        expiresAt: { gt: new Date() },
+      },
     }),
   ]);
+
   const doesUserHaveCredentialAccount = !!userAccounts.find(
     (account) => account.provider === "credential",
   );
-  const isExistingEmailChangeRequestExpired =
-    existingEmailChangeRequest &&
-    existingEmailChangeRequest?.expiresAt.getTime() <= Date.now();
-
-  if (isExistingEmailChangeRequestExpired) {
-    await prisma.emailChangeRequest.delete({
-      where: {
-        id: existingEmailChangeRequest.id,
-      },
-    });
-  }
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -81,16 +81,14 @@ export default async function SettingsPage() {
               defaultFullName={session.user.name}
               defaultEmail={session.user.email}
               doesUserHavePassword={doesUserHaveCredentialAccount}
-              {...(!isExistingEmailChangeRequestExpired &&
-                existingEmailChangeRequest && {
-                  pendingNewEmailObject: {
-                    email: existingEmailChangeRequest.newEmail,
-                    remainingHours: new Date(
-                      existingEmailChangeRequest.expiresAt.getTime() -
-                        Date.now(),
-                    ).getHours(),
-                  },
-                })}
+              {...(existingEmailChangeRequest && {
+                pendingNewEmailObject: {
+                  email: existingEmailChangeRequest.newEmail,
+                  remainingHours: getRemainingHours(
+                    existingEmailChangeRequest.expiresAt,
+                  ),
+                },
+              })}
             />
           </CardContent>
         </Card>
@@ -131,7 +129,7 @@ export default async function SettingsPage() {
 
         {/* Delete User */}
         <Card className="bg-destructive/10 border-destructive">
-          <CardHeader className="">
+          <CardHeader>
             <CardTitle className="text-destructive">Delete Accounts</CardTitle>
             <CardDescription className="text-destructive">
               Please proceed with caution, this cannot be undone.
