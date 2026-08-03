@@ -47,7 +47,9 @@ export async function updateProfileInformation(
     };
   }
 
-  const { fullName: newName, email: newEmail } = validated.data;
+  const newName = validated.data.fullName.trim();
+  const newEmail = validated.data.email.trim();
+
   let password: string | null = null;
   let code: string | null = null;
 
