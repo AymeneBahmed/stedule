@@ -14,6 +14,8 @@ export function ThemeTogglerButton({
 
   // Ensure component is mounted before showing theme icon
   useEffect(() => {
+    // Disable synchronous state update error because the workaround using useSyncExternalStore is ugly
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
