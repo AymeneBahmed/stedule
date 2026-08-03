@@ -2,7 +2,7 @@
 
 import { newTaskSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import {
   Form,
@@ -64,8 +64,10 @@ export function NewTaskForm() {
   const [submitted, setSubmitted] = useState(false);
   const isGuestMode = useIsGuestMode();
   const [guestModeError, setGuestModeError] = useState<string>();
-  const day = form.watch("day");
-  const timeString = form.watch("time");
+  const [day, timeString] = useWatch({
+    control: form.control,
+    name: ["day", "time"],
+  });
 
   function onSubmit(values: z.infer<typeof newTaskSchema>) {
     startTransition(async () => {
