@@ -1,22 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stedule
 
-## Getting Started
+Stedule is a task scheduling app where you can create weekly schedules for organization.
 
-First, run the development server:
+[![Live Demo](https://img.shields.io/badge/Demo-Live_App-blue?style=for-the-badge)](https://stedule.vercel.app/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+![Project preview](thumbnail.png)
+
+## Tech Stack
+
+- **Language:** TypeScript
+- **Framework:** Next.js
+- **Styling:** Tailwind CSS, shadcn/ui
+- **Form Validation:** Zod + react-hook-form
+- **Printing:** react-to-print
+- **Database:** PostgreSQL + Prisma ORM
+- **Authentication:** Better Auth
+- **Testing:** Vitest, Playwright
+
+## Features
+
+- **Simple:** only the features you need with no unnecessary bloat.
+- **Offline-Friendly:** you can use the app without creating an account thanks to IndexedDB which acts like a client-side database.
+- **Online-Friendly:** you can use save your data across devices by creating an account.
+- **Printing:** you can save the schedule as a PDF and print it.
+- **Accessiblility:** the app supports both light and dark modes, high-contrast colors, reduced motion, and forced colors mode for user comfortability.
+- **Secure:** the app is built with personal data security in mind.
+- **Client-Side Validation:** validate user input on the client-side for instant user feedback and reducing server requests, saving server costs and improving UX.
+- **Server-Side Validation:** validate and sanitize user input on the server-side for data security and integrity.
+
+## Engineering Decisions
+
+### Frontend
+
+- **TypeScript:** type safety and powerful IDE support.
+- **Next.js:** component-based framework for highly interactive UIs, offering exceptional IDE support and type safety when combined with TypeScript.
+- **shadcn/ui:** beautiful, accessible, and easy-to-edit components. It also comes with CSS variables to easily add support for both light and dark modes.
+- **Zod:** rich-feature library with a powerful API to validate user input at runtime.
+- **react-hook-form:** client-side validation library for instant user feedback and better UX.
+- **react-to-print:** a specialized React printing library for printing specific UIs components instead of the whole page.
+
+### Backend
+
+- **Next.js:** use Next.js backend features (RSC, proxy, and server actions) for a unified TypeScript codebase and simple, free hosting.
+- **Prisma ORM:** abstract raw PostgreSQL for simple, type-safe database operations directly in TypeScript, improving the developer experience.
+- **Better Auth:** a powerful TypeScript authentication framework with a simple API for self-hosted authentication.
+
+### Testing
+
+- **Vitest:** for unit testing.
+- **Playwright:** for end-to-end (E2E) testing.
+
+## Getting started
+
+### 1. Clone Repository
+
+To use the project locally, run the following commands:
+
+```bash
+git clone https://github.com/AymeneBahmed/stedule.git
+cd stedule
+npm run install
+```
+
+### 2. Set Environment Variables
+
+Before running the development server, make sure to replace the placeholder values in `.env.example`.
+
+### 4. Initialize Database
+
+```bash
+npx prisma db push
+```
+
+### 5. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Run Vitest tests
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run test
+```
 
 ## Run Playwright Tests
 
