@@ -47,7 +47,7 @@ export async function updateProfileInformation(
     };
   }
 
-  const { fullName, email: newEmail } = validated.data;
+  const { fullName: newName, email: newEmail } = validated.data;
   let password: string | null = null;
   let code: string | null = null;
 
@@ -115,7 +115,7 @@ export async function updateProfileInformation(
         id: session.user.id,
       },
       data: {
-        name: fullName,
+        name: newName,
       },
     });
   } catch (e) {
@@ -135,7 +135,9 @@ export async function updateProfileInformation(
   if (session.user.email !== newEmail) {
     return {
       success:
-        "Updated full name successfully! Check your new email's inbox to verify the new email.",
+        (session.user.name !== newName
+          ? "Updated full name successfully! "
+          : "") + "Check your new email's inbox to verify the new email.",
     };
   }
 
