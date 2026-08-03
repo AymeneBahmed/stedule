@@ -9,7 +9,7 @@ export type TaskFromStore =
   | PrismaTaskModified
   | Omit<PrismaTaskModified, "userId" | "time">;
 
-interface TasksStore {
+export interface TasksStore {
   tasks: TaskFromStore[];
   addTasks: (newTasks: TaskFromStore[]) => void;
   findTaskByDayAndTime: (
