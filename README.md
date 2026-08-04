@@ -14,7 +14,8 @@ Stedule is a task scheduling app where you can create weekly schedules for organ
 - **Styling:** Tailwind CSS, shadcn/ui
 - **Form Validation:** Zod + react-hook-form
 - **Printing:** react-to-print
-- **Database:** PostgreSQL + Prisma ORM
+- **Backend Database:** PostgreSQL + Prisma ORM
+- **Frontend Database:** IndexedDB + Dexie.js
 - **Authentication:** Better Auth
 - **Testing:** Vitest, Playwright
 
@@ -39,6 +40,8 @@ Stedule is a task scheduling app where you can create weekly schedules for organ
 - **Zod:** rich-feature library with a powerful API to validate user input at runtime.
 - **react-hook-form:** client-side validation library for instant user feedback and better UX.
 - **react-to-print:** a specialized React printing library for printing specific UIs components instead of the whole page.
+- **IndexedDB:** browser built-in asynchronous client-side storage for complex data handling.
+- **Dexie.js:** a lightweight IndexedDB wrapper library that provides a simple API to manipulate IndexedDB.
 
 ### Backend
 
@@ -60,7 +63,8 @@ To use the project locally, run the following commands:
 ```bash
 git clone https://github.com/AymeneBahmed/stedule.git
 cd stedule
-npm run install
+# use --legacy-peer-deps to avoid Github Actions dependency installation error
+npm install --legacy-peer-deps
 ```
 
 ### 2. Set Environment Variables
